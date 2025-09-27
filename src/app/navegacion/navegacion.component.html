@@ -1,0 +1,65 @@
+<!-- Barra de navegación -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="#" class="logo">
+            <i class="fas fa-rocket"></i>
+            MiSitio
+        </a>
+
+        <!-- Menú hamburguesa para móviles -->
+        <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Enlaces de navegación -->
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="#"><i class="fas fa-info-circle"></i> Acerca de</a></li>
+            <li><a href="#"><i class="fas fa-box"></i> Productos</a></li>
+            <li><a href="#"><i class="fas fa-envelope"></i> Contacto</a></li>
+        </ul>
+
+        <!-- Sistema de búsqueda -->
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Buscar...">
+            <button class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Contenido principal -->
+<div class="content">
+    <h1>Barra de Navegación con Búsqueda</h1>
+    <p>Esta es una barra de navegación moderna con funcionalidad de búsqueda integrada. Es completamente responsiva y se
+        adapta a diferentes tamaños de pantalla.</p>
+    <p>Puedes utilizar la barra de búsqueda para buscar contenido en el sitio web. Los enlaces de navegación te llevarán
+        a diferentes secciones.</p>
+    <p>En dispositivos móviles, el menú se colapsa en un icono de hamburguesa para ahorrar espacio.</p>
+</div>
+
+<script>
+    // Toggle del menú móvil
+    document.getElementById('mobile-menu').addEventListener('click', function () {
+        document.getElementById('nav-links').classList.toggle('active');
+    });
+
+    // Funcionalidad de búsqueda
+    document.querySelector('.search-btn').addEventListener('click', function () {
+        const searchTerm = document.querySelector('.search-input').value;
+        if (searchTerm.trim() !== '') {
+            alert(`Buscando: "${searchTerm}"`);
+            // Aquí normalmente redirigirías a una página de resultados o harías una búsqueda AJAX
+        }
+    });
+
+    // Permitir búsqueda con la tecla Enter
+    document.querySelector('.search-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            document.querySelector('.search-btn').click();
+        }
+    });
+</script>

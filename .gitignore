@@ -1,0 +1,8 @@
+**/documentacion/
+**/node_modules/
+**/resource/
+**/public/
+**/.angular/
+**README.md
+**angular.json
+**package-lock.json
