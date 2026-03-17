@@ -1,0 +1,53 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Iniciar Sesión</h2>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          class="form-control"
+          placeholder="usuario@ejemplo.com">
+        <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="error-message">
+          <span *ngIf="loginForm.get('email')?.errors?.['required']">Email es requerido</span>
+          <span *ngIf="loginForm.get('email')?.errors?.['email']">Email no válido</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña:</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password"
+          class="form-control"
+          placeholder="Mínimo 6 caracteres">
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error-message">
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">Contraseña es requerida</span>
+          <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Mínimo 6 caracteres</span>
+        </div>
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="loading">
+        {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+      </button>
+
+      <div *ngIf="errorMessage" class="alert alert-error">
+        {{ errorMessage }}
+      </div>
+    </form>
+
+    <!-- Credenciales de prueba -->
+    <div class="test-credentials">
+      <p><strong>Para probar:</strong></p>
+      <p>Email: usuario&#64;ejemplo.com</p>
+      <p>Contraseña: 123456</p>
+    </div>
+  </div>
+</div>

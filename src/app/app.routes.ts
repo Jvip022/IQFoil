@@ -1,6 +1,22 @@
+// src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { NoEncontradoComponent } from './navegacion/no-encontrado/no-encontrado.component';
+import { LoginComponent } from './login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthGuard } from './core/guards/auth.guard'; 
 
 export const routes: Routes = [
-    { path: '**', redirectTo: 'no-econtrado' } // Ruta comodín para páginas no encontradas
+  { path: 'login', component: LoginComponent },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { 
+    path: 'contenidos', 
+    loadChildren: () => import('./modules/contenidos/contenidos.module').then(m => m.ContenidosModule),
+    canActivate: [AuthGuard] 
+  },
+  { 
+    path: 'documentacion', 
+    loadChildren: () => import('./modules/documentacion/documentacion.module').then(m => m.DocumentacionModule),
+    canActivate: [AuthGuard] 
+  },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '**', redirectTo: '/dashboard' }
 ];
