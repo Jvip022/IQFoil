@@ -1,1 +1,144 @@
-<p>insignias works!</p>
+<div class="insignias">
+  <!-- Encabezado -->
+  <header class="insignias__header">
+    <div class="header-left">
+      <h2 class="insignias__title">🏅 Insignias y logros</h2>
+      <p class="insignias__subtitle">Reconocimientos obtenidos por tu trayectoria y habilidades</p>
+    </div>
+    <div class="header-right">
+      <button 
+        class="btn btn-primary" 
+        (click)="abrirModalOtorgar()" 
+        *ngIf="puedeOtorgar"
+        title="Otorgar nueva insignia a un usuario">
+        ➕ Otorgar insignia
+      </button>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="insignias__connection"></app-estado-conexion>
+
+  <!-- Filtros -->
+  <div class="insignias__filters" *ngIf="insignias.length > 0">
+    <div class="filter-tabs">
+      <button 
+        class="filter-tab" 
+        [class.active]="filtroCategoria === ''"
+        (click)="filtroCategoria = ''; filtrarInsignias()">
+        Todas
+      </button>
+      <button 
+        class="filter-tab" 
+        *ngFor="let cat of categorias" 
+        [class.active]="filtroCategoria === cat"
+        (click)="filtroCategoria = cat; filtrarInsignias()">
+        {{ cat }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando insignias...'"></app-loading-spinner>
+
+  <!-- Grid de insignias -->
+  <div class="insignias__grid" *ngIf="!cargando">
+    <div class="insignias-list" *ngIf="insigniasFiltradas.length > 0; else sinInsignias">
+      <div 
+        class="insignia-card" 
+        *ngFor="let insignia of insigniasFiltradas" 
+        [class.insignia-card--obtenida]="insignia.fechaObtenida"
+        (click)="seleccionarInsignia(insignia)">
+        
+        <div class="insignia-card__icon" [style.background]="insignia.color || 'var(--navy)'">
+          {{ insignia.icono }}
+        </div>
+        
+        <div class="insignia-card__info">
+          <h3 class="insignia-card__nombre">{{ insignia.nombre }}</h3>
+          <p class="insignia-card__descripcion">{{ insignia.descripcion }}</p>
+          <div class="insignia-card__meta">
+            <span class="insignia-card__categoria" *ngIf="insignia.categoria">{{ insignia.categoria }}</span>
+            <span class="insignia-card__fecha" *ngIf="insignia.fechaObtenida">
+              Obtenida: {{ insignia.fechaObtenida | date:'dd/MM/yyyy' }}
+            </span>
+            <span class="insignia-card__no-obtenida" *ngIf="!insignia.fechaObtenida">
+              No obtenida
+            </span>
+          </div>
+        </div>
+
+        <div class="insignia-card__badge" *ngIf="insignia.fechaObtenida" title="¡Obtenida!">✅</div>
+      </div>
+    </div>
+
+    <ng-template #sinInsignias>
+      <div class="sin-insignias">
+        <p *ngIf="insignias.length === 0">No hay insignias disponibles.</p>
+        <p *ngIf="insignias.length > 0 && insigniasFiltradas.length === 0">
+          No hay insignias en la categoría "{{ filtroCategoria }}".
+        </p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de detalle de insignia -->
+  <app-modal-confirmacion 
+    *ngIf="insigniaSeleccionada"
+    [isOpen]="true"
+    [title]="insigniaSeleccionada.nombre"
+    [width]="'500px'"
+    (cancel)="cerrarDetalle()"
+    [confirmText]="'Cerrar'"
+    [cancelText]="''"
+    [closeOnOverlayClick]="true">
+    
+    <div class="insignia-detalle">
+      <div class="detalle-icono" [style.background]="insigniaSeleccionada.color || 'var(--navy)'">
+        {{ insigniaSeleccionada.icono }}
+      </div>
+      <div class="detalle-info">
+        <p class="detalle-descripcion">{{ insigniaSeleccionada.descripcion }}</p>
+        <p class="detalle-categoria" *ngIf="insigniaSeleccionada.categoria"><strong>Categoría:</strong> {{ insigniaSeleccionada.categoria }}</p>
+        <p class="detalle-fecha" *ngIf="insigniaSeleccionada.fechaObtenida">
+          <strong>Obtenida:</strong> {{ insigniaSeleccionada.fechaObtenida | date:'dd/MM/yyyy' }}
+        </p>
+        <p class="detalle-no-obtenida" *ngIf="!insigniaSeleccionada.fechaObtenida">
+          Aún no has obtenido esta insignia.
+        </p>
+        <p class="detalle-requisitos" *ngIf="insigniaSeleccionada.requisitos">
+          <strong>Requisitos:</strong> {{ insigniaSeleccionada.requisitos }}
+        </p>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+
+  <!-- Modal para otorgar insignia (solo admin/entrenador) -->
+  <app-modal-confirmacion 
+    *ngIf="modalOtorgarVisible"
+    [isOpen]="true"
+    title="Otorgar insignia"
+    [width]="'500px'"
+    (confirm)="otorgarInsignia()"
+    (cancel)="cerrarModalOtorgar()"
+    confirmText="Otorgar"
+    cancelText="Cancelar">
+    
+    <div class="otorgar-form">
+      <div class="form-group">
+        <label for="usuario">Seleccionar usuario</label>
+        <select id="usuario" [(ngModel)]="usuarioSeleccionadoId" class="form-control" required>
+          <option value="">-- Elige un usuario --</option>
+          <option *ngFor="let user of usuarios" [value]="user.id">{{ user.nombre }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="insignia">Seleccionar insignia</label>
+        <select id="insignia" [(ngModel)]="insigniaAOtorgarId" class="form-control" required>
+          <option value="">-- Elige una insignia --</option>
+          <option *ngFor="let ins of insigniasDisponibles" [value]="ins.id">{{ ins.nombre }}</option>
+        </select>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+</div>

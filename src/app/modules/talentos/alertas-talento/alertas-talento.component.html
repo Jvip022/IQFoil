@@ -1,1 +1,78 @@
-<p>alertas-talento works!</p>
+<div class="alertas-talento">
+  <!-- Encabezado -->
+  <header class="alertas-talento__header">
+    <div class="header-left">
+      <h2 class="alertas-talento__title">🔔 Alertas de talento</h2>
+      <p class="alertas-talento__subtitle">Notificaciones sobre nuevos talentos, logros y recomendaciones</p>
+    </div>
+    <div class="header-right">
+      <button 
+        class="btn btn-outline" 
+        (click)="marcarTodasLeidas()" 
+        [disabled]="!tieneNoLeidas"
+        *ngIf="alertas.length > 0">
+        Marcar todas como leídas
+      </button>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="alertas-talento__connection"></app-estado-conexion>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando alertas...'"></app-loading-spinner>
+
+  <!-- Lista de alertas -->
+  <div class="alertas-talento__content" *ngIf="!cargando">
+    <div class="alertas-list" *ngIf="alertas.length > 0; else sinAlertas">
+      <div 
+        class="alerta-item" 
+        *ngFor="let alerta of alertas" 
+        [class.alerta-item--no-leida]="!alerta.leida"
+        (click)="marcarComoLeida(alerta)">
+        
+        <div class="alerta-item__icon" [class]="'alerta-item__icon--' + alerta.tipo">
+          {{ getIcono(alerta.tipo) }}
+        </div>
+        
+        <div class="alerta-item__content">
+          <div class="alerta-item__header">
+            <span class="alerta-item__tipo">{{ getTipoTexto(alerta.tipo) }}</span>
+            <span class="alerta-item__fecha">{{ alerta.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <p class="alerta-item__mensaje">{{ alerta.mensaje }}</p>
+          <span class="alerta-item__usuario" *ngIf="alerta.usuario">— {{ alerta.usuario }}</span>
+        </div>
+
+        <div class="alerta-item__actions">
+          <button 
+            class="icon-btn" 
+            (click)="confirmarEliminar(alerta, $event)" 
+            title="Eliminar alerta"
+            *ngIf="!alerta.leida">
+            🗑️
+          </button>
+          <span class="indicador-no-leida" *ngIf="!alerta.leida" title="No leída"></span>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinAlertas>
+      <div class="sin-alertas">
+        <p>No hay alertas nuevas en este momento.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de confirmación para eliminar -->
+  <app-modal-confirmacion 
+    *ngIf="modalEliminarVisible"
+    [isOpen]="true"
+    title="Eliminar alerta"
+    [message]="mensajeEliminar"
+    (confirm)="eliminarAlerta()"
+    (cancel)="cancelarEliminacion()"
+    confirmText="Eliminar"
+    cancelText="Cancelar">
+  </app-modal-confirmacion>
+</div>

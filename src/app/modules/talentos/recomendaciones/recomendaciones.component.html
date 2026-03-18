@@ -1,1 +1,99 @@
-<p>recomendaciones works!</p>
+<div class="recomendaciones">
+  <!-- Encabezado -->
+  <header class="recomendaciones__header">
+    <div class="header-left">
+      <h2 class="recomendaciones__title">💡 Recomendaciones personalizadas</h2>
+      <p class="recomendaciones__subtitle">Sugerencias basadas en tu perfil y progreso</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-outline" (click)="refrescarRecomendaciones()" [disabled]="cargando">
+        <span>🔄</span> Refrescar
+      </button>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="recomendaciones__connection"></app-estado-conexion>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Buscando recomendaciones...'"></app-loading-spinner>
+
+  <!-- Contenido principal -->
+  <div class="recomendaciones__content" *ngIf="!cargando">
+    <!-- Filtros por tipo -->
+    <div class="recomendaciones__filters" *ngIf="recomendaciones.length > 0">
+      <div class="filter-buttons">
+        <button 
+          class="filter-btn" 
+          [class.active]="filtroTipo === 'todos'" 
+          (click)="filtroTipo = 'todos'">
+          Todos
+        </button>
+        <button 
+          class="filter-btn" 
+          [class.active]="filtroTipo === 'curso'" 
+          (click)="filtroTipo = 'curso'">
+          Cursos
+        </button>
+        <button 
+          class="filter-btn" 
+          [class.active]="filtroTipo === 'mentoria'" 
+          (click)="filtroTipo = 'mentoria'">
+          Mentorías
+        </button>
+        <button 
+          class="filter-btn" 
+          [class.active]="filtroTipo === 'evento'" 
+          (click)="filtroTipo = 'evento'">
+          Eventos
+        </button>
+      </div>
+    </div>
+
+    <!-- Lista de recomendaciones -->
+    <div class="recomendaciones__list" *ngIf="recomendacionesFiltradas.length > 0; else sinRecomendaciones">
+      <div class="recomendacion-card" *ngFor="let rec of recomendacionesFiltradas" [class]="'recomendacion-card--' + rec.tipo">
+        <div class="recomendacion-card__header">
+          <span class="recomendacion-card__tipo-badge" [class]="'badge--' + rec.tipo">
+            {{ getTipoTexto(rec.tipo) }}
+          </span>
+        </div>
+
+        <div class="recomendacion-card__body">
+          <h3 class="recomendacion-card__titulo">{{ rec.titulo }}</h3>
+          <p class="recomendacion-card__descripcion">{{ rec.descripcion }}</p>
+          <p class="recomendacion-card__razon"><strong>Por qué:</strong> {{ rec.razon }}</p>
+        </div>
+
+        <div class="recomendacion-card__footer">
+          <div class="recomendacion-card__meta" *ngIf="rec.meta">
+            <span *ngIf="rec.meta.duracion">⏱️ {{ rec.meta.duracion }}</span>
+            <span *ngIf="rec.meta.nivel">📊 {{ rec.meta.nivel }}</span>
+          </div>
+          <button class="btn btn-primary btn-sm" (click)="interesado(rec)">
+            Me interesa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinRecomendaciones>
+      <div class="sin-recomendaciones">
+        <p *ngIf="filtroTipo !== 'todos'">No hay recomendaciones de tipo "{{ filtroTipo }}" en este momento.</p>
+        <p *ngIf="filtroTipo === 'todos'">No hay recomendaciones disponibles en este momento. Vuelve más tarde.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de confirmación para "Me interesa" -->
+  <app-modal-confirmacion 
+    *ngIf="modalVisible"
+    [isOpen]="true"
+    [title]="'Confirmar interés'"
+    [message]="modalMensaje"
+    (confirm)="confirmarInteres()"
+    (cancel)="cancelarInteres()"
+    confirmText="Aceptar"
+    cancelText="Cancelar">
+  </app-modal-confirmacion>
+</div>

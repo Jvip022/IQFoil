@@ -1,0 +1,171 @@
+@use 'variable' as *;
+
+.alertas-talento {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+
+    .alertas-talento__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .alertas-talento__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+}
+
+.alertas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.alerta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 15px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px var(--surface-elev);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--surface-elev);
+  }
+
+  &--no-leida {
+    border-left: 4px solid var(--orange);
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+
+    &--nuevo-talento {
+      background: rgba(74, 163, 194, 0.2);
+      color: var(--cyan);
+    }
+    &--logro-destacado {
+      background: rgba(243, 156, 18, 0.2);
+      color: var(--orange);
+    }
+    &--recomendacion {
+      background: rgba(26, 43, 76, 0.2);
+      color: var(--navy);
+    }
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+
+  &__tipo {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  &__fecha {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  &__mensaje {
+    margin: 0 0 5px;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+
+  &__usuario {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .indicador-no-leida {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--orange);
+    display: inline-block;
+  }
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  color: var(--text);
+
+  &:hover {
+    background-color: var(--surface-elev);
+    color: var(--orange);
+  }
+}
+
+.sin-alertas {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .alertas-talento__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .alerta-item {
+    flex-wrap: wrap;
+
+    &__actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+}

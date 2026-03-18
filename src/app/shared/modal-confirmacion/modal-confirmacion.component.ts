@@ -42,27 +42,27 @@ export class ModalConfirmacionComponent {
   /** Emite cuando el modal se cierra (tanto por confirm como por cancel) */
   @Output() closed = new EventEmitter<void>();
 
-  @HostListener('document:keydown.escape', ['$event'])
-  onEscapeKey(event: KeyboardEvent) {
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
     if (this.isOpen && this.closeOnEscape) {
       this.onCancel();
     }
   }
 
-  onOverlayClick(event: MouseEvent) {
+  onOverlayClick(event: MouseEvent): void {
     // Solo cerrar si el clic fue directamente en el overlay (no en el contenido)
     if (this.closeOnOverlayClick && (event.target as HTMLElement).classList.contains('modal-overlay')) {
       this.onCancel();
     }
   }
 
-  onConfirm() {
+  onConfirm(): void {
     this.confirm.emit();
     this.closed.emit();
     this.isOpen = false;
   }
 
-  onCancel() {
+  onCancel(): void {
     this.cancel.emit();
     this.closed.emit();
     this.isOpen = false;

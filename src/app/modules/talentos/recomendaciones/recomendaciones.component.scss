@@ -1,0 +1,203 @@
+@use 'variable' as *;
+
+.recomendaciones {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+
+    .recomendaciones__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .recomendaciones__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+
+  &__filters {
+    margin-bottom: 25px;
+
+    .filter-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--surface-elev);
+      border-radius: calc(var(--radius) / 2);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: var(--cyan);
+        color: var(--cyan);
+      }
+
+      &.active {
+        background: var(--cyan);
+        border-color: var(--cyan);
+        color: white;
+      }
+    }
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+  }
+}
+
+.recomendacion-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--surface-elev);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px var(--surface-elev);
+  }
+
+  &--curso {
+    border-top: 4px solid var(--cyan);
+  }
+  &--mentoria {
+    border-top: 4px solid var(--orange);
+  }
+  &--evento {
+    border-top: 4px solid var(--navy);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: var(--surface-elev);
+  }
+
+  &__tipo-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+
+    &.badge--curso {
+      background: var(--cyan);
+      color: white;
+    }
+    &.badge--mentoria {
+      background: var(--orange);
+      color: white;
+    }
+    &.badge--evento {
+      background: var(--navy);
+      color: white;
+    }
+  }
+
+  &__fecha {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  &__body {
+    padding: 15px;
+    flex: 1;
+  }
+
+  &__titulo {
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+    color: var(--navy);
+  }
+
+  &__descripcion {
+    color: var(--text);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+
+  &__razon {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 0;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-top: 1px solid var(--surface-elev);
+    background: var(--surface-elev);
+  }
+
+  &__meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: var(--muted);
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+.sin-recomendaciones {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .recomendaciones__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .recomendaciones__list {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-buttons {
+    justify-content: center;
+  }
+}

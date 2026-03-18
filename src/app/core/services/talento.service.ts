@@ -84,3 +84,28 @@ export class TalentoService {
     return of([]).pipe(delay(600));
   }
 }
+export interface Insignia {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  icono: string;
+  fechaObtenida?: Date;
+  categoria?: string;
+  color?: string;
+  requisitos?: string;
+}
+
+export interface Recomendacion {
+  id: string;
+  tipo: 'curso' | 'mentoria' | 'evento';
+  titulo: string;
+  descripcion: string;
+  razon: string;
+  url?: string;
+  fecha?: Date;          // para eventos
+  meta?: {                // metadatos adicionales
+    duracion?: string;
+    nivel?: string;
+    [key: string]: any;
+  };
+}

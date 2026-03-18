@@ -1,1 +1,132 @@
-<p>panel-metricas works!</p>
+<div class="panel-metricas">
+  <!-- Encabezado -->
+  <header class="panel-metricas__header">
+    <div class="header-left">
+      <h2 class="panel-metricas__title">📊 Panel de métricas</h2>
+      <p class="panel-metricas__subtitle">Estadísticas y análisis de rendimiento</p>
+    </div>
+    <div class="header-right">
+      <select class="period-selector" [(ngModel)]="periodoSeleccionado" (change)="cambiarPeriodo()">
+        <option value="semana">Última semana</option>
+        <option value="mes">Último mes</option>
+        <option value="trimestre">Último trimestre</option>
+        <option value="año">Último año</option>
+        <option value="todo">Todo el historial</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="panel-metricas__connection"></app-estado-conexion>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando métricas...'"></app-loading-spinner>
+
+  <!-- Contenido principal -->
+  <div class="panel-metricas__content" *ngIf="!cargando">
+    <!-- Tarjetas de KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-card__icon">📈</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Progreso general</span>
+          <span class="kpi-card__value">{{ metricas.progresoGeneral }}%</span>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="metricas.progresoGeneral"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-card__icon">🏆</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Insignias obtenidas</span>
+          <span class="kpi-card__value">{{ metricas.insigniasObtenidas }} / {{ metricas.totalInsignias }}</span>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="(metricas.insigniasObtenidas / metricas.totalInsignias) * 100"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-card__icon">⏱️</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Horas de navegación</span>
+          <span class="kpi-card__value">{{ metricas.horasNavegacion }} h</span>
+          <span class="kpi-card__trend" [class.positive]="metricas.trendHoras > 0" [class.negative]="metricas.trendHoras < 0">
+            {{ metricas.trendHoras > 0 ? '▲' : '▼' }} {{ metricas.trendHoras }}%
+          </span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-card__icon">📋</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Evaluaciones</span>
+          <span class="kpi-card__value">{{ metricas.evaluacionesRealizadas }}</span>
+          <span class="kpi-card__subtext">{{ metricas.evaluacionesPendientes }} pendientes</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-card__icon">🔔</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Alertas activas</span>
+          <span class="kpi-card__value">{{ metricas.alertasActivas }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-card__icon">⭐</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Puntuación media</span>
+          <span class="kpi-card__value">{{ metricas.puntuacionMedia }}/10</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráficos (simulados con CSS) -->
+    <div class="graficos-grid">
+      <div class="grafico-card">
+        <h3 class="grafico-card__title">Progreso por categoría</h3>
+        <div class="barras-container">
+          <div class="barra-item" *ngFor="let cat of metricas.progresoCategoria">
+            <span class="barra-label">{{ cat.nombre }}</span>
+            <div class="barra-bg">
+              <div class="barra-fill" [style.width.%]="cat.valor" [style.background-color]="cat.color"></div>
+            </div>
+            <span class="barra-valor">{{ cat.valor }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grafico-card">
+        <h3 class="grafico-card__title">Evolución mensual</h3>
+        <div class="lineas-container">
+          <div class="linea-item" *ngFor="let mes of metricas.evolucionMensual; let i = index">
+            <span class="linea-mes">{{ mes.mes }}</span>
+            <div class="linea-barra" [style.height.px]="mes.valor * 2" [style.background-color]="coloresEvolucion[i % coloresEvolucion.length]"></div>
+            <span class="linea-valor">{{ mes.valor }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Últimas actividades -->
+    <div class="actividades-card">
+      <h3 class="actividades-card__title">Últimas actividades</h3>
+      <div class="actividades-list" *ngIf="metricas.ultimasActividades.length > 0; else sinActividades">
+        <div class="actividad-item" *ngFor="let act of metricas.ultimasActividades">
+          <span class="actividad-icon">{{ act.icono }}</span>
+          <div class="actividad-content">
+            <span class="actividad-desc">{{ act.descripcion }}</span>
+            <span class="actividad-fecha">{{ act.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+      <ng-template #sinActividades>
+        <p class="sin-actividades">No hay actividades recientes.</p>
+      </ng-template>
+    </div>
+  </div>
+</div>
