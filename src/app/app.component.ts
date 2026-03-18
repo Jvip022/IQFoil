@@ -2,15 +2,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from './shared/navbar/navbar.component'; // Ajusta la ruta según tu proyecto
+import { NavbarComponent } from './shared/navbar/navbar.component'; 
+import { FooterComponent } from './shared/footer/footer.component'; 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavbarComponent], 
+  imports: [CommonModule, RouterOutlet, NavbarComponent,FooterComponent], 
   templateUrl: './app.component.html', 
   styleUrls: ['./app.component.scss']  
 })
 export class AppComponent {
-  title = 'mi-login-app';
+  title = 'IQ-Foil';
 }

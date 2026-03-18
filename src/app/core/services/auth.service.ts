@@ -1,45 +1,65 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
+export interface User {
+  uid?: string;
+  nombre?: string;
+  displayName?: string;
+  avatarUrl?: string;
+  roles?: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private isLoggedIn = false;
+  private currentUser: User | null = null;
 
   constructor() {
-    // Al iniciar, verifica si existe un token en localStorage
     this.isLoggedIn = !!localStorage.getItem('token');
+    // Simula un usuario mock si está logueado
+    if (this.isLoggedIn) {
+      this.currentUser = {
+        uid: '123',
+        displayName: 'Usuario Demo',
+        nombre: 'Demo',
+        avatarUrl: '',
+        roles: ['atleta']
+      };
+    }
   }
 
-  /**
-   * Simula el inicio de sesión.
-   * En un caso real, aquí harías una petición HTTP a tu backend.
-   */
   login(username: string, password: string): Observable<boolean> {
-    // Ejemplo básico: credenciales fijas
     if (username === 'demo' && password === 'demo') {
       localStorage.setItem('token', 'fake-jwt-token');
       this.isLoggedIn = true;
+      this.currentUser = {
+        uid: '123',
+        displayName: 'Usuario Demo',
+        nombre: 'Demo',
+        roles: ['atleta']
+      };
       return of(true);
     }
     return of(false);
   }
 
-  /** Cierra la sesión eliminando el token */
   logout(): void {
     localStorage.removeItem('token');
     this.isLoggedIn = false;
+    this.currentUser = null;
   }
 
-  /** Retorna true si el usuario está autenticado */
   isAuthenticated(): boolean {
-    // Podrías agregar validación de expiración del token aquí
     return this.isLoggedIn;
   }
 
-  /** Observable del estado de autenticación (útil para componentes) */
   getAuthStatus(): Observable<boolean> {
     return of(this.isLoggedIn);
+  }
+
+  getUser(): Observable<User | null> {
+    return of(this.currentUser);
   }
 }

@@ -1,18 +1,20 @@
 @use 'variable' as *;
 
-// Variables CSS globales (custom properties) basadas en las variables Sass
+// Variables CSS globales basadas en las variables Sass
 :root {
   // Modo claro por defecto
   --bg: #{$bg-light};
   --text: #{$text-light};
   --card-bg: #{$card-bg-light};
   --surface-elev: #{$surface-elev-light};
+  --muted: #{$muted-light};
   --navy: #{$navy};
   --cyan: #{$cyan};
   --orange: #{$orange};
   --gray: #{$gray};
   --radius: #{$radius};
   --gap: #{$gap};
+  --max-width: #{$max-width};
 }
 
 // Modo oscuro automático según preferencia del sistema
@@ -22,15 +24,17 @@
     --text: #{$text-dark};
     --card-bg: #{$card-bg-dark};
     --surface-elev: #{$surface-elev-dark};
+    --muted: #{$muted-dark};
   }
 }
 
-// También puedes permitir cambio manual con una clase o atributo
+// Cambio manual con atributo data-theme
 [data-theme='dark'] {
   --bg: #{$bg-dark};
   --text: #{$text-dark};
   --card-bg: #{$card-bg-dark};
   --surface-elev: #{$surface-elev-dark};
+  --muted: #{$muted-dark};
 }
 
 body {
@@ -60,14 +64,14 @@ button {
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: darken($cyan, 10%);
+    background-color: color-mix(in srgb, var(--cyan) 90%, black);
   }
 }
 
-// Ejemplo de enlaces
 a {
   color: var(--orange);
   text-decoration: none;
+
   &:hover {
     text-decoration: underline;
   }

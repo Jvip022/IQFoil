@@ -1,24 +1,27 @@
-
 <section class="dashboard" role="main" aria-labelledby="dashboard-title">
-    
+
     <header class="dashboard__header">
         <div class="header-left">
             <h1 id="dashboard-title" class="greeting">
+
+                 <img src="/Iqfoil.jpg" alt="Logo IQFOIL" class="iqfoil-header-logo">
                 Hola, <span class="username">{{ (user$ | async)?.displayName || (user$ | async)?.nombre || 'Usuario'
                     }}</span>
             </h1>
-            
+
             <app-estado-conexion class="estado-conexion"></app-estado-conexion>
         </div>
 
         <div class="header-right">
-            
+
+           
+
             <button class="icon-btn notificacion" aria-label="Notificaciones" (click)="goToNotifications()">
                 <span class="bell" aria-hidden="true">🔔</span>
                 <span *ngIf="(unreadCount$ | async) as unread" class="badge" [hidden]="unread === 0">{{ unread }}</span>
             </button>
 
-           
+
             <div class="avatar" [title]="(user$ | async)?.displayName || (user$ | async)?.nombre">
                 <ng-container *ngIf="(user$ | async) as u">
                     <img *ngIf="u.avatarUrl; else initials" [src]="u.avatarUrl"
@@ -31,19 +34,19 @@
         </div>
     </header>
 
-    
+
     <div *ngIf="(isOnline$ | async) === false" class="offline-banner" role="status">
         <p>Estás sin conexión. Algunas funciones están limitadas.</p>
         <app-biblioteca-offline class="biblioteca-offline-link"></app-biblioteca-offline>
     </div>
 
-    
+
     <div class="dashboard__grid">
-       
+
         <section class="card progreso" aria-labelledby="progreso-title">
             <h2 id="progreso-title">Resumen de progreso</h2>
 
-            
+
             <div class="global-progress">
                 <div class="progress-label">
                     <span>Progreso global</span>
@@ -55,7 +58,7 @@
                 </div>
             </div>
 
-            
+
             <div class="quick-stats">
                 <div class="stat-card">
                     <div class="stat-value">{{ (stats$ | async)?.videosVistos ?? 0 }}</div>
@@ -72,13 +75,13 @@
                 </div>
             </div>
 
-            
+
             <div class="evolution-chart" *ngIf="(stats$ | async)?.evolucion?.length > 0">
                 <canvas #evolutionCanvas aria-label="Evolución de progreso" role="img"></canvas>
             </div>
         </section>
 
-       
+
         <section class="card recomendaciones" aria-labelledby="rec-title">
             <h2 id="rec-title">Recomendaciones para ti</h2>
             <div *ngIf="(recomendaciones$ | async) as recs; else noRecs">
@@ -101,10 +104,10 @@
             </ng-template>
         </section>
 
-        
+
         <section class="card notificaciones" aria-labelledby="noti-title">
             <h2 id="noti-title">Últimas notificaciones</h2>
-            
+
             <ul *ngIf="(ultimasNotificaciones$ | async) as notas" class="noti-list">
                 <ng-container *ngIf="notas.length > 0; else noNotes">
                     <li *ngFor="let n of notas | slice:0:6" class="noti-item" (click)="openNotification(n)">
@@ -119,7 +122,7 @@
             <a class="ver-todas" (click)="goToNotifications()">Ver todas</a>
         </section>
 
-        
+
         <nav class="card accesos" aria-label="Accesos rápidos">
             <h2>Accesos rápidos</h2>
             <ul class="access-grid">
@@ -132,11 +135,11 @@
             </ul>
         </nav>
 
-        
+
         <section class="card por-rol" aria-labelledby="rol-title">
             <h2 id="rol-title">Panel específico</h2>
 
-            
+
             <div *ngIf="(role$ | async) === 'atleta'">
                 <h3>Próximos eventos</h3>
                 <ul class="list-inline">
@@ -152,7 +155,7 @@
                 </div>
             </div>
 
-            
+
             <div *ngIf="(role$ | async) === 'entrenador'">
                 <h3>Atletas a cargo</h3>
                 <ul class="coach-list">

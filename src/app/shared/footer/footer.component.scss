@@ -1,0 +1,46 @@
+.footer {
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--surface-elev);
+  padding: var(--gap) 0;
+  margin-top: calc(var(--gap) * 2);
+  color: var(--text);
+
+  &__container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--gap);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--gap);
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  &__info {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  &__nav {
+    display: flex;
+    gap: calc(var(--gap) * 1.5);
+    flex-wrap: wrap;
+    justify-content: center;
+
+    a {
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.2s;
+
+      &:hover {
+        color: var(--cyan);
+        text-decoration: underline;
+      }
+    }
+  }
+}
