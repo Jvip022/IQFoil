@@ -1,0 +1,74 @@
+@use 'variable' as *;
+
+// Variables CSS globales (custom properties) basadas en las variables Sass
+:root {
+  // Modo claro por defecto
+  --bg: #{$bg-light};
+  --text: #{$text-light};
+  --card-bg: #{$card-bg-light};
+  --surface-elev: #{$surface-elev-light};
+  --navy: #{$navy};
+  --cyan: #{$cyan};
+  --orange: #{$orange};
+  --gray: #{$gray};
+  --radius: #{$radius};
+  --gap: #{$gap};
+}
+
+// Modo oscuro automático según preferencia del sistema
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #{$bg-dark};
+    --text: #{$text-dark};
+    --card-bg: #{$card-bg-dark};
+    --surface-elev: #{$surface-elev-dark};
+  }
+}
+
+// También puedes permitir cambio manual con una clase o atributo
+[data-theme='dark'] {
+  --bg: #{$bg-dark};
+  --text: #{$text-dark};
+  --card-bg: #{$card-bg-dark};
+  --surface-elev: #{$surface-elev-dark};
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+// Ejemplo de estilos para elementos comunes
+.card {
+  background-color: var(--card-bg);
+  border-radius: var(--radius);
+  padding: var(--gap);
+  box-shadow: 0 4px 12px var(--surface-elev);
+}
+
+button {
+  background-color: var(--cyan);
+  color: white;
+  border: none;
+  border-radius: calc(var(--radius) / 2);
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: darken($cyan, 10%);
+  }
+}
+
+// Ejemplo de enlaces
+a {
+  color: var(--orange);
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -1,66 +1,49 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="login-container">
+      <h2>Iniciar sesión</h2>
+      <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
+        <div>
+          <label>Usuario:</label>
+          <input type="text" [(ngModel)]="username" name="username" required>
+        </div>
+        <div>
+          <label>Contraseña:</label>
+          <input type="password" [(ngModel)]="password" name="password" required>
+        </div>
+        <button type="submit" [disabled]="loginForm.invalid">Entrar</button>
+      </form>
+      <p *ngIf="error" class="error">{{ error }}</p>
+    </div>
+  `,
+  styles: [`
+    .login-container { max-width: 300px; margin: 50px auto; }
+    .error { color: red; }
+  `]
 })
-export class LoginComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
-  private router = inject(Router);
+export class LoginComponent {
+  username = '';
+  password = '';
+  error = '';
 
-  loginForm: FormGroup;
-  loading = false;
-  errorMessage = '';
-
-  constructor() {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-  }
-
-  ngOnInit(): void {
-    // Redirigir si ya está autenticado
-    this.authService.isLoggedIn().subscribe(isLoggedIn => {
-      if (isLoggedIn) {
-        this.router.navigate(['/dashboard']);
-      }
-    });
-  }
+  constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.loading = true;
-      this.errorMessage = '';
-
-      this.authService.login(this.loginForm.value).subscribe({
-        next: (response) => {
-          this.loading = false;
-          if (response) {
-            this.router.navigate(['/dashboard']);
-          }
-        },
-        error: (error) => {
-          this.loading = false;
-          this.errorMessage = error.message || 'Error en el login. Verifica tus credenciales.';
-        }
-      });
-    } else {
-      this.markFormGroupTouched();
-    }
-  }
-
-  private markFormGroupTouched(): void {
-    Object.keys(this.loginForm.controls).forEach(key => {
-      this.loginForm.get(key)?.markAsTouched();
+    this.authService.login(this.username, this.password).subscribe(success => {
+      if (success) {
+        this.router.navigate(['/dashboard']);
+      } else {
+        this.error = 'Credenciales incorrectas';
+      }
     });
   }
 }

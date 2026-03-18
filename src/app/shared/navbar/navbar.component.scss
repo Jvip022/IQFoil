@@ -1,0 +1,15 @@
+@import 'variable';
+
+.navbar {
+  background-color: $navy;
+  color: white;
+  padding: $gap;
+
+  a {
+    color: white;
+    &:hover {
+      color: $cyan;
+    }
+  }
+}
+

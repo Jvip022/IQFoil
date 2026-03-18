@@ -1,0 +1,26 @@
+// src/_variable.scss
+
+// Paleta de colores (acentos)
+$navy: #1a2b4c;       // azul marino principal
+$cyan: #4aa3c2;       // azul cielo/cian
+$orange: #f39c12;     // naranja cálido (como salvavidas)
+$white: #ffffff;
+$black: #0b1724;
+$gray: #61708b;
+
+// Fondo y superficies - TEMA CLARO (tonos suaves de azul)
+$bg-light: #eef2f8;           // azul muy claro, como cielo al amanecer
+$text-light: #1e2f47;         // azul marino oscuro para texto (legible)
+$card-bg-light: #ffffff;      // blanco puro para tarjetas (destacan sobre fondo claro)
+$surface-elev-light: rgba(26, 43, 76, 0.08); // sombra sutil basada en navy
+
+// TEMA OSCURO (azul marino profundo)
+$bg-dark: #0b1a2e;            // azul marino muy oscuro, casi negro
+$text-dark: #d9e6f2;          // blanco azulado suave para texto
+$card-bg-dark: #12253b;       // azul oscuro para tarjetas, ligeramente más claro que fondo
+$surface-elev-dark: rgba(0, 0, 0, 0.3); // sombra para dar profundidad
+
+// Medidas (sin cambios)
+$radius: 12px;
+$gap: 16px;
+$max-width: 1200px;

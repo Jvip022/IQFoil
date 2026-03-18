@@ -1,1 +1,193 @@
-<p>dashboard works!</p>
+
+<section class="dashboard" role="main" aria-labelledby="dashboard-title">
+    
+    <header class="dashboard__header">
+        <div class="header-left">
+            <h1 id="dashboard-title" class="greeting">
+                Hola, <span class="username">{{ (user$ | async)?.displayName || (user$ | async)?.nombre || 'Usuario'
+                    }}</span>
+            </h1>
+            
+            <app-estado-conexion class="estado-conexion"></app-estado-conexion>
+        </div>
+
+        <div class="header-right">
+            
+            <button class="icon-btn notificacion" aria-label="Notificaciones" (click)="goToNotifications()">
+                <span class="bell" aria-hidden="true">🔔</span>
+                <span *ngIf="(unreadCount$ | async) as unread" class="badge" [hidden]="unread === 0">{{ unread }}</span>
+            </button>
+
+           
+            <div class="avatar" [title]="(user$ | async)?.displayName || (user$ | async)?.nombre">
+                <ng-container *ngIf="(user$ | async) as u">
+                    <img *ngIf="u.avatarUrl; else initials" [src]="u.avatarUrl"
+                        alt="Avatar de {{ u.displayName || u.nombre }}" />
+                    <ng-template #initials>
+                        <span class="initials">{{ getInitials(u) }}</span>
+                    </ng-template>
+                </ng-container>
+            </div>
+        </div>
+    </header>
+
+    
+    <div *ngIf="(isOnline$ | async) === false" class="offline-banner" role="status">
+        <p>Estás sin conexión. Algunas funciones están limitadas.</p>
+        <app-biblioteca-offline class="biblioteca-offline-link"></app-biblioteca-offline>
+    </div>
+
+    
+    <div class="dashboard__grid">
+       
+        <section class="card progreso" aria-labelledby="progreso-title">
+            <h2 id="progreso-title">Resumen de progreso</h2>
+
+            
+            <div class="global-progress">
+                <div class="progress-label">
+                    <span>Progreso global</span>
+                    <span class="percent">{{ (stats$ | async)?.globalProgress ?? 0 }}%</span>
+                </div>
+                <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                    [attr.aria-valuenow]="(stats$ | async)?.globalProgress ?? 0">
+                    <div class="progress-fill" [style.width.%]="(stats$ | async)?.globalProgress ?? 0"></div>
+                </div>
+            </div>
+
+            
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-value">{{ (stats$ | async)?.videosVistos ?? 0 }}</div>
+                    <div class="stat-label">Vistos <span class="muted">/ {{ (stats$ | async)?.videosTotales ?? 0
+                            }}</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ (stats$ | async)?.evaluacionesCompletadas ?? 0 }}</div>
+                    <div class="stat-label">Evaluaciones completadas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ (stats$ | async)?.insignias ?? 0 }}</div>
+                    <div class="stat-label">Insignias obtenidas</div>
+                </div>
+            </div>
+
+            
+            <div class="evolution-chart" *ngIf="(stats$ | async)?.evolucion?.length > 0">
+                <canvas #evolutionCanvas aria-label="Evolución de progreso" role="img"></canvas>
+            </div>
+        </section>
+
+       
+        <section class="card recomendaciones" aria-labelledby="rec-title">
+            <h2 id="rec-title">Recomendaciones para ti</h2>
+            <div *ngIf="(recomendaciones$ | async) as recs; else noRecs">
+                <ul class="rec-list">
+                    <li *ngFor="let r of recs" class="rec-item">
+                        <div class="rec-left">
+                            <div class="rec-type">{{ r.tipo | uppercase }}</div>
+                            <h3 class="rec-title">{{ r.titulo }}</h3>
+                            <div class="rec-meta">Nivel: {{ r.nivel }}</div>
+                        </div>
+                        <div class="rec-right">
+                            <button class="btn btn-outline" (click)="openContent(r)">Ver</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <ng-template #noRecs>
+                <p class="muted">No hay recomendaciones por el momento. Sigue completando contenidos para que el sistema
+                    te sugiera material.</p>
+            </ng-template>
+        </section>
+
+        
+        <section class="card notificaciones" aria-labelledby="noti-title">
+            <h2 id="noti-title">Últimas notificaciones</h2>
+            
+            <ul *ngIf="(ultimasNotificaciones$ | async) as notas" class="noti-list">
+                <ng-container *ngIf="notas.length > 0; else noNotes">
+                    <li *ngFor="let n of notas | slice:0:6" class="noti-item" (click)="openNotification(n)">
+                        <div class="noti-title">{{ n.titulo }}</div>
+                        <div class="noti-meta">{{ n.resumen }}</div>
+                    </li>
+                </ng-container>
+            </ul>
+            <ng-template #noNotes>
+                <p class="muted">No hay notificaciones recientes.</p>
+            </ng-template>
+            <a class="ver-todas" (click)="goToNotifications()">Ver todas</a>
+        </section>
+
+        
+        <nav class="card accesos" aria-label="Accesos rápidos">
+            <h2>Accesos rápidos</h2>
+            <ul class="access-grid">
+                <li *ngFor="let a of accesosVisibles" class="access-item">
+                    <a [routerLink]="a.link" class="access-link" [attr.aria-label]="a.label">
+                        <div class="access-icon" [innerHTML]="a.icon"></div>
+                        <div class="access-label">{{ a.label }}</div>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        
+        <section class="card por-rol" aria-labelledby="rol-title">
+            <h2 id="rol-title">Panel específico</h2>
+
+            
+            <div *ngIf="(role$ | async) === 'atleta'">
+                <h3>Próximos eventos</h3>
+                <ul class="list-inline">
+                    <li *ngFor="let e of (proximosEventos$ | async) || []">{{ e.fecha | date:'shortDate' }} — {{
+                        e.titulo }}</li>
+                </ul>
+                <div class="mentor" *ngIf="(mentor$ | async) as m">
+                    <h4>Mentor asignado</h4>
+                    <div class="mentor-card">
+                        <div class="mentor-name">{{ m.nombre }}</div>
+                        <div class="mentor-contact">{{ m.contacto }}</div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div *ngIf="(role$ | async) === 'entrenador'">
+                <h3>Atletas a cargo</h3>
+                <ul class="coach-list">
+                    <li *ngFor="let a of (atletasACargo$ | async) || []" class="coach-item">
+                        <div class="coach-name">{{ a.nombre }}</div>
+                        <div class="coach-progress">
+                            <div class="mini-progress" [style.width.%]="a.progreso ?? 0"></div>
+                            <div class="mini-text">{{ a.progreso ?? 0 }}%</div>
+                        </div>
+                    </li>
+                </ul>
+
+                <h3>Evaluaciones pendientes</h3>
+                <ul class="list-inline">
+                    <li *ngFor="let ev of (evaluacionesPendientes$ | async) || []">{{ ev.titulo }} — {{ ev.atleta }}
+                    </li>
+                </ul>
+            </div>
+
+            <!-- ADMIN -->
+            <div *ngIf="(role$ | async) === 'admin'">
+                <h3>Estadísticas de uso</h3>
+                <div class="admin-stats-grid">
+                    <div class="admin-stat">
+                        <div class="admin-value">{{ (adminStats$ | async)?.usuariosActivos ?? 0 }}</div>
+                        <div class="admin-label">Usuarios activos</div>
+                    </div>
+                    <div class="admin-stat">
+                        <div class="admin-value">{{ (adminStats$ | async)?.contenidoTop ?? '—' }}</div>
+                        <div class="admin-label">Contenido más visto</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" (click)="goToAdmin()">Ir a administración</button>
+            </div>
+        </section>
+    </div>
+</section>
