@@ -1,0 +1,69 @@
+@use 'variable' as *;
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: var(--gap, 16px);
+  padding: 8px 12px;
+  border-radius: var(--radius, 12px);
+  background-color: var(--card-bg, #ffffff);
+  box-shadow: 0 2px 8px var(--surface-elev, rgba(0,0,0,0.1));
+  font-family: 'Inter', Roboto, sans-serif;
+  transition: background-color 0.3s, box-shadow 0.3s;
+
+  &--offline {
+    background-color: #ffeeee; // Color de fondo para offline (puede ser variable)
+    .connection-status__dot {
+      background-color: #f44336; // rojo
+    }
+  }
+
+  &__indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__dot {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #4caf50; // verde online
+    transition: background-color 0.3s;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  &__text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text, #1e2f47);
+  }
+
+  &__subtext {
+    font-size: 0.8rem;
+    color: var(--muted, #61708b);
+    margin-top: 2px;
+  }
+
+  &__retry {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--navy, #1a2b4c);
+    padding: 0 4px;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+      color: var(--cyan, #4aa3c2);
+    }
+  }
+}

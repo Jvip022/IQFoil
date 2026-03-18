@@ -10,6 +10,10 @@
   z-index: 1000;
   transition: background-color 0.3s, box-shadow 0.3s;
 
+  &--hidden {
+    transform: translateY(-100%);
+  }
+
   &--scrolled {
     background-color: var(--bg);
     box-shadow: 0 4px 12px var(--surface-elev);

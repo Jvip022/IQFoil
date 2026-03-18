@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { Subscription } from 'rxjs';
 
-// Interfaz local para tipar el objeto usuario (ajústala según la estructura real)
 interface User {
   name: string;
   avatar?: string | null;
@@ -21,6 +20,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
   isUserMenuOpen = false;
   isScrolled = false;
+  isHidden = false; // Para ocultar/mostrar por scroll
 
   isAuthenticated = false;
   userName = 'Usuario';
@@ -28,6 +28,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   userAvatar: string | null = null;
 
   private authSubscription?: Subscription;
+  private lastScrollY = 0;
+  private readonly HIDE_THRESHOLD = 10; // píxeles de scroll para considerar dirección
+  private readonly SHOW_ON_TOP_THRESHOLD = 50; // píxeles desde el borde superior para mostrar al hover/touch
 
   @ViewChild('userMenuTrigger') userMenuTrigger!: ElementRef;
 
@@ -37,14 +40,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Asumimos que getAuthStatus() devuelve un Observable<boolean>
     this.authSubscription = this.authService.getAuthStatus().subscribe((status: boolean) => {
       this.isAuthenticated = status;
       if (status) {
-        // Obtén el usuario según la API real de AuthService:
-        // Puede ser this.authService.getUser(), this.authService.getCurrentUser(),
-        // o una propiedad como this.authService.currentUser.
-        // Aquí usamos un acceso opcional para evitar errores si el método no existe.
         const user = (this.authService as any).getUser?.() as User | undefined;
         if (user) {
           this.userName = user.name || 'Usuario';
@@ -61,13 +59,41 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    this.isScrolled = window.scrollY > 10;
+    const currentScrollY = window.scrollY;
+    this.isScrolled = currentScrollY > 10;
+
+    // Determinar dirección del scroll
+    if (currentScrollY > this.lastScrollY && currentScrollY > this.HIDE_THRESHOLD) {
+      // Scroll hacia abajo - ocultar navbar
+      this.isHidden = true;
+    } else if (currentScrollY < this.lastScrollY) {
+      // Scroll hacia arriba - mostrar navbar
+      this.isHidden = false;
+    }
+    this.lastScrollY = currentScrollY;
   }
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
     if (this.isUserMenuOpen && !this.userMenuTrigger.nativeElement.contains(event.target)) {
       this.closeUserMenu();
+    }
+  }
+
+  // Mostrar navbar cuando el mouse se acerca al borde superior
+  @HostListener('window:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent) {
+    if (event.clientY < this.SHOW_ON_TOP_THRESHOLD) {
+      this.isHidden = false;
+    }
+  }
+
+  // Para móviles: mostrar navbar al tocar cerca del borde superior
+  @HostListener('window:touchstart', ['$event'])
+  onTouchStart(event: TouchEvent) {
+    const touch = event.touches[0];
+    if (touch && touch.clientY < this.SHOW_ON_TOP_THRESHOLD) {
+      this.isHidden = false;
     }
   }
 

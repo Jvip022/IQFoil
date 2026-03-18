@@ -1,0 +1,118 @@
+@use 'variable' as *;
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-container {
+  background-color: var(--card-bg, #ffffff);
+  border-radius: var(--radius, 12px);
+  box-shadow: 0 20px 40px var(--surface-elev, rgba(0,0,0,0.2));
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem var(--gap, 16px);
+  border-bottom: 1px solid var(--surface-elev, rgba(0,0,0,0.1));
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text, #1e2f47);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--muted, #61708b);
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--navy, #1a2b4c);
+  }
+}
+
+.modal-body {
+  padding: 1.5rem var(--gap, 16px);
+}
+
+.modal-message {
+  margin: 0;
+  color: var(--text, #1e2f47);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem var(--gap, 16px);
+  border-top: 1px solid var(--surface-elev, rgba(0,0,0,0.1));
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: calc(var(--radius, 12px) / 2);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+
+  &-primary {
+    background-color: var(--cyan, #4aa3c2);
+    color: white;
+
+    &:hover {
+      background-color: color-mix(in srgb, var(--cyan, #4aa3c2) 90%, black);
+    }
+  }
+
+  &-secondary {
+    background-color: transparent;
+    border: 1px solid var(--muted, #61708b);
+    color: var(--text, #1e2f47);
+
+    &:hover {
+      background-color: var(--surface-elev, rgba(0,0,0,0.05));
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

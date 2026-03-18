@@ -1,1 +1,13 @@
-<p>estado-conexion works!</p>
+<div class="connection-status" [class.connection-status--offline]="!isOnline">
+  <div class="connection-status__indicator">
+    <span class="connection-status__dot"></span>
+  </div>
+  <div class="connection-status__info">
+    <span class="connection-status__text">{{ statusText }}</span>
+    <span class="connection-status__subtext" *ngIf="!isOnline && showReconnectHint">Intentando reconectar...</span>
+  </div>
+  <button *ngIf="!isOnline" class="connection-status__retry" (click)="checkConnection()"
+    aria-label="Reintentar conexión">
+    ⟳
+  </button>
+</div>

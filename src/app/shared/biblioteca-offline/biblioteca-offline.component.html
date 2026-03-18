@@ -1,1 +1,70 @@
-<p>biblioteca-offline works!</p>
+<div class="biblioteca-offline">
+  <!-- Encabezado -->
+  <header class="biblioteca-offline__header">
+    <h2 class="biblioteca-offline__title">📚 Biblioteca Offline</h2>
+    <p class="biblioteca-offline__subtitle">Documentos disponibles sin conexión</p>
+  </header>
+
+  <!-- Estado de conexión -->
+  <div class="biblioteca-offline__connection-status" [class.offline]="!isOnline">
+    <span class="status-indicator"></span>
+    <span>{{ isOnline ? 'Conectado' : 'Trabajando sin conexión' }}</span>
+  </div>
+
+  <!-- Buscador local -->
+  <div class="biblioteca-offline__search">
+    <input type="text" placeholder="Buscar en documentos..." [(ngModel)]="searchTerm" (input)="filterDocuments()"
+      class="search-input" />
+    <i class="search-icon">🔍</i>
+  </div>
+
+  <!-- Lista de documentos -->
+  <div class="biblioteca-offline__content" *ngIf="filteredDocuments.length > 0; else noDocs">
+    <div class="documents-grid">
+      <div class="document-card" *ngFor="let doc of filteredDocuments" (click)="openDocument(doc)"
+        [class.selected]="selectedDoc?.id === doc.id">
+        <div class="document-card__icon">
+          {{ getFileIcon(doc.type) }}
+        </div>
+        <div class="document-card__info">
+          <h3 class="document-card__title">{{ doc.title }}</h3>
+          <p class="document-card__meta">
+            <span class="document-card__date">{{ doc.lastModified | date:'shortDate' }}</span>
+            <span class="document-card__size">{{ doc.size | fileSize }}</span>
+          </p>
+        </div>
+        <button class="document-card__download" (click)="downloadDocument(doc, $event)" title="Descargar">
+          ⬇️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noDocs>
+    <div class="biblioteca-offline__empty">
+      <p *ngIf="searchTerm">No se encontraron documentos con "{{ searchTerm }}"</p>
+      <p *ngIf="!searchTerm">No hay documentos disponibles sin conexión</p>
+      <button class="btn btn-primary" (click)="syncDocuments()" *ngIf="isOnline">
+        Sincronizar documentos
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Visor de documento seleccionado -->
+  <div class="biblioteca-offline__viewer" *ngIf="selectedDoc">
+    <div class="viewer-header">
+      <h3>{{ selectedDoc.title }}</h3>
+      <button class="close-btn" (click)="closeViewer()">✕</button>
+    </div>
+    <div class="viewer-content">
+      <iframe *ngIf="selectedDoc.type === 'pdf' && selectedDoc.url" [src]="selectedDoc.url | safeUrl" frameborder="0"></iframe>
+      <img *ngIf="selectedDoc.type === 'image'" [src]="selectedDoc.url" alt="{{ selectedDoc.title }}" />
+      <div *ngIf="selectedDoc.type === 'text'" class="text-content">
+        <pre>{{ selectedDoc.content }}</pre>
+      </div>
+      <div *ngIf="selectedDoc.type === 'video'" class="video-content">
+        <video controls [src]="selectedDoc.url"></video>
+      </div>
+    </div>
+  </div>
+</div>

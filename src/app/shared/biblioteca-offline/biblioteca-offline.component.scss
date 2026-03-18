@@ -1,0 +1,240 @@
+@use 'variable' as *;
+
+.biblioteca-offline {
+  padding: var(--gap);
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+
+  &__header {
+    margin-bottom: 2rem;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0 0 0.5rem;
+  }
+
+  &__subtitle {
+    font-size: 1rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  &__connection-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--card-bg);
+    border-radius: 999px;
+    box-shadow: 0 2px 4px var(--surface-elev);
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #4caf50;
+    }
+
+    &.offline .status-indicator {
+      background-color: #f44336;
+    }
+  }
+
+  &__search {
+    position: relative;
+    margin-bottom: 2rem;
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid var(--surface-elev);
+      border-radius: var(--radius);
+      background-color: var(--card-bg);
+      color: var(--text);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: var(--muted);
+    }
+  }
+
+  &__content {
+    margin-bottom: 2rem;
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 3rem;
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    color: var(--muted);
+
+    p {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .documents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--gap);
+  }
+
+  .document-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px var(--surface-elev);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--surface-elev);
+    }
+
+    &.selected {
+      border: 2px solid var(--cyan);
+    }
+
+    &__icon {
+      font-size: 2rem;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    &__info {
+      flex: 1;
+    }
+
+    &__title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 0.25rem;
+      color: var(--text);
+    }
+
+    &__meta {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    &__download {
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: var(--surface-elev);
+      }
+    }
+  }
+
+  &__viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+
+    .viewer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem var(--gap);
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--surface-elev);
+
+      h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: var(--text);
+      }
+
+      .close-btn {
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--muted);
+        transition: color 0.2s;
+
+        &:hover {
+          color: var(--text);
+        }
+      }
+    }
+
+    .viewer-content {
+      flex: 1;
+      overflow: auto;
+      padding: var(--gap);
+
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .text-content {
+        pre {
+          white-space: pre-wrap;
+          font-family: monospace;
+          background-color: var(--card-bg);
+          padding: 1rem;
+          border-radius: var(--radius);
+        }
+      }
+
+      .video-content {
+        video {
+          max-width: 100%;
+          max-height: 80vh;
+          display: block;
+          margin: 0 auto;
+        }
+      }
+    }
+  }
+}
+
+// Estilos para el pipe personalizado fileSize (opcional)
+// Si no existe, se puede implementar como función en el componente
