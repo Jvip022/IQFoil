@@ -1,1 +1,209 @@
-//cometario
+@use 'variable' as *;
+
+.calendario-eventos {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    margin-bottom: 25px;
+
+    .calendario-eventos__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .calendario-eventos__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+
+    .search-box {
+      flex: 2;
+      min-width: 250px;
+      position: relative;
+
+      .search-input {
+        width: 100%;
+        padding: 10px 15px 10px 40px;
+        border: 1px solid var(--surface-elev);
+        border-radius: calc(var(--radius) / 2);
+        background: var(--card-bg);
+        color: var(--text);
+        font-size: 0.95rem;
+
+        &:focus {
+          outline: none;
+          border-color: var(--cyan);
+        }
+      }
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+      }
+    }
+
+    .filter-options {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+
+      .filter-select {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid var(--surface-elev);
+        border-radius: calc(var(--radius) / 2);
+        background: var(--card-bg);
+        color: var(--text);
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+          border-color: var(--cyan);
+        }
+      }
+    }
+  }
+}
+
+.eventos-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.evento-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 15px 20px;
+  box-shadow: 0 2px 8px var(--surface-elev);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px var(--surface-elev);
+  }
+
+  &__fecha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    background: var(--surface-elev);
+    border-radius: calc(var(--radius) / 2);
+    padding: 8px 5px;
+
+    .evento-dia {
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--navy);
+    }
+    .evento-mes {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+  }
+
+  &__info {
+    flex: 1;
+
+    .evento-titulo {
+      margin: 0 0 5px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .evento-descripcion {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      line-clamp: 2;
+      overflow: hidden;
+    }
+    .evento-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 0.85rem;
+
+      .evento-tipo {
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: var(--surface-elev);
+        color: var(--muted);
+
+        &.tipo--regata {
+          background: rgba(74, 163, 194, 0.2);
+          color: var(--cyan);
+        }
+        &.tipo--entrenamiento {
+          background: rgba(26, 43, 76, 0.2);
+          color: var(--navy);
+        }
+        &.tipo--reunion {
+          background: rgba(243, 156, 18, 0.2);
+          color: var(--orange);
+        }
+        &.tipo--social {
+          background: rgba(76, 175, 80, 0.2);
+          color: #4caf50;
+        }
+      }
+      .evento-lugar {
+        color: var(--muted);
+      }
+    }
+  }
+
+  &__hora {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--cyan);
+    min-width: 60px;
+    text-align: right;
+  }
+}
+
+.sin-eventos {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+}
+
+// Modal de detalle
+.evento-detalle {
+  p {
+    margin: 10px 0;
+  }
+  .detalle-acciones {
+    margin-top: 20px;
+    text-align: center;
+  }
+}

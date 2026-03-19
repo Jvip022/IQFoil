@@ -1,1 +1,105 @@
-//cometario
+<div class="calendario-eventos">
+  <!-- Encabezado -->
+  <header class="calendario-eventos__header">
+    <div class="header-left">
+      <h2 class="calendario-eventos__title">📅 Calendario de eventos</h2>
+      <p class="calendario-eventos__subtitle">Próximas regatas, entrenamientos y reuniones</p>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="calendario-eventos__connection"></app-estado-conexion>
+
+  <!-- Filtros -->
+  <div class="calendario-eventos__filters">
+    <div class="search-box">
+      <input type="text" 
+             placeholder="Buscar evento..." 
+             [(ngModel)]="searchTerm" 
+             (input)="filtrarEventos()"
+             class="search-input" />
+      <i class="search-icon">🔍</i>
+    </div>
+    <div class="filter-options">
+      <select [(ngModel)]="filtroTipo" (change)="filtrarEventos()" class="filter-select">
+        <option value="">Todos los tipos</option>
+        <option value="regata">Regata</option>
+        <option value="entrenamiento">Entrenamiento</option>
+        <option value="reunion">Reunión</option>
+        <option value="social">Social</option>
+      </select>
+      <select [(ngModel)]="filtroMes" (change)="filtrarEventos()" class="filter-select">
+        <option value="">Todos los meses</option>
+        <option value="0">Enero</option>
+        <option value="1">Febrero</option>
+        <option value="2">Marzo</option>
+        <option value="3">Abril</option>
+        <option value="4">Mayo</option>
+        <option value="5">Junio</option>
+        <option value="6">Julio</option>
+        <option value="7">Agosto</option>
+        <option value="8">Septiembre</option>
+        <option value="9">Octubre</option>
+        <option value="10">Noviembre</option>
+        <option value="11">Diciembre</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando eventos...'"></app-loading-spinner>
+
+  <!-- Lista de eventos -->
+  <div class="calendario-eventos__list" *ngIf="!cargando">
+    <div class="eventos-grid" *ngIf="eventosFiltrados.length > 0; else sinEventos">
+      <div class="evento-card" *ngFor="let evento of eventosFiltrados" (click)="verEvento(evento)">
+        <div class="evento-card__fecha">
+          <span class="evento-dia">{{ evento.fecha | date:'dd' }}</span>
+          <span class="evento-mes">{{ evento.fecha | date:'MMM' }}</span>
+        </div>
+        <div class="evento-card__info">
+          <h3 class="evento-titulo">{{ evento.titulo }}</h3>
+          <p class="evento-descripcion">{{ evento.descripcion }}</p>
+          <div class="evento-meta">
+            <span class="evento-tipo" [class]="'tipo--' + evento.tipo">{{ evento.tipo | titlecase }}</span>
+            <span class="evento-lugar">📍 {{ evento.lugar }}</span>
+          </div>
+        </div>
+        <div class="evento-card__hora">
+          {{ evento.fecha | date:'HH:mm' }}
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinEventos>
+      <div class="sin-eventos">
+        <p *ngIf="searchTerm || filtroTipo || filtroMes">No se encontraron eventos con los filtros aplicados.</p>
+        <p *ngIf="!searchTerm && !filtroTipo && !filtroMes">No hay eventos próximos en este momento.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de detalle de evento -->
+  <app-modal-confirmacion 
+    *ngIf="eventoSeleccionado"
+    [isOpen]="true"
+    [title]="eventoSeleccionado.titulo"
+    [width]="'500px'"
+    (cancel)="cerrarDetalle()"
+    [confirmText]="'Cerrar'"
+    [cancelText]="''"
+    [closeOnOverlayClick]="true">
+    
+    <div class="evento-detalle">
+      <p><strong>Descripción:</strong> {{ eventoSeleccionado.descripcion }}</p>
+      <p><strong>Fecha:</strong> {{ eventoSeleccionado.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p><strong>Lugar:</strong> {{ eventoSeleccionado.lugar }}</p>
+      <p><strong>Tipo:</strong> {{ eventoSeleccionado.tipo | titlecase }}</p>
+      <p *ngIf="eventoSeleccionado.organizador"><strong>Organizador:</strong> {{ eventoSeleccionado.organizador }}</p>
+      <p *ngIf="eventoSeleccionado.contacto"><strong>Contacto:</strong> {{ eventoSeleccionado.contacto }}</p>
+      <div class="detalle-acciones">
+        <button class="btn btn-primary" (click)="inscribirse(eventoSeleccionado)">Inscribirme</button>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+</div>

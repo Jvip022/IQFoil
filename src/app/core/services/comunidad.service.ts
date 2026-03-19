@@ -14,6 +14,7 @@ export interface Hilo {
   id: string;
   foroId: string;
   titulo: string;
+  contenido: string;          // <-- Asegúrate de que esté presente
   autor: string;
   fechaCreacion: Date;
   ultimaRespuesta: Date;
@@ -50,8 +51,8 @@ export class ComunidadService {
   ];
 
   private hilosMock: Hilo[] = [
-    { id: '101', foroId: '1', titulo: '¿Cómo se penaliza un fuera de línea?', autor: 'Juan', fechaCreacion: new Date(Date.now() - 86400000), ultimaRespuesta: new Date(), respuestas: 5, vistas: 120 },
-    { id: '102', foroId: '2', titulo: 'Mejorar la virada', autor: 'Ana', fechaCreacion: new Date(Date.now() - 172800000), ultimaRespuesta: new Date(Date.now() - 3600000), respuestas: 8, vistas: 210 }
+    { id: '101', foroId: '1', titulo: '¿Cómo se penaliza un fuera de línea?', contenido: 'Texto del hilo...', autor: 'Juan', fechaCreacion: new Date(Date.now() - 86400000), ultimaRespuesta: new Date(), respuestas: 5, vistas: 120 },
+    { id: '102', foroId: '2', titulo: 'Mejorar la virada', contenido: 'Contenido del hilo...', autor: 'Ana', fechaCreacion: new Date(Date.now() - 172800000), ultimaRespuesta: new Date(Date.now() - 3600000), respuestas: 8, vistas: 210 }
   ];
 
   private mensajesMock: Mensaje[] = [
@@ -65,7 +66,6 @@ export class ComunidadService {
 
   constructor() {}
 
-  // Foros
   getForos(): Observable<Foro[]> {
     return of(this.forosMock).pipe(delay(400));
   }
@@ -74,7 +74,6 @@ export class ComunidadService {
     return of(this.forosMock.find(f => f.id === id)).pipe(delay(200));
   }
 
-  // Hilos
   getHilos(foroId?: string): Observable<Hilo[]> {
     if (foroId) {
       return of(this.hilosMock.filter(h => h.foroId === foroId)).pipe(delay(500));
@@ -91,6 +90,7 @@ export class ComunidadService {
       id: Date.now().toString(),
       foroId: hilo.foroId || '1',
       titulo: hilo.titulo || 'Nuevo hilo',
+      contenido: hilo.contenido || '',
       autor: hilo.autor || 'Usuario actual',
       fechaCreacion: new Date(),
       ultimaRespuesta: new Date(),
@@ -101,7 +101,6 @@ export class ComunidadService {
     return of(nuevoHilo).pipe(delay(600));
   }
 
-  // Mensajes
   getMensajes(hiloId: string): Observable<Mensaje[]> {
     return of(this.mensajesMock.filter(m => m.hiloId === hiloId)).pipe(delay(300));
   }
@@ -116,7 +115,6 @@ export class ComunidadService {
     };
     this.mensajesMock.push(nuevoMensaje);
 
-    // Actualizar el hilo (última respuesta)
     const hilo = this.hilosMock.find(h => h.id === mensaje.hiloId);
     if (hilo) {
       hilo.ultimaRespuesta = new Date();
@@ -125,9 +123,7 @@ export class ComunidadService {
     return of(nuevoMensaje).pipe(delay(400));
   }
 
-  // Mentorías
   getMentorias(usuarioId?: string): Observable<Mentoria[]> {
-    // Si se proporciona usuario, filtrar por mentor o aprendiz
     return of(this.mentoriasMock).pipe(delay(500));
   }
 

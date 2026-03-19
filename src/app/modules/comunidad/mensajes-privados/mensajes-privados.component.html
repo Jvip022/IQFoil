@@ -1,1 +1,127 @@
-<p>mensajes-privados works!</p>
+<div class="mensajes-privados">
+  <!-- Encabezado -->
+  <header class="mensajes-privados__header">
+    <div class="header-left">
+      <h2 class="mensajes-privados__title">💬 Mensajes privados</h2>
+      <p class="mensajes-privados__subtitle">Conversaciones con otros miembros</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="abrirNuevaConversacion()">
+        ➕ Nueva conversación
+      </button>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="mensajes-privados__connection"></app-estado-conexion>
+
+  <div class="mensajes-privados__layout">
+    <!-- Lista de conversaciones -->
+    <aside class="conversaciones-sidebar" *ngIf="!cargandoConversaciones; else loadingConversaciones">
+      <div class="sidebar-header">
+        <input type="text" placeholder="Buscar conversación..." [(ngModel)]="busquedaConversaciones" (input)="filtrarConversaciones()" class="search-input" />
+      </div>
+      <div class="conversaciones-list" *ngIf="conversacionesFiltradas.length > 0; else sinConversaciones">
+        <div class="conversacion-item" *ngFor="let conv of conversacionesFiltradas" (click)="seleccionarConversacion(conv)" [class.activa]="conv.id === conversacionActiva?.id">
+          <div class="conversacion-avatar">
+            <img [src]="conv.avatar || '/assets/default-avatar.png'" alt="Avatar" />
+          </div>
+          <div class="conversacion-info">
+            <div class="conversacion-nombre">{{ conv.nombre }}</div>
+            <div class="conversacion-ultimo-mensaje">{{ conv.ultimoMensaje | slice:0:30 }}{{ conv.ultimoMensaje.length > 30 ? '...' : '' }}</div>
+          </div>
+          <div class="conversacion-meta">
+            <span class="conversacion-fecha">{{ conv.ultimaActividad | date:'dd/MM' }}</span>
+            <span class="conversacion-no-leidos" *ngIf="conv.noLeidos > 0">{{ conv.noLeidos }}</span>
+          </div>
+        </div>
+      </div>
+      <ng-template #sinConversaciones>
+        <div class="sin-conversaciones">
+          <p *ngIf="busquedaConversaciones">No se encontraron conversaciones.</p>
+          <p *ngIf="!busquedaConversaciones">No tienes conversaciones aún.</p>
+        </div>
+      </ng-template>
+    </aside>
+    <ng-template #loadingConversaciones>
+      <div class="conversaciones-sidebar loading">
+        <app-loading-spinner [text]="'Cargando conversaciones...'"></app-loading-spinner>
+      </div>
+    </ng-template>
+
+    <!-- Panel de conversación activa -->
+    <main class="conversacion-panel" *ngIf="conversacionActiva; else seleccionaConversacion">
+      <!-- Cabecera de la conversación -->
+      <div class="conversacion-header">
+        <div class="usuario-info">
+          <img [src]="conversacionActiva.avatar || '/assets/default-avatar.png'" alt="Avatar" class="avatar" />
+          <span class="nombre">{{ conversacionActiva.nombre }}</span>
+        </div>
+        <button class="btn-icon" (click)="cerrarConversacion()" title="Cerrar">✕</button>
+      </div>
+
+      <!-- Mensajes -->
+      <div class="mensajes-container" #mensajesContainer>
+        <app-loading-spinner *ngIf="cargandoMensajes" [text]="'Cargando mensajes...'"></app-loading-spinner>
+        <div class="mensajes-list" *ngIf="!cargandoMensajes">
+          <div class="mensaje-item" *ngFor="let msg of mensajes" [class.mensaje-propio]="msg.esPropio">
+            <div class="mensaje-burbuja">
+              <div class="mensaje-contenido">{{ msg.contenido }}</div>
+              <div class="mensaje-fecha">{{ msg.fecha | date:'HH:mm' }}</div>
+            </div>
+          </div>
+          <div class="nuevos-mensajes-indicator" *ngIf="hayNuevosMensajes && !autoScroll" (click)="scrollAlFinal()">
+            ⬇️ Nuevos mensajes
+          </div>
+        </div>
+      </div>
+
+      <!-- Input para enviar mensaje -->
+      <div class="mensaje-input">
+        <textarea 
+          [(ngModel)]="nuevoMensaje" 
+          placeholder="Escribe un mensaje..." 
+          rows="1" 
+          (keydown.enter)="enviarMensaje($event)"
+          [disabled]="enviando"></textarea>
+        <button class="btn btn-primary" (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim() || enviando">
+          <span *ngIf="!enviando">Enviar</span>
+          <span *ngIf="enviando">Enviando...</span>
+        </button>
+      </div>
+    </main>
+
+    <ng-template #seleccionaConversacion>
+      <div class="conversacion-panel vacio">
+        <p>Selecciona una conversación para comenzar</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal para nueva conversación (búsqueda de usuario) -->
+  <app-modal-confirmacion 
+    *ngIf="modalNuevaConvVisible"
+    [isOpen]="true"
+    title="Nueva conversación"
+    [width]="'400px'"
+    (cancel)="cerrarModalNuevaConv()"
+    [confirmText]="'Iniciar'"
+    [cancelText]="'Cancelar'"
+    (confirm)="iniciarNuevaConversacion()">
+    
+    <div class="nueva-conv-form">
+      <div class="form-group">
+        <label for="buscarUsuario">Buscar usuario</label>
+        <input type="text" id="buscarUsuario" [(ngModel)]="busquedaUsuario" (input)="buscarUsuarios()" class="form-control" placeholder="Nombre o email..." />
+      </div>
+      <div class="usuarios-resultados" *ngIf="usuariosResultados.length > 0">
+        <div class="usuario-item" *ngFor="let user of usuariosResultados" (click)="seleccionarUsuarioDestino(user)">
+          <img [src]="user.avatar || '/assets/default-avatar.png'" alt="Avatar" />
+          <span>{{ user.nombre }}</span>
+          <span class="check" *ngIf="usuarioDestino?.id === user.id">✓</span>
+        </div>
+      </div>
+      <p *ngIf="busquedaUsuario && usuariosResultados.length === 0" class="sin-resultados">No se encontraron usuarios</p>
+    </div>
+  </app-modal-confirmacion>
+</div>

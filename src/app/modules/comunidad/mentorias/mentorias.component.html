@@ -1,1 +1,147 @@
-<p>mentorias works!</p>
+<div class="mentorias">
+  <!-- Encabezado -->
+  <header class="mentorias__header">
+    <div class="header-left">
+      <h2 class="mentorias__title">🧑‍🏫 Mentorías</h2>
+      <p class="mentorias__subtitle">Conecta con expertos para acelerar tu aprendizaje</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="abrirModalSolicitar()">
+        ➕ Solicitar mentoría
+      </button>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="mentorias__connection"></app-estado-conexion>
+
+  <!-- Pestañas -->
+  <div class="mentorias__tabs">
+    <button 
+      class="tab-btn" 
+      [class.active]="tabActivo === 'disponibles'"
+      (click)="cambiarTab('disponibles')">
+      <span>Disponibles</span>
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="tabActivo === 'mis-mentorias'"
+      (click)="cambiarTab('mis-mentorias')">
+      <span>Mis mentorías</span>
+    </button>
+  </div>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando...'"></app-loading-spinner>
+
+  <!-- Contenido: Mentorías disponibles -->
+  <div class="mentorias__content" *ngIf="!cargando && tabActivo === 'disponibles'">
+    <div class="filtros">
+      <input 
+        type="text" 
+        placeholder="Buscar por área o nombre..." 
+        [(ngModel)]="searchTerm"
+        (input)="filtrarMentores()"
+        class="search-input" />
+    </div>
+    <div class="mentores-grid" *ngIf="mentoresFiltrados.length > 0; else sinResultados">
+      <div class="mentor-card" *ngFor="let mentor of mentoresFiltrados">
+        <div class="mentor-card__avatar">
+          <img [src]="mentor.avatar || '/assets/default-avatar.png'" alt="Avatar" />
+        </div>
+        <div class="mentor-card__info">
+          <h3 class="mentor-nombre">{{ mentor.nombre }}</h3>
+          <p class="mentor-area">{{ mentor.area }}</p>
+          <p class="mentor-experiencia">{{ mentor.experiencia }} años de experiencia</p>
+        </div>
+        <div class="mentor-card__actions">
+          <button class="btn btn-primary" (click)="solicitarMentoria(mentor)">Solicitar</button>
+          <button class="btn btn-outline" (click)="verPerfil(mentor)">Ver perfil</button>
+        </div>
+      </div>
+    </div>
+    <ng-template #sinResultados>
+      <p class="sin-resultados">No se encontraron mentores con esos criterios.</p>
+    </ng-template>
+  </div>
+
+  <!-- Contenido: Mis mentorías -->
+  <div class="mentorias__content" *ngIf="!cargando && tabActivo === 'mis-mentorias'">
+    <div class="mis-mentorias-list" *ngIf="misMentorias.length > 0; else sinMentorias">
+      <div class="mentoria-item" *ngFor="let m of misMentorias">
+        <div class="mentoria-item__header">
+          <span class="estado" [class]="'estado--' + m.estado">{{ m.estado | titlecase }}</span>
+          <span class="fecha">{{ m.fechaInicio | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="mentoria-item__body">
+          <div class="mentor-avatar">
+            <img [src]="m.mentorAvatar || '/assets/default-avatar.png'" alt="Avatar" />
+          </div>
+          <div class="mentor-info">
+            <h4>{{ m.mentorNombre }}</h4>
+            <p>{{ m.area }}</p>
+          </div>
+        </div>
+        <div class="mentoria-item__actions" *ngIf="m.estado === 'activa'">
+          <button class="btn btn-outline btn-sm" (click)="iniciarChat(m)">💬 Mensaje</button>
+          <button class="btn btn-outline btn-sm" (click)="finalizarMentoria(m)">✓ Finalizar</button>
+        </div>
+        <div class="mentoria-item__feedback" *ngIf="m.estado === 'completada'">
+          <button class="btn btn-outline btn-sm" (click)="darFeedback(m)">📝 Dejar feedback</button>
+        </div>
+      </div>
+    </div>
+    <ng-template #sinMentorias>
+      <p class="sin-resultados">No tienes mentorías activas. ¡Solicita una en la pestaña "Disponibles"!</p>
+    </ng-template>
+  </div>
+
+  <!-- Modal de solicitud de mentoría -->
+  <app-modal-confirmacion 
+    *ngIf="modalSolicitudVisible"
+    [isOpen]="true"
+    title="Solicitar mentoría"
+    [width]="'450px'"
+    (confirm)="confirmarSolicitud()"
+    (cancel)="cancelarSolicitud()"
+    confirmText="Enviar solicitud"
+    cancelText="Cancelar">
+    
+    <div class="form-solicitud" *ngIf="mentorSeleccionado">
+      <p>Vas a solicitar una mentoría con <strong>{{ mentorSeleccionado.nombre }}</strong>.</p>
+      <div class="form-group">
+        <label for="mensaje">Mensaje (opcional)</label>
+        <textarea id="mensaje" [(ngModel)]="mensajeSolicitud" rows="3" class="form-control" placeholder="Cuéntale qué te gustaría aprender..."></textarea>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+
+  <!-- Modal de feedback -->
+  <app-modal-confirmacion 
+    *ngIf="modalFeedbackVisible"
+    [isOpen]="true"
+    title="Dejar feedback"
+    [width]="'450px'"
+    (confirm)="enviarFeedback()"
+    (cancel)="cancelarFeedback()"
+    confirmText="Enviar"
+    cancelText="Cancelar">
+    
+    <div class="form-feedback">
+      <div class="form-group">
+        <label for="puntuacion">Puntuación</label>
+        <select id="puntuacion" [(ngModel)]="feedbackPuntuacion" class="form-control">
+          <option value="5">5 - Excelente</option>
+          <option value="4">4 - Muy buena</option>
+          <option value="3">3 - Buena</option>
+          <option value="2">2 - Regular</option>
+          <option value="1">1 - Mala</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="comentario">Comentario</label>
+        <textarea id="comentario" [(ngModel)]="feedbackComentario" rows="3" class="form-control" placeholder="Escribe tu opinión..."></textarea>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+</div>

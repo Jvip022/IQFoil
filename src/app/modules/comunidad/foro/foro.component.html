@@ -1,1 +1,136 @@
-<p>foro works!</p>
+<div class="foro">
+  <!-- Encabezado -->
+  <header class="foro__header">
+    <div class="header-left">
+      <h2 class="foro__title">💬 Foro de la comunidad</h2>
+      <p class="foro__subtitle">Comparte dudas, experiencias y conocimientos</p>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="foro__connection"></app-estado-conexion>
+
+  <div class="foro__layout">
+    <!-- Barra lateral con categorías -->
+    <aside class="foro__sidebar">
+      <h3>Categorías</h3>
+      <ul class="categorias-list">
+        <li *ngFor="let foro of foros"
+            [class.activo]="foroSeleccionado?.id === foro.id"
+            (click)="seleccionarForo(foro)">
+          <span class="categoria-icon">📌</span>
+          <span class="categoria-nombre">{{ foro.titulo }}</span>
+          <span class="categoria-count">{{ foro.totalHilos }}</span>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Lista de hilos -->
+    <main class="foro__main">
+      <div class="main-header">
+        <h3>{{ foroSeleccionado ? foroSeleccionado.titulo : 'Selecciona una categoría' }}</h3>
+        <button class="btn btn-primary" (click)="abrirModalNuevoHilo()" [disabled]="!foroSeleccionado">
+          ➕ Nuevo hilo
+        </button>
+      </div>
+
+      <!-- Loader -->
+      <app-loading-spinner *ngIf="cargandoHilos" [text]="'Cargando hilos...'"></app-loading-spinner>
+
+      <!-- Lista de hilos -->
+      <div class="hilos-list" *ngIf="!cargandoHilos">
+        <div class="hilo-card" *ngFor="let hilo of hilos" (click)="verHilo(hilo)">
+          <div class="hilo-icon">📋</div>
+          <div class="hilo-info">
+            <h4 class="hilo-titulo">{{ hilo.titulo }}</h4>
+            <p class="hilo-meta">
+              <span class="hilo-autor">{{ hilo.autor }}</span> ·
+              <span class="hilo-fecha">{{ hilo.fechaCreacion | date:'dd/MM/yyyy' }}</span>
+            </p>
+          </div>
+          <div class="hilo-stats">
+            <span class="hilo-respuestas" title="Respuestas">💬 {{ hilo.respuestas }}</span>
+            <span class="hilo-vistas" title="Vistas">👁️ {{ hilo.vistas }}</span>
+          </div>
+          <div class="hilo-ultima">
+            <span class="ultima-fecha">{{ hilo.ultimaRespuesta | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+        <div *ngIf="hilos.length === 0" class="sin-hilos">
+          No hay hilos en esta categoría. ¡Sé el primero en crear uno!
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal para nuevo hilo -->
+  <app-modal-confirmacion 
+    *ngIf="modalNuevoHiloVisible"
+    [isOpen]="true"
+    title="Crear nuevo hilo"
+    [width]="'500px'"
+    (confirm)="guardarNuevoHilo()"
+    (cancel)="cerrarModalNuevoHilo()"
+    confirmText="Publicar"
+    cancelText="Cancelar">
+    <div class="form-nuevo-hilo">
+      <div class="form-group">
+        <label for="tituloHilo">Título</label>
+        <input type="text" id="tituloHilo" [(ngModel)]="nuevoHilo.titulo" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label for="contenidoHilo">Mensaje</label>
+        <textarea id="contenidoHilo" [(ngModel)]="nuevoHilo.contenido" rows="5" class="form-control" required></textarea>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+
+  <!-- Modal para ver hilo y respuestas -->
+  <app-modal-confirmacion 
+    *ngIf="hiloSeleccionado"
+    [isOpen]="true"
+    [title]="hiloSeleccionado.titulo"
+    [width]="'700px'"
+    (cancel)="cerrarDetalleHilo()"
+    [confirmText]="'Cerrar'"
+    [cancelText]="''"
+    [closeOnOverlayClick]="true">
+    
+    <div class="hilo-detalle">
+      <!-- Mensaje principal -->
+      <div class="hilo-principal">
+        <div class="hilo-autor-info">
+          <span class="autor">{{ hiloSeleccionado.autor }}</span>
+          <span class="fecha">{{ hiloSeleccionado.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <div class="hilo-contenido">
+          {{ hiloSeleccionado.contenido }}
+        </div>
+      </div>
+
+      <!-- Respuestas -->
+      <div class="respuestas" *ngIf="respuestas.length > 0; else sinRespuestas">
+        <h4>Respuestas ({{ respuestas.length }})</h4>
+        <div class="respuesta-item" *ngFor="let resp of respuestas">
+          <div class="respuesta-autor-info">
+            <span class="autor">{{ resp.autor }}</span>
+            <span class="fecha">{{ resp.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="respuesta-contenido">
+            {{ resp.contenido }}
+          </div>
+        </div>
+      </div>
+      <ng-template #sinRespuestas>
+        <p class="sin-respuestas">No hay respuestas aún. ¡Sé el primero en responder!</p>
+      </ng-template>
+
+      <!-- Formulario para nueva respuesta -->
+      <div class="nueva-respuesta">
+        <h4>Responder</h4>
+        <textarea [(ngModel)]="nuevaRespuesta" rows="3" class="form-control" placeholder="Escribe tu respuesta..."></textarea>
+        <button class="btn btn-primary" (click)="enviarRespuesta()" [disabled]="!nuevaRespuesta.trim()">Enviar respuesta</button>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+</div>

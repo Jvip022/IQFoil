@@ -1,1 +1,276 @@
-//cometario
+@use 'variable' as *;
+
+.mentorias {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .mentorias__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .mentorias__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+
+  &__tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--surface-elev);
+    padding-bottom: 10px;
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      padding: 8px 16px;
+      border-radius: calc(var(--radius) / 2) calc(var(--radius) / 2) 0 0;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        color: var(--cyan);
+        background: var(--surface-elev);
+      }
+
+      &.active {
+        color: var(--cyan);
+        border-bottom: 3px solid var(--cyan);
+        background: var(--surface-elev);
+      }
+    }
+  }
+
+  .filtros {
+    margin-bottom: 20px;
+
+    .search-input {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px 15px;
+      border: 1px solid var(--surface-elev);
+      border-radius: calc(var(--radius) / 2);
+      background: var(--card-bg);
+      color: var(--text);
+
+      &:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+    }
+  }
+}
+
+// Grid de mentores
+.mentores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.mentor-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: 0 2px 8px var(--surface-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px var(--surface-elev);
+  }
+
+  &__avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 15px;
+    background: var(--surface-elev);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__info {
+    margin-bottom: 20px;
+
+    .mentor-nombre {
+      margin: 0 0 5px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .mentor-area {
+      margin: 0 0 5px;
+      color: var(--cyan);
+      font-weight: 500;
+    }
+    .mentor-experiencia {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// Mis mentorías
+.mis-mentorias-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mentoria-item {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 15px;
+  box-shadow: 0 2px 4px var(--surface-elev);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .estado {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+
+      &.estado--pendiente {
+        background: rgba(255, 152, 0, 0.2);
+        color: #ff9800;
+      }
+      &.estado--activa {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4caf50;
+      }
+      &.estado--completada {
+        background: rgba(33, 150, 243, 0.2);
+        color: #2196f3;
+      }
+      &.estado--cancelada {
+        background: rgba(244, 67, 54, 0.2);
+        color: #f44336;
+      }
+    }
+
+    .fecha {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+  }
+
+  &__body {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    .mentor-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .mentor-info {
+      h4 {
+        margin: 0 0 5px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--navy);
+      }
+      p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+    }
+  }
+
+  &__actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  &__feedback {
+    margin-top: 15px;
+    text-align: right;
+  }
+}
+
+.sin-resultados {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+}
+
+// Formularios en modales
+.form-solicitud,
+.form-feedback {
+  .form-group {
+    margin-bottom: 15px;
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--surface-elev);
+      border-radius: calc(var(--radius) / 2);
+      background: var(--bg);
+      color: var(--text);
+
+      &:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+    }
+  }
+}
