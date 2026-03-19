@@ -1,1 +1,177 @@
-<p>configuracion works!</p>
+<div class="configuracion">
+    <!-- Encabezado -->
+    <header class="configuracion__header">
+        <div class="header-left">
+            <h2 class="configuracion__title">⚙️ Configuración</h2>
+            <p class="configuracion__subtitle">Personaliza tu experiencia y preferencias</p>
+        </div>
+    </header>
+
+    <!-- Estado de conexión -->
+    <app-estado-conexion class="configuracion__connection"></app-estado-conexion>
+
+    <!-- Pestañas de configuración -->
+    <div class="configuracion__tabs">
+        <button class="tab-btn" *ngFor="let tab of tabs" [class.active]="tabActivo === tab.id"
+            (click)="cambiarTab(tab.id)">
+            <span class="tab-icon">{{ tab.icono }}</span>
+            <span class="tab-label">{{ tab.nombre }}</span>
+        </button>
+    </div>
+
+    <!-- Contenido de las pestañas -->
+    <div class="configuracion__content">
+        <!-- Pestaña General -->
+        <div class="tab-panel" *ngIf="tabActivo === 'general'">
+            <div class="config-section">
+                <h3 class="section-title">Información personal</h3>
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" [(ngModel)]="configGeneral.nombre" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" [(ngModel)]="configGeneral.email" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="idioma">Idioma preferido</label>
+                    <select id="idioma" [(ngModel)]="configGeneral.idioma" class="form-control">
+                        <option value="es">Español</option>
+                        <option value="en">Inglés</option>
+                        <option value="ca">Catalán</option>
+                        <option value="eu">Euskera</option>
+                        <option value="gl">Gallego</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña Notificaciones -->
+        <div class="tab-panel" *ngIf="tabActivo === 'notificaciones'">
+            <div class="config-section">
+                <h3 class="section-title">Preferencias de notificaciones</h3>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" [(ngModel)]="configNotificaciones.emailNotificaciones" />
+                        Recibir notificaciones por email
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" [(ngModel)]="configNotificaciones.pushNotificaciones" />
+                        Recibir notificaciones push en el navegador
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" [(ngModel)]="configNotificaciones.recordatoriosEventos" />
+                        Recordatorios de eventos y regatas
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" [(ngModel)]="configNotificaciones.nuevosContenidos" />
+                        Alertas de nuevos contenidos
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña Apariencia -->
+        <div class="tab-panel" *ngIf="tabActivo === 'apariencia'">
+            <div class="config-section">
+                <h3 class="section-title">Tema y apariencia</h3>
+                <div class="form-group">
+                    <label>Tema</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="tema" value="claro" [(ngModel)]="configApariencia.tema" />
+                            Claro
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="tema" value="oscuro" [(ngModel)]="configApariencia.tema" />
+                            Oscuro
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="tema" value="sistema" [(ngModel)]="configApariencia.tema" />
+                            Seguir sistema
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="tamanoFuente">Tamaño de fuente</label>
+                    <select id="tamanoFuente" [(ngModel)]="configApariencia.tamanoFuente" class="form-control">
+                        <option value="pequeno">Pequeño</option>
+                        <option value="mediano">Mediano</option>
+                        <option value="grande">Grande</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="contraste">Contraste</label>
+                    <select id="contraste" [(ngModel)]="configApariencia.contraste" class="form-control">
+                        <option value="normal">Normal</option>
+                        <option value="alto">Alto contraste</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña Privacidad -->
+        <div class="tab-panel" *ngIf="tabActivo === 'privacidad'">
+            <div class="config-section">
+                <h3 class="section-title">Privacidad y seguridad</h3>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" [(ngModel)]="configPrivacidad.perfilPublico" />
+                        Perfil público (visible para otros usuarios)
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" [(ngModel)]="configPrivacidad.mostrarEstadisticas" />
+                        Mostrar estadísticas de progreso
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="visibilidadEmail">Visibilidad del email</label>
+                    <select id="visibilidadEmail" [(ngModel)]="configPrivacidad.visibilidadEmail" class="form-control">
+                        <option value="privado">Solo yo</option>
+                        <option value="contactos">Mis contactos</option>
+                        <option value="publico">Público</option>
+                    </select>
+                </div>
+            </div>
+            <div class="config-section">
+                <h3 class="section-title">Acciones de cuenta</h3>
+                <button class="btn btn-outline-danger" (click)="confirmarEliminarCuenta()">
+                    Eliminar mi cuenta
+                </button>
+                <p class="help-text">Esta acción es irreversible y eliminará todos tus datos.</p>
+            </div>
+        </div>
+
+        <!-- Botones de acción globales -->
+        <div class="configuracion__actions">
+            <button class="btn btn-outline" (click)="restablecerValores()" [disabled]="!hayCambios">
+                Restablecer
+            </button>
+            <button class="btn btn-primary" (click)="guardarCambios()" [disabled]="!hayCambios || guardando">
+                <span *ngIf="!guardando">Guardar cambios</span>
+                <span *ngIf="guardando">Guardando...</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar cuenta -->
+    <app-modal-confirmacion *ngIf="modalEliminarVisible" [isOpen]="true" title="Eliminar cuenta"
+        [message]="mensajeEliminar" (confirm)="eliminarCuenta()" (cancel)="cancelarEliminar()"
+        confirmText="Eliminar permanentemente" cancelText="Cancelar">
+    </app-modal-confirmacion>
+
+    <!-- Modal de confirmación para restablecer valores -->
+    <app-modal-confirmacion *ngIf="modalRestablecerVisible" [isOpen]="true" title="Restablecer configuración"
+        [message]="'¿Estás seguro de que deseas restablecer todos los valores a su estado por defecto?'"
+        (confirm)="confirmarRestablecer()" (cancel)="cancelarRestablecer()" confirmText="Restablecer"
+        cancelText="Cancelar">
+    </app-modal-confirmacion>
+</div>

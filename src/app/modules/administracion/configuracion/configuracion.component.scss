@@ -1,1 +1,182 @@
-//cometario
+@use 'variable' as *;
+
+.configuracion {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    margin-bottom: 25px;
+
+    .configuracion__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .configuracion__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+
+  &__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--surface-elev);
+    padding-bottom: 10px;
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: transparent;
+      border: none;
+      border-radius: calc(var(--radius) / 2) calc(var(--radius) / 2) 0 0;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        color: var(--cyan);
+        background: var(--surface-elev);
+      }
+
+      &.active {
+        color: var(--cyan);
+        border-bottom: 3px solid var(--cyan);
+        background: var(--surface-elev);
+      }
+
+      .tab-icon {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  &__content {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 25px;
+    box-shadow: 0 2px 8px var(--surface-elev);
+  }
+
+  .config-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--surface-elev);
+
+    &:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section-title {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+      color: var(--navy);
+    }
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-control {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px 12px;
+      border: 1px solid var(--surface-elev);
+      border-radius: calc(var(--radius) / 2);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+
+      &:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+    }
+
+    select.form-control {
+      cursor: pointer;
+    }
+  }
+
+  .checkbox-group {
+    margin-bottom: 15px;
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+
+    .radio-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+
+      input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .help-text {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--surface-elev);
+  }
+
+  .btn-outline-danger {
+    background: transparent;
+    border: 1px solid #f44336;
+    color: #f44336;
+
+    &:hover {
+      background: #f44336;
+      color: white;
+    }
+  }
+}

@@ -1,1 +1,185 @@
-<p>moderacion works!</p>
+<div class="moderacion">
+  <!-- Encabezado -->
+  <header class="moderacion__header">
+    <div class="header-left">
+      <h2 class="moderacion__title">🛡️ Moderación</h2>
+      <p class="moderacion__subtitle">Revisa y modera el contenido generado por los usuarios</p>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="moderacion__connection"></app-estado-conexion>
+
+  <!-- Pestañas de moderación -->
+  <div class="moderacion__tabs">
+    <button 
+      class="tab-btn" 
+      *ngFor="let tab of tabs" 
+      [class.active]="tabActivo === tab.id"
+      (click)="cambiarTab(tab.id)">
+      <span class="tab-icon">{{ tab.icono }}</span>
+      <span class="tab-label">{{ tab.nombre }}</span>
+      <span class="tab-badge" *ngIf="tab.pendientes > 0">{{ tab.pendientes }}</span>
+    </button>
+  </div>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando elementos pendientes...'"></app-loading-spinner>
+
+  <!-- Contenido por pestaña -->
+  <div class="moderacion__content" *ngIf="!cargando">
+
+    <!-- Pestaña Comentarios -->
+    <div class="tab-panel" *ngIf="tabActivo === 'comentarios'">
+      <div class="panel-header">
+        <h3>Comentarios pendientes de moderación</h3>
+        <div class="header-actions">
+          <button class="btn btn-outline btn-sm" (click)="aprobarTodos('comentarios')" [disabled]="!hayPendientes('comentarios')">
+            Aprobar todos
+          </button>
+          <button class="btn btn-outline btn-sm" (click)="rechazarTodos('comentarios')" [disabled]="!hayPendientes('comentarios')">
+            Rechazar todos
+          </button>
+        </div>
+      </div>
+
+      <div class="items-list" *ngIf="comentariosPendientes.length > 0; else sinItems">
+        <div class="item-card" *ngFor="let item of comentariosPendientes">
+          <div class="item-card__header">
+            <span class="item-autor">{{ item.autor }}</span>
+            <span class="item-fecha">{{ item.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="item-card__content">
+            <p class="item-texto">{{ item.texto }}</p>
+            <div class="item-contexto" *ngIf="item.contexto">
+              <strong>En:</strong> {{ item.contexto }}
+            </div>
+          </div>
+          <div class="item-card__actions">
+            <button class="btn-icon aprobar" (click)="aprobarItem(item, 'comentarios')" title="Aprobar">✅</button>
+            <button class="btn-icon rechazar" (click)="rechazarItem(item, 'comentarios')" title="Rechazar">❌</button>
+            <button class="btn-icon eliminar" (click)="confirmarEliminar(item, 'comentarios')" title="Eliminar">🗑️</button>
+          </div>
+        </div>
+      </div>
+      <ng-template #sinItems>
+        <p class="sin-items">No hay comentarios pendientes de moderación.</p>
+      </ng-template>
+    </div>
+
+    <!-- Pestaña Foros (hilos y respuestas) -->
+    <div class="tab-panel" *ngIf="tabActivo === 'foros'">
+      <div class="panel-header">
+        <h3>Hilos y respuestas pendientes</h3>
+        <div class="header-actions">
+          <button class="btn btn-outline btn-sm" (click)="aprobarTodos('foros')" [disabled]="!hayPendientes('foros')">
+            Aprobar todos
+          </button>
+          <button class="btn btn-outline btn-sm" (click)="rechazarTodos('foros')" [disabled]="!hayPendientes('foros')">
+            Rechazar todos
+          </button>
+        </div>
+      </div>
+
+      <div class="items-list" *ngIf="forosPendientes.length > 0; else sinItems">
+        <div class="item-card" *ngFor="let item of forosPendientes">
+          <div class="item-card__header">
+            <span class="item-autor">{{ item.autor }}</span>
+            <span class="item-fecha">{{ item.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+            <span class="item-tipo">{{ item.tipo === 'hilo' ? 'Hilo' : 'Respuesta' }}</span>
+          </div>
+          <div class="item-card__content">
+            <p class="item-texto">{{ item.texto }}</p>
+            <div class="item-contexto" *ngIf="item.titulo">
+              <strong>Título:</strong> {{ item.titulo }}
+            </div>
+          </div>
+          <div class="item-card__actions">
+            <button class="btn-icon aprobar" (click)="aprobarItem(item, 'foros')" title="Aprobar">✅</button>
+            <button class="btn-icon rechazar" (click)="rechazarItem(item, 'foros')" title="Rechazar">❌</button>
+            <button class="btn-icon eliminar" (click)="confirmarEliminar(item, 'foros')" title="Eliminar">🗑️</button>
+          </div>
+        </div>
+      </div>
+      <ng-template #sinItems>
+        <p class="sin-items">No hay hilos o respuestas pendientes.</p>
+      </ng-template>
+    </div>
+
+    <!-- Pestaña Documentos -->
+    <div class="tab-panel" *ngIf="tabActivo === 'documentos'">
+      <div class="panel-header">
+        <h3>Documentos subidos por usuarios</h3>
+        <div class="header-actions">
+          <button class="btn btn-outline btn-sm" (click)="aprobarTodos('documentos')" [disabled]="!hayPendientes('documentos')">
+            Aprobar todos
+          </button>
+          <button class="btn btn-outline btn-sm" (click)="rechazarTodos('documentos')" [disabled]="!hayPendientes('documentos')">
+            Rechazar todos
+          </button>
+        </div>
+      </div>
+
+      <div class="items-list" *ngIf="documentosPendientes.length > 0; else sinItems">
+        <div class="item-card" *ngFor="let item of documentosPendientes">
+          <div class="item-card__header">
+            <span class="item-autor">{{ item.autor }}</span>
+            <span class="item-fecha">{{ item.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="item-card__content">
+            <p class="item-texto"><strong>{{ item.nombre }}</strong> ({{ item.tipoArchivo }})</p>
+            <p class="item-descripcion">{{ item.descripcion }}</p>
+          </div>
+          <div class="item-card__actions">
+            <button class="btn-icon aprobar" (click)="aprobarItem(item, 'documentos')" title="Aprobar">✅</button>
+            <button class="btn-icon rechazar" (click)="rechazarItem(item, 'documentos')" title="Rechazar">❌</button>
+            <button class="btn-icon ver" (click)="verDocumento(item)" title="Ver">👁️</button>
+            <button class="btn-icon eliminar" (click)="confirmarEliminar(item, 'documentos')" title="Eliminar">🗑️</button>
+          </div>
+        </div>
+      </div>
+      <ng-template #sinItems>
+        <p class="sin-items">No hay documentos pendientes de revisión.</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación para acciones múltiples o eliminación -->
+  <app-modal-confirmacion 
+    *ngIf="modalVisible"
+    [isOpen]="true"
+    [title]="modalTitulo"
+    [message]="modalMensaje"
+    (confirm)="confirmarAccionModal()"
+    (cancel)="cancelarModal()"
+    [confirmText]="modalConfirmText"
+    [cancelText]="'Cancelar'">
+  </app-modal-confirmacion>
+
+  <!-- Modal para vista previa de documento -->
+<app-modal-confirmacion 
+  *ngIf="modalDocumentoVisible"
+  [isOpen]="true"
+  [title]="'Vista previa: ' + (documentoSeleccionado?.nombre || 'Documento')"
+  [width]="'700px'"
+  (cancel)="cerrarVistaPrevia()"
+  [confirmText]="'Cerrar'"
+  [cancelText]="''"
+  [closeOnOverlayClick]="true">
+  
+  <ng-container *ngIf="documentoSeleccionado as doc">
+    <div class="documento-preview">
+      <iframe *ngIf="doc.tipoArchivo === 'pdf' && doc.url" 
+              [src]="doc.url | safeUrl" 
+              frameborder="0"></iframe>
+      <img *ngIf="doc.tipoArchivo?.startsWith('image') && doc.url" 
+           [src]="doc.url" 
+           alt="Vista previa" />
+      <div *ngIf="!['pdf','image'].includes(doc.tipoArchivo || '')" class="unsupported">
+        <p>Vista previa no disponible para este tipo de archivo.</p>
+        <a *ngIf="doc.url" [href]="doc.url" target="_blank" class="btn btn-primary">Abrir en nueva pestaña</a>
+      </div>
+    </div>
+  </ng-container>
+</app-modal-confirmacion>
+</div>

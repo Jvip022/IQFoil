@@ -1,0 +1,220 @@
+@use 'variable' as *;
+
+.gestion-usuarios {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+
+    .gestion-usuarios__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .gestion-usuarios__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+
+    .search-box {
+      flex: 2;
+      min-width: 250px;
+      position: relative;
+
+      .search-input {
+        width: 100%;
+        padding: 10px 15px 10px 40px;
+        border: 1px solid var(--surface-elev);
+        border-radius: calc(var(--radius) / 2);
+        background: var(--card-bg);
+        color: var(--text);
+        font-size: 0.95rem;
+
+        &:focus {
+          outline: none;
+          border-color: var(--cyan);
+        }
+      }
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+      }
+    }
+
+    .filter-options {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+
+      .filter-select {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid var(--surface-elev);
+        border-radius: calc(var(--radius) / 2);
+        background: var(--card-bg);
+        color: var(--text);
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+          border-color: var(--cyan);
+        }
+      }
+    }
+  }
+
+  &__table-container {
+    overflow-x: auto;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px var(--surface-elev);
+    padding: 1px; // para evitar scroll interno
+  }
+}
+
+.usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+
+  th {
+    text-align: left;
+    padding: 15px 12px;
+    background: var(--surface-elev);
+    color: var(--navy);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid var(--surface-elev);
+    color: var(--text);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background: var(--surface-elev);
+  }
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &--atleta {
+    background: rgba(74, 163, 194, 0.2);
+    color: var(--cyan);
+  }
+  &--entrenador {
+    background: rgba(26, 43, 76, 0.2);
+    color: var(--navy);
+  }
+  &--admin {
+    background: rgba(243, 156, 18, 0.2);
+    color: var(--orange);
+  }
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  &--activo {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4caf50;
+  }
+  &--inactivo {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+  }
+}
+
+.actions-cell {
+  white-space: nowrap;
+  text-align: right;
+
+  .icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    color: var(--text);
+
+    &:hover {
+      background-color: var(--surface-elev);
+    }
+  }
+}
+
+.no-results {
+  text-align: center;
+  padding: 30px;
+  color: var(--muted);
+}
+
+// Formulario modal
+.usuario-form {
+  .form-group {
+    margin-bottom: 15px;
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--surface-elev);
+      border-radius: calc(var(--radius) / 2);
+      background: var(--bg);
+      color: var(--text);
+
+      &:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+    }
+  }
+}

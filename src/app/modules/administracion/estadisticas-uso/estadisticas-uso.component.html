@@ -1,1 +1,136 @@
-<p>estadisticas-uso works!</p>
+<div class="estadisticas-uso">
+  <!-- Encabezado -->
+  <header class="estadisticas-uso__header">
+    <div class="header-left">
+      <h2 class="estadisticas-uso__title">📊 Estadísticas de uso</h2>
+      <p class="estadisticas-uso__subtitle">Resumen de actividad y métricas de la plataforma</p>
+    </div>
+    <div class="header-right">
+      <select class="period-selector" [(ngModel)]="periodoSeleccionado" (change)="cargarEstadisticas()">
+        <option value="hoy">Hoy</option>
+        <option value="semana">Última semana</option>
+        <option value="mes">Último mes</option>
+        <option value="año">Último año</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="estadisticas-uso__connection"></app-estado-conexion>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando estadísticas...'"></app-loading-spinner>
+
+  <!-- Contenido principal -->
+  <div class="estadisticas-uso__content" *ngIf="!cargando">
+    <!-- Tarjetas de KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-card__icon">👥</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Usuarios totales</span>
+          <span class="kpi-card__value">{{ stats.usuariosTotales }}</span>
+          <span class="kpi-card__trend" [class.positive]="stats.trendUsuarios > 0" [class.negative]="stats.trendUsuarios < 0">
+            {{ stats.trendUsuarios > 0 ? '▲' : '▼' }} {{ stats.trendUsuarios }}%
+          </span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon">✅</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Usuarios activos</span>
+          <span class="kpi-card__value">{{ stats.usuariosActivos }}</span>
+          <span class="kpi-card__subtext">{{ stats.porcentajeActivos }}% del total</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon">📄</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Documentos</span>
+          <span class="kpi-card__value">{{ stats.documentos }}</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon">🎥</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Videos</span>
+          <span class="kpi-card__value">{{ stats.videos }}</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon">📝</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Evaluaciones</span>
+          <span class="kpi-card__value">{{ stats.evaluaciones }}</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon">⏱️</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Horas de navegación</span>
+          <span class="kpi-card__value">{{ stats.horasNavegacion }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Distribuciones -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3 class="chart-card__title">Usuarios por rol</h3>
+        <div class="barras-container">
+          <div class="barra-item" *ngFor="let item of stats.usuariosPorRol">
+            <span class="barra-label">{{ item.rol }}</span>
+            <div class="barra-bg">
+              <div class="barra-fill" [style.width.%]="item.porcentaje" [style.background-color]="item.color"></div>
+            </div>
+            <span class="barra-valor">{{ item.cantidad }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3 class="chart-card__title">Contenido por tipo</h3>
+        <div class="barras-container">
+          <div class="barra-item" *ngFor="let item of stats.contenidoPorTipo">
+            <span class="barra-label">{{ item.tipo }}</span>
+            <div class="barra-bg">
+              <div class="barra-fill" [style.width.%]="item.porcentaje" [style.background-color]="item.color"></div>
+            </div>
+            <span class="barra-valor">{{ item.cantidad }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actividad reciente y usuarios destacados -->
+    <div class="activity-grid">
+      <div class="activity-card">
+        <h3 class="activity-card__title">Actividad reciente</h3>
+        <div class="activity-list" *ngIf="stats.actividadReciente.length > 0; else sinActividad">
+          <div class="activity-item" *ngFor="let act of stats.actividadReciente">
+            <span class="activity-icon">{{ act.icono }}</span>
+            <div class="activity-content">
+              <span class="activity-desc">{{ act.descripcion }}</span>
+              <span class="activity-fecha">{{ act.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+          </div>
+        </div>
+        <ng-template #sinActividad>
+          <p class="sin-datos">No hay actividad reciente.</p>
+        </ng-template>
+      </div>
+      <div class="activity-card">
+        <h3 class="activity-card__title">Usuarios más activos</h3>
+        <div class="top-users-list" *ngIf="stats.topUsuarios.length > 0; else sinTop">
+          <div class="top-user-item" *ngFor="let user of stats.topUsuarios; let i = index">
+            <span class="top-user-rank">{{ i + 1 }}</span>
+            <span class="top-user-nombre">{{ user.nombre }}</span>
+            <span class="top-user-actividad">{{ user.actividad }} acciones</span>
+          </div>
+        </div>
+        <ng-template #sinTop>
+          <p class="sin-datos">No hay datos suficientes.</p>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

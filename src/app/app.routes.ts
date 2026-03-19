@@ -16,6 +16,11 @@ export const routes: Routes = [
     loadChildren: () => import('./modules/documentacion/documentacion.module').then(m => m.DocumentacionModule),
     canActivate: [AuthGuard] 
   },
+  { 
+    path: 'talentos', 
+    loadChildren: () => import('./modules/talentos/talentos.module').then(m => m.TalentosModule),
+    canActivate: [AuthGuard] 
+  },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' }
 ];
