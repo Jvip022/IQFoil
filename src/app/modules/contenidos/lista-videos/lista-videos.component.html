@@ -1,1 +1,104 @@
-<p>lista-videos works!</p>
+<div class="lista-videos">
+  <!-- Encabezado -->
+  <header class="lista-videos__header">
+    <div class="header-left">
+      <h2 class="lista-videos__title">🎥 Videoteca</h2>
+      <p class="lista-videos__subtitle">Explora los videos formativos y técnicos</p>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="lista-videos__connection"></app-estado-conexion>
+
+  <!-- Filtros y búsqueda -->
+  <div class="lista-videos__filters">
+    <div class="search-box">
+      <input type="text" 
+             placeholder="Buscar por título..." 
+             [(ngModel)]="searchTerm" 
+             (input)="filtrarVideos()"
+             class="search-input" />
+      <i class="search-icon">🔍</i>
+    </div>
+    <div class="filter-options">
+      <select [(ngModel)]="filtroNivel" (change)="filtrarVideos()" class="filter-select">
+        <option value="">Todos los niveles</option>
+        <option value="principiante">Principiante</option>
+        <option value="intermedio">Intermedio</option>
+        <option value="avanzado">Avanzado</option>
+      </select>
+      <select [(ngModel)]="ordenPor" (change)="ordenarVideos()" class="filter-select">
+        <option value="fechaDesc">Más recientes</option>
+        <option value="fechaAsc">Más antiguos</option>
+        <option value="tituloAsc">Título A-Z</option>
+        <option value="tituloDesc">Título Z-A</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando videos...'"></app-loading-spinner>
+
+  <!-- Grid de videos -->
+  <div class="lista-videos__grid" *ngIf="!cargando">
+    <div class="videos-grid" *ngIf="videosFiltrados.length > 0; else sinVideos">
+      <div class="video-card" *ngFor="let video of videosFiltrados" (click)="verVideo(video)">
+        <div class="video-card__thumbnail" [style.background-image]="'url(' + (video.thumbnail || '/assets/images/video-placeholder.jpg') + ')'">
+          <div class="video-card__duration">{{ video.duracion | duracion }}</div>
+          <div class="video-card__play-icon">▶</div>
+        </div>
+        <div class="video-card__info">
+          <h3 class="video-card__titulo">{{ video.titulo }}</h3>
+          <p class="video-card__descripcion">{{ video.descripcion }}</p>
+          <div class="video-card__meta">
+            <span class="video-card__nivel" [class]="'nivel--' + video.nivel">{{ video.nivel | titlecase }}</span>
+            <span class="video-card__progreso" *ngIf="video.progreso !== undefined">
+              {{ video.progreso }}% completado
+            </span>
+          </div>
+        </div>
+        <div class="video-card__actions">
+          <button class="btn-icon" (click)="marcarComoVisto(video, $event)" title="Marcar como visto">✅</button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinVideos>
+      <div class="sin-videos">
+        <p *ngIf="searchTerm || filtroNivel">No se encontraron videos con los filtros aplicados.</p>
+        <p *ngIf="!searchTerm && !filtroNivel">No hay videos disponibles en este momento.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de detalle de video -->
+  <app-modal-confirmacion 
+    *ngIf="videoSeleccionado"
+    [isOpen]="true"
+    [title]="videoSeleccionado.titulo"
+    [width]="'800px'"
+    (cancel)="cerrarDetalle()"
+    [confirmText]="'Cerrar'"
+    [cancelText]="''"
+    [closeOnOverlayClick]="true">
+    
+    <div class="video-detalle">
+      <div class="video-player">
+        <video controls [src]="videoSeleccionado.url" width="100%" height="auto"></video>
+      </div>
+      <div class="video-info">
+        <p><strong>Descripción:</strong> {{ videoSeleccionado.descripcion }}</p>
+        <p><strong>Nivel:</strong> {{ videoSeleccionado.nivel | titlecase }}</p>
+        <p><strong>Duración:</strong> {{ videoSeleccionado.duracion | duracion }}</p>
+        <p *ngIf="videoSeleccionado.progreso !== undefined">
+          <strong>Tu progreso:</strong> {{ videoSeleccionado.progreso }}%
+        </p>
+      </div>
+      <div class="video-actions">
+        <button class="btn btn-primary" (click)="marcarComoVisto(videoSeleccionado)">
+          Marcar como visto
+        </button>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+</div>

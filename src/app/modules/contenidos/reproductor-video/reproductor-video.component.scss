@@ -1,0 +1,231 @@
+@use 'variable' as *;
+
+.reproductor-video {
+  position: relative;
+  background: black;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--surface-elev);
+  color: white;
+  font-family: 'Inter', sans-serif;
+
+  &.controles-ocultos .video-controls,
+  &.controles-ocultos .video-titulo {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .video-titulo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 15px 20px;
+    background: linear-gradient(0deg, transparent, rgba(0,0,0,0.7));
+    z-index: 10;
+    transition: opacity 0.3s;
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: white;
+    }
+  }
+
+  .video-container {
+    position: relative;
+    width: 100%;
+    background: black;
+
+    video {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: pointer;
+    }
+  }
+
+  .video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    z-index: 15;
+    cursor: pointer;
+
+    .play-button {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: var(--cyan);
+      color: white;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      transition: transform 0.2s;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .video-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.8), transparent);
+    padding: 15px 20px;
+    z-index: 20;
+    transition: opacity 0.3s;
+
+    .progress-bar-container {
+      position: relative;
+      height: 8px;
+      margin-bottom: 12px;
+      cursor: pointer;
+
+      .progress-bar-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 8px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 4px;
+        overflow: hidden;
+
+        .progress-bar-fill {
+          height: 100%;
+          background: var(--cyan);
+          transition: width 0.1s linear;
+        }
+
+        .progress-bar-hover {
+          position: absolute;
+          top: 0;
+          height: 100%;
+          background: rgba(255,255,255,0.4);
+          pointer-events: none;
+        }
+      }
+    }
+
+    .controls-bottom {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+
+      .control-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1.3rem;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 50%;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: rgba(255,255,255,0.2);
+        }
+      }
+
+      .volume-control {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        .volume-slider {
+          width: 80px;
+          cursor: pointer;
+          background: transparent;
+          accent-color: var(--cyan);
+        }
+      }
+
+      .time-display {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.8);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .speed-select {
+        background: rgba(0,0,0,0.5);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+
+        option {
+          background: #333;
+        }
+      }
+    }
+  }
+
+  .playlist {
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.9);
+
+    h4 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: white;
+    }
+
+    .playlist-items {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 200px;
+      overflow-y: auto;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: calc(var(--radius) / 2);
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: rgba(255,255,255,0.1);
+        }
+
+        &.activo {
+          background: rgba(74, 163, 194, 0.3);
+        }
+
+        .playlist-index {
+          color: rgba(255,255,255,0.5);
+          font-size: 0.9rem;
+          min-width: 25px;
+        }
+        .playlist-titulo {
+          flex: 1;
+          color: white;
+        }
+        .playlist-duracion {
+          color: rgba(255,255,255,0.5);
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+}

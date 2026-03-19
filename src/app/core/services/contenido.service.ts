@@ -11,6 +11,7 @@ export interface Video {
   nivel: 'principiante' | 'intermedio' | 'avanzado';
   progreso?: number; // 0-100
   completado: boolean;
+  thumbnail?: string;
 }
 
 export interface Modulo {
@@ -18,6 +19,7 @@ export interface Modulo {
   titulo: string;
   videos: Video[];
   completado: boolean;
+  progreso?: number; // AÑADIDO (opcional, se calculará en el componente)
 }
 
 @Injectable({
@@ -73,25 +75,20 @@ export class ContenidoService {
 
   constructor() {}
 
-  /** Obtiene todos los módulos */
   getModulos(): Observable<Modulo[]> {
     return of(this.modulosMock).pipe(delay(600));
   }
 
-  /** Obtiene un módulo por id */
   getModulo(id: string): Observable<Modulo | undefined> {
     const modulo = this.modulosMock.find(m => m.id === id);
     return of(modulo).pipe(delay(300));
   }
 
-  /** Obtiene los videos recomendados */
   getRecomendados(limit: number = 5): Observable<Video[]> {
     const todosLosVideos = this.modulosMock.flatMap(m => m.videos);
-    // Simplemente devolvemos los primeros
     return of(todosLosVideos.slice(0, limit)).pipe(delay(400));
   }
 
-  /** Marca un video como visto y actualiza progreso */
   marcarVideoComoVisto(moduloId: string, videoId: string): Observable<boolean> {
     const modulo = this.modulosMock.find(m => m.id === moduloId);
     if (modulo) {
@@ -100,13 +97,11 @@ export class ContenidoService {
         video.progreso = 100;
         video.completado = true;
       }
-      // Comprobar si el módulo está completo
       modulo.completado = modulo.videos.every(v => v.completado);
     }
     return of(true).pipe(delay(200));
   }
 
-  /** Actualiza el progreso de un video */
   actualizarProgreso(moduloId: string, videoId: string, progreso: number): Observable<boolean> {
     const modulo = this.modulosMock.find(m => m.id === moduloId);
     if (modulo) {
@@ -121,7 +116,6 @@ export class ContenidoService {
     return of(true).pipe(delay(200));
   }
 
-  /** Obtiene el progreso global del usuario (porcentaje de videos completados) */
   getProgresoGlobal(): Observable<number> {
     const todosLosVideos = this.modulosMock.flatMap(m => m.videos);
     const completados = todosLosVideos.filter(v => v.completado).length;

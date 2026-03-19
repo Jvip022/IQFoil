@@ -1,1 +1,82 @@
-<p>certificado works!</p>
+<div class="certificado">
+  <!-- Encabezado -->
+  <header class="certificado__header">
+    <div class="header-left">
+      <h2 class="certificado__title">🎓 Mis certificados</h2>
+      <p class="certificado__subtitle">Acreditaciones obtenidas por tu progreso en los cursos</p>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="certificado__connection"></app-estado-conexion>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando certificados...'"></app-loading-spinner>
+
+  <!-- Grid de certificados -->
+  <div class="certificado__grid" *ngIf="!cargando">
+    <div class="certificados-list" *ngIf="certificados.length > 0; else sinCertificados">
+      <div class="certificado-card" *ngFor="let cert of certificados" (click)="verCertificado(cert)">
+        <div class="certificado-card__icon">📜</div>
+        <div class="certificado-card__info">
+          <h3 class="certificado-card__titulo">{{ cert.titulo }}</h3>
+          <p class="certificado-card__descripcion">{{ cert.descripcion }}</p>
+          <div class="certificado-card__meta">
+            <span class="certificado-card__fecha">Obtenido: {{ cert.fecha | date:'dd/MM/yyyy' }}</span>
+            <span class="certificado-card__creditos">{{ cert.creditos }} créditos</span>
+          </div>
+        </div>
+        <div class="certificado-card__actions">
+          <button class="btn-icon" (click)="descargarCertificado(cert, $event)" title="Descargar PDF">⬇️</button>
+          <button class="btn-icon" (click)="verCertificado(cert)" title="Ver detalles">👁️</button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinCertificados>
+      <div class="sin-certificados">
+        <p>No has obtenido ningún certificado todavía.</p>
+        <p>Completa cursos y módulos para recibir tus acreditaciones.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de detalle del certificado -->
+  <app-modal-confirmacion 
+    *ngIf="certificadoSeleccionado"
+    [isOpen]="true"
+    [title]="certificadoSeleccionado.titulo"
+    [width]="'600px'"
+    (cancel)="cerrarDetalle()"
+    [confirmText]="'Cerrar'"
+    [cancelText]="''"
+    [closeOnOverlayClick]="true">
+    
+    <div class="certificado-detalle">
+      <div class="detalle-cabecera">
+        <div class="detalle-icono">🎓</div>
+        <div class="detalle-titulo">
+          <h3>{{ certificadoSeleccionado.titulo }}</h3>
+          <p>Otorgado a: <strong>{{ usuarioNombre }}</strong></p>
+        </div>
+      </div>
+      <div class="detalle-cuerpo">
+        <p><strong>Descripción:</strong> {{ certificadoSeleccionado.descripcion }}</p>
+        <p><strong>Fecha de obtención:</strong> {{ certificadoSeleccionado.fecha | date:'dd/MM/yyyy' }}</p>
+        <p><strong>Créditos:</strong> {{ certificadoSeleccionado.creditos }}</p>
+        <p><strong>ID del certificado:</strong> {{ certificadoSeleccionado.id }}</p>
+        <div class="detalle-logros" *ngIf="certificadoSeleccionado.logros?.length">
+          <p><strong>Logros incluidos:</strong></p>
+          <ul>
+            <li *ngFor="let logro of certificadoSeleccionado.logros">{{ logro }}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="detalle-acciones">
+        <button class="btn btn-primary" (click)="descargarCertificado(certificadoSeleccionado)">
+          ⬇️ Descargar PDF
+        </button>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+</div>

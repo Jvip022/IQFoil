@@ -1,1 +1,82 @@
-<p>progreso-modulo works!</p>
+<div class="progreso-modulo">
+  <!-- Encabezado -->
+  <header class="progreso-modulo__header">
+    <div class="header-left">
+      <h2 class="progreso-modulo__title">📊 Progreso de módulos</h2>
+      <p class="progreso-modulo__subtitle">Sigue tu avance en los diferentes módulos formativos</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-outline" (click)="refrescar()" [disabled]="cargando">
+        <span>🔄</span> Refrescar
+      </button>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="progreso-modulo__connection"></app-estado-conexion>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando progreso...'"></app-loading-spinner>
+
+  <!-- Lista de módulos -->
+  <div class="progreso-modulo__content" *ngIf="!cargando">
+    <div class="modulos-list" *ngIf="modulos.length > 0; else sinModulos">
+      <div class="modulo-card" *ngFor="let modulo of modulos" (click)="toggleModulo(modulo)">
+        <div class="modulo-card__header">
+          <div class="modulo-info">
+            <h3 class="modulo-titulo">{{ modulo.titulo }}</h3>
+            <span class="modulo-estado" [class.completado]="modulo.completado">
+              {{ modulo.completado ? 'Completado' : 'En progreso' }}
+            </span>
+          </div>
+          <div class="modulo-progreso">
+            <span class="progreso-porcentaje">{{ modulo.progreso }}%</span>
+            <button class="toggle-btn">
+              <span [class.rotado]="modulo.expandido">▼</span>
+            </button>
+          </div>
+        </div>
+        <div class="modulo-card__progress-bar">
+          <div class="progress-fill" [style.width.%]="modulo.progreso"></div>
+        </div>
+
+        <!-- Videos del módulo (expandible) -->
+        <div class="modulo-videos" *ngIf="modulo.expandido">
+          <div class="videos-list">
+            <div class="video-item" *ngFor="let video of modulo.videos">
+              <div class="video-check">
+                <span class="check-icon" [class.completado]="video.completado">✅</span>
+              </div>
+              <div class="video-info">
+                <span class="video-titulo">{{ video.titulo }}</span>
+                <span class="video-duracion">{{ video.duracion | duracion }}</span>
+              </div>
+              <div class="video-progreso">
+                <span class="progreso-texto">{{ video.progreso || 0 }}%</span>
+                <button class="btn-icon" (click)="marcarVideoComoVisto(modulo.id, video, $event)" title="Marcar como visto">✔️</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinModulos>
+      <div class="sin-modulos">
+        <p>No hay módulos disponibles en este momento.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de confirmación (opcional, por si se necesita) -->
+  <app-modal-confirmacion 
+    *ngIf="modalVisible"
+    [isOpen]="true"
+    [title]="modalTitulo"
+    [message]="modalMensaje"
+    (confirm)="confirmarAccionModal()"
+    (cancel)="cancelarModal()"
+    [confirmText]="modalConfirmText"
+    [cancelText]="'Cancelar'">
+  </app-modal-confirmacion>
+</div>

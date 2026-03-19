@@ -1,0 +1,217 @@
+@use 'variable' as *;
+
+.progreso-modulo {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+
+    .progreso-modulo__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .progreso-modulo__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+}
+
+.modulos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modulo-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 2px 8px var(--surface-elev);
+  transition: box-shadow 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 6px 16px var(--surface-elev);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .modulo-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .modulo-titulo {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--navy);
+      }
+
+      .modulo-estado {
+        font-size: 0.8rem;
+        padding: 3px 8px;
+        border-radius: 20px;
+        background: var(--surface-elev);
+        color: var(--muted);
+
+        &.completado {
+          background: rgba(76, 175, 80, 0.2);
+          color: #4caf50;
+        }
+      }
+    }
+
+    .modulo-progreso {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .progreso-porcentaje {
+        font-weight: 600;
+        color: var(--cyan);
+        min-width: 45px;
+        text-align: right;
+      }
+
+      .toggle-btn {
+        background: transparent;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: var(--muted);
+        transition: transform 0.2s;
+
+        .rotado {
+          transform: rotate(180deg);
+          display: inline-block;
+        }
+      }
+    }
+  }
+
+  &__progress-bar {
+    height: 8px;
+    background: var(--surface-elev);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--navy));
+      transition: width 0.3s ease;
+    }
+  }
+
+  .modulo-videos {
+    margin-top: 15px;
+    border-top: 1px solid var(--surface-elev);
+    padding-top: 15px;
+  }
+}
+
+.videos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.video-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: calc(var(--radius) / 2);
+  background: var(--surface-elev);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--surface-elev) 80%, black);
+  }
+
+  .video-check {
+    min-width: 30px;
+    text-align: center;
+
+    .check-icon {
+      font-size: 1.2rem;
+      opacity: 0.3;
+      transition: opacity 0.2s;
+
+      &.completado {
+        opacity: 1;
+      }
+    }
+  }
+
+  .video-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .video-titulo {
+      font-weight: 500;
+      color: var(--text);
+    }
+    .video-duracion {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  }
+
+  .video-progreso {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .progreso-texto {
+      font-size: 0.9rem;
+      color: var(--cyan);
+      min-width: 40px;
+      text-align: right;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      transition: background-color 0.2s, transform 0.2s;
+      color: var(--text);
+
+      &:hover {
+        background: var(--card-bg);
+        transform: scale(1.1);
+        color: var(--cyan);
+      }
+    }
+  }
+}
+
+.sin-modulos {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+}
