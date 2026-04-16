@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Pipe, PipeTransform } from '@angular/core';
+import { Component, OnInit, OnDestroy, Pipe, PipeTransform, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -42,7 +42,9 @@ export class SafeUrlPipe implements PipeTransform {
   templateUrl: './biblioteca-offline.component.html',
   styleUrls: ['./biblioteca-offline.component.scss']
 })
-export class BibliotecaOfflineComponent implements OnInit, OnDestroy {
+export class BibliotecaOfflineComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('foilGlow') foilGlow!: ElementRef<HTMLDivElement>;
+
   isOnline = navigator.onLine;
   searchTerm = '';
   documents: OfflineDocument[] = [];
@@ -53,6 +55,7 @@ export class BibliotecaOfflineComponent implements OnInit, OnDestroy {
   private onNetworkChange = () => {
     this.isOnline = navigator.onLine;
   };
+  private mouseMoveHandler: ((e: MouseEvent) => void) | null = null;
 
   constructor(
     private offlineService: OfflineService,
@@ -67,10 +70,30 @@ export class BibliotecaOfflineComponent implements OnInit, OnDestroy {
     window.addEventListener('offline', this.onNetworkChange);
   }
 
+  ngAfterViewInit(): void {
+    this.initGlowEffect();
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
     window.removeEventListener('online', this.onNetworkChange);
     window.removeEventListener('offline', this.onNetworkChange);
+    if (this.mouseMoveHandler) {
+      window.removeEventListener('mousemove', this.mouseMoveHandler);
+    }
+  }
+
+  private initGlowEffect(): void {
+    if (!this.foilGlow) return;
+
+    this.mouseMoveHandler = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth) * 100;
+      const y = (e.clientY / window.innerHeight) * 100;
+      if (this.foilGlow) {
+        this.foilGlow.nativeElement.style.background = `radial-gradient(ellipse at ${x}% ${y}%, rgba(0, 212, 255, 0.2), transparent 70%)`;
+      }
+    };
+    window.addEventListener('mousemove', this.mouseMoveHandler);
   }
 
   private loadDocuments(): void {

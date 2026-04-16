@@ -1,29 +1,33 @@
-// src/_variable.scss
-// Variables de diseño y colores (Sass)
+// ==========================================
+// Variables globales del tema IQFoil (estilo foil-home)
+// ==========================================
 
-// Paleta de colores principales (acentos)
-$navy: #1a2b4c;       // azul marino principal
-$cyan: #4aa3c2;       // azul cielo/cian
-$orange: #f39c12;     // naranja cálido (como salvavidas)
-$white: #ffffff;
-$black: #f8f8f8;
-$gray: #61708b;       // gris azulado para textos secundarios
+// Colores base (modo oscuro por defecto - estilo foil-home)
+$bg-dark: #03111f;
+$text-dark: #ffffff;
+$card-bg-dark: rgba(10, 25, 47, 0.7);
+$surface-elev-dark: rgba(20, 40, 65, 0.5);
+$muted-dark: #94a3b8;
 
-// Fondo y superficies - TEMA CLARO (tonos suaves de azul)
-$bg-light: #185c6dc0;           // azul muy claro, como cielo al amanecer
-$text-light: #1e2f47;         // azul marino oscuro para texto (legible)
-$card-bg-light: #84a59d;      // blanco con matiz azul suave (mayor contraste visual que blanco puro)
-$surface-elev-light: rgba(26, 43, 76, 0.08); // sombra sutil basada en navy
-$muted-light: #61708b;        // texto secundario en modo claro (usando $gray)
+// Colores modo claro (versión más suave, manteniendo coherencia)
+$bg-light: #eef2f8;
+$text-light: #1e293b;
+$card-bg-light: rgba(255, 255, 255, 0.85);
+$surface-elev-light: rgba(245, 245, 250, 0.9);
+$muted-light: #64748b;
 
-// TEMA OSCURO (azul marino profundo)
-$bg-dark: #0b1a2e;            // azul marino muy oscuro, casi negro
-$text-dark: #d9e6f2;          // blanco azulado suave para texto
-$card-bg-dark: #1e3347;       // azul más claro que el fondo (mejor contraste visual)
-$surface-elev-dark: rgba(0, 0, 0, 0.3); // sombra para dar profundidad
-$muted-dark: #9fb3c8;         // texto secundario en modo oscuro
+// Colores principales (comunes - tomados de foil-home)
+$navy: #1a2b4c;
+$cyan: #00e6d6;
+$orange: #f39c12;
+$gray: #94a3b8;
 
-// Medidas comunes
-$radius: 12px;
-$gap: 16px;
-$max-width: 1200px;           // ancho máximo de contenido
+// Medidas
+$radius: 0.75rem;
+$gap: 1rem;
+$max-width: 1400px;
+
+// Transparencias y efectos (estilo foil-home)
+$border-cyan-alpha: rgba(0, 230, 214, 0.2);
+$bg-blur: rgba(2, 20, 35, 0.6);
+$glow-cyan: rgba(0, 230, 214, 0.3);

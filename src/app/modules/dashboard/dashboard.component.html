@@ -1,196 +1,223 @@
-<section class="dashboard" role="main" aria-labelledby="dashboard-title">
+<section class="dashboard py-4" role="main" aria-labelledby="dashboard-title">
+  <div class="container-fluid px-4">
+    <!-- Header -->
+    <header class="dashboard__header d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+      <div class="header-left d-flex align-items-center gap-3">
+        <h1 id="dashboard-title" class="greeting h4 mb-0">
+          <img src="/Iqfoil.jpg" alt="Logo IQFOIL" class="iqfoil-header-logo me-2" style="height: 40px;">
+          Hola, <span class="username fw-bold text-cyan">{{ (user$ | async)?.displayName || (user$ | async)?.nombre || 'Usuario' }}</span>
+        </h1>
+        <app-estado-conexion class="estado-conexion"></app-estado-conexion>
+      </div>
 
-    <header class="dashboard__header">
-        <div class="header-left">
-            <h1 id="dashboard-title" class="greeting">
+      <div class="header-right d-flex align-items-center gap-3">
+        <button class="btn btn-icon position-relative" aria-label="Notificaciones" (click)="goToNotifications()">
+          <i class="bi bi-bell fs-5"></i>
+          <span *ngIf="(unreadCount$ | async) as unread" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-orange">
+            {{ unread }}
+          </span>
+        </button>
 
-                 <img src="/Iqfoil.jpg" alt="Logo IQFOIL" class="iqfoil-header-logo">
-                Hola, <span class="username">{{ (user$ | async)?.displayName || (user$ | async)?.nombre || 'Usuario'
-                    }}</span>
-            </h1>
-
-            <app-estado-conexion class="estado-conexion"></app-estado-conexion>
+        <div class="avatar" [title]="(user$ | async)?.displayName || (user$ | async)?.nombre">
+          <ng-container *ngIf="(user$ | async) as u">
+            <img *ngIf="u.avatarUrl; else initials" [src]="u.avatarUrl" class="rounded-circle object-fit-cover" width="44" height="44"
+                 alt="Avatar de {{ u.displayName || u.nombre }}" />
+            <ng-template #initials>
+              <span class="initials d-flex align-items-center justify-content-center bg-soft-cyan text-navy fw-bold rounded-circle" style="width: 44px; height: 44px;">
+                {{ getInitials(u) }}
+              </span>
+            </ng-template>
+          </ng-container>
         </div>
-
-        <div class="header-right">
-
-           
-
-            <button class="icon-btn notificacion" aria-label="Notificaciones" (click)="goToNotifications()">
-                <span class="bell" aria-hidden="true">🔔</span>
-                <span *ngIf="(unreadCount$ | async) as unread" class="badge" [hidden]="unread === 0">{{ unread }}</span>
-            </button>
-
-
-            <div class="avatar" [title]="(user$ | async)?.displayName || (user$ | async)?.nombre">
-                <ng-container *ngIf="(user$ | async) as u">
-                    <img *ngIf="u.avatarUrl; else initials" [src]="u.avatarUrl"
-                        alt="Avatar de {{ u.displayName || u.nombre }}" />
-                    <ng-template #initials>
-                        <span class="initials">{{ getInitials(u) }}</span>
-                    </ng-template>
-                </ng-container>
-            </div>
-        </div>
+      </div>
     </header>
 
-
-    <div *ngIf="(isOnline$ | async) === false" class="offline-banner" role="status">
-        <p>Estás sin conexión. Algunas funciones están limitadas.</p>
-        <app-biblioteca-offline class="biblioteca-offline-link"></app-biblioteca-offline>
+    <!-- Offline banner -->
+    <div *ngIf="(isOnline$ | async) === false" class="alert alert-warning d-flex justify-content-between align-items-center" role="status">
+      <p class="mb-0">Estás sin conexión. Algunas funciones están limitadas.</p>
+      <app-biblioteca-offline class="biblioteca-offline-link"></app-biblioteca-offline>
     </div>
 
+    <!-- Grid principal (Bootstrap) -->
+    <div class="row g-4">
+      <!-- Progreso (8 columnas en lg) -->
+      <div class="col-lg-8">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h2 class="card-title h5 mb-3">Resumen de progreso</h2>
 
-    <div class="dashboard__grid">
-
-        <section class="card progreso" aria-labelledby="progreso-title">
-            <h2 id="progreso-title">Resumen de progreso</h2>
-
-
-            <div class="global-progress">
-                <div class="progress-label">
-                    <span>Progreso global</span>
-                    <span class="percent">{{ (stats$ | async)?.globalProgress ?? 0 }}%</span>
-                </div>
-                <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"
-                    [attr.aria-valuenow]="(stats$ | async)?.globalProgress ?? 0">
-                    <div class="progress-fill" [style.width.%]="(stats$ | async)?.globalProgress ?? 0"></div>
-                </div>
+            <div class="global-progress mb-4">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Progreso global</span>
+                <span class="fw-bold">{{ (stats$ | async)?.globalProgress ?? 0 }}%</span>
+              </div>
+              <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                   [attr.aria-valuenow]="(stats$ | async)?.globalProgress ?? 0">
+                <div class="progress-bar bg-gradient-cyan-navy" [style.width.%]="(stats$ | async)?.globalProgress ?? 0"></div>
+              </div>
             </div>
 
-
-            <div class="quick-stats">
-                <div class="stat-card">
-                    <div class="stat-value">{{ (stats$ | async)?.videosVistos ?? 0 }}</div>
-                    <div class="stat-label">Vistos <span class="muted">/ {{ (stats$ | async)?.videosTotales ?? 0
-                            }}</span></div>
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <div class="stat-card p-3 border rounded-3 text-center">
+                  <div class="stat-value display-6 fw-bold text-navy">{{ (stats$ | async)?.videosVistos ?? 0 }}</div>
+                  <div class="stat-label text-muted">Vistos / {{ (stats$ | async)?.videosTotales ?? 0 }}</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">{{ (stats$ | async)?.evaluacionesCompletadas ?? 0 }}</div>
-                    <div class="stat-label">Evaluaciones completadas</div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card p-3 border rounded-3 text-center">
+                  <div class="stat-value display-6 fw-bold text-navy">{{ (stats$ | async)?.evaluacionesCompletadas ?? 0 }}</div>
+                  <div class="stat-label text-muted">Evaluaciones completadas</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value">{{ (stats$ | async)?.insignias ?? 0 }}</div>
-                    <div class="stat-label">Insignias obtenidas</div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card p-3 border rounded-3 text-center">
+                  <div class="stat-value display-6 fw-bold text-navy">{{ (stats$ | async)?.insignias ?? 0 }}</div>
+                  <div class="stat-label text-muted">Insignias obtenidas</div>
                 </div>
+              </div>
             </div>
-
 
             <div class="evolution-chart" *ngIf="(stats$ | async)?.evolucion?.length > 0">
-                <canvas #evolutionCanvas aria-label="Evolución de progreso" role="img"></canvas>
+              <canvas #evolutionCanvas class="w-100" aria-label="Evolución de progreso" role="img"></canvas>
             </div>
-        </section>
+          </div>
+        </div>
+      </div>
 
-
-        <section class="card recomendaciones" aria-labelledby="rec-title">
-            <h2 id="rec-title">Recomendaciones para ti</h2>
+      <!-- Recomendaciones (4 columnas en lg) -->
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h2 class="card-title h5 mb-3">Recomendaciones para ti</h2>
             <div *ngIf="(recomendaciones$ | async) as recs; else noRecs">
-                <ul class="rec-list">
-                    <li *ngFor="let r of recs" class="rec-item">
-                        <div class="rec-left">
-                            <div class="rec-type">{{ r.tipo | uppercase }}</div>
-                            <h3 class="rec-title">{{ r.titulo }}</h3>
-                            <div class="rec-meta">Nivel: {{ r.nivel }}</div>
-                        </div>
-                        <div class="rec-right">
-                            <button class="btn btn-outline" (click)="openContent(r)">Ver</button>
-                        </div>
-                    </li>
-                </ul>
+              <div class="list-group list-group-flush">
+                <div *ngFor="let r of recs" class="list-group-item bg-transparent px-0 d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="badge bg-soft-cyan text-navy mb-1">{{ r.tipo | uppercase }}</div>
+                    <h3 class="h6 mb-0">{{ r.titulo }}</h3>
+                    <small class="text-muted">Nivel: {{ r.nivel }}</small>
+                  </div>
+                  <button class="btn btn-sm btn-outline-cyan" (click)="openContent(r)">Ver</button>
+                </div>
+              </div>
             </div>
             <ng-template #noRecs>
-                <p class="muted">No hay recomendaciones por el momento. Sigue completando contenidos para que el sistema
-                    te sugiera material.</p>
+              <p class="text-muted mb-0">No hay recomendaciones por el momento. Sigue completando contenidos para que el sistema te sugiera material.</p>
             </ng-template>
-        </section>
+          </div>
+        </div>
+      </div>
 
+      <!-- Notificaciones (4 col) -->
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h2 class="card-title h5 mb-3">Últimas notificaciones</h2>
+            <div *ngIf="(ultimasNotificaciones$ | async) as notas">
+              <div *ngIf="notas.length > 0; else noNotes">
+                <div class="list-group list-group-flush">
+                  <div *ngFor="let n of notas | slice:0:6" class="list-group-item bg-transparent px-0" (click)="openNotification(n)" style="cursor: pointer;">
+                    <div class="fw-semibold">{{ n.titulo }}</div>
+                    <div class="small text-muted">{{ n.resumen }}</div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noNotes>
+                <p class="text-muted mb-0">No hay notificaciones recientes.</p>
+              </ng-template>
+              <a class="btn btn-link text-cyan mt-2 p-0" (click)="goToNotifications()">Ver todas</a>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <section class="card notificaciones" aria-labelledby="noti-title">
-            <h2 id="noti-title">Últimas notificaciones</h2>
+      <!-- Accesos rápidos (4 col) -->
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h2 class="card-title h5 mb-3">Accesos rápidos</h2>
+            <div class="row g-3">
+              <div *ngFor="let a of accesosVisibles" class="col-6 col-md-4">
+                <a [routerLink]="a.link" class="text-decoration-none text-center d-block p-2 rounded-3 access-link" [attr.aria-label]="a.label">
+                  <div class="access-icon fs-1 mb-2" [innerHTML]="a.icon"></div>
+                  <div class="access-label small fw-semibold">{{ a.label }}</div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <ul *ngIf="(ultimasNotificaciones$ | async) as notas" class="noti-list">
-                <ng-container *ngIf="notas.length > 0; else noNotes">
-                    <li *ngFor="let n of notas | slice:0:6" class="noti-item" (click)="openNotification(n)">
-                        <div class="noti-title">{{ n.titulo }}</div>
-                        <div class="noti-meta">{{ n.resumen }}</div>
-                    </li>
-                </ng-container>
-            </ul>
-            <ng-template #noNotes>
-                <p class="muted">No hay notificaciones recientes.</p>
-            </ng-template>
-            <a class="ver-todas" (click)="goToNotifications()">Ver todas</a>
-        </section>
+      <!-- Panel específico por rol (4 col) -->
+      <div class="col-lg-4">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body">
+            <h2 class="card-title h5 mb-3">Panel específico</h2>
 
-
-        <nav class="card accesos" aria-label="Accesos rápidos">
-            <h2>Accesos rápidos</h2>
-            <ul class="access-grid">
-                <li *ngFor="let a of accesosVisibles" class="access-item">
-                    <a [routerLink]="a.link" class="access-link" [attr.aria-label]="a.label">
-                        <div class="access-icon" [innerHTML]="a.icon"></div>
-                        <div class="access-label">{{ a.label }}</div>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-
-        <section class="card por-rol" aria-labelledby="rol-title">
-            <h2 id="rol-title">Panel específico</h2>
-
-
+            <!-- Atleta -->
             <div *ngIf="(role$ | async) === 'atleta'">
-                <h3>Próximos eventos</h3>
-                <ul class="list-inline">
-                    <li *ngFor="let e of (proximosEventos$ | async) || []">{{ e.fecha | date:'shortDate' }} — {{
-                        e.titulo }}</li>
-                </ul>
-                <div class="mentor" *ngIf="(mentor$ | async) as m">
-                    <h4>Mentor asignado</h4>
-                    <div class="mentor-card">
-                        <div class="mentor-name">{{ m.nombre }}</div>
-                        <div class="mentor-contact">{{ m.contacto }}</div>
-                    </div>
+              <h3 class="h6">Próximos eventos</h3>
+              <ul class="list-unstyled mb-3">
+                <li *ngFor="let e of (proximosEventos$ | async) || []" class="mb-2">
+                  <i class="bi bi-calendar-event me-2 text-cyan"></i> {{ e.fecha | date:'shortDate' }} — {{ e.titulo }}
+                </li>
+              </ul>
+              <div class="mentor" *ngIf="(mentor$ | async) as m">
+                <h4 class="h6">Mentor asignado</h4>
+                <div class="p-3 bg-soft-cyan rounded-3">
+                  <div class="fw-bold">{{ m.nombre }}</div>
+                  <div class="small">{{ m.contacto }}</div>
                 </div>
+              </div>
             </div>
 
-
+            <!-- Entrenador -->
             <div *ngIf="(role$ | async) === 'entrenador'">
-                <h3>Atletas a cargo</h3>
-                <ul class="coach-list">
-                    <li *ngFor="let a of (atletasACargo$ | async) || []" class="coach-item">
-                        <div class="coach-name">{{ a.nombre }}</div>
-                        <div class="coach-progress">
-                            <div class="mini-progress" [style.width.%]="a.progreso ?? 0"></div>
-                            <div class="mini-text">{{ a.progreso ?? 0 }}%</div>
-                        </div>
-                    </li>
-                </ul>
-
-                <h3>Evaluaciones pendientes</h3>
-                <ul class="list-inline">
-                    <li *ngFor="let ev of (evaluacionesPendientes$ | async) || []">{{ ev.titulo }} — {{ ev.atleta }}
-                    </li>
-                </ul>
+              <h3 class="h6">Atletas a cargo</h3>
+              <ul class="list-unstyled mb-3">
+                <li *ngFor="let a of (atletasACargo$ | async) || []" class="mb-2">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span>{{ a.nombre }}</span>
+                    <div class="w-50 ms-2">
+                      <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-cyan" [style.width.%]="a.progreso ?? 0"></div>
+                      </div>
+                    </div>
+                    <span class="small ms-2">{{ a.progreso ?? 0 }}%</span>
+                  </div>
+                </li>
+              </ul>
+              <h3 class="h6 mt-3">Evaluaciones pendientes</h3>
+              <ul class="list-unstyled">
+                <li *ngFor="let ev of (evaluacionesPendientes$ | async) || []" class="mb-2">
+                  <i class="bi bi-clipboard-check me-2 text-cyan"></i> {{ ev.titulo }} — {{ ev.atleta }}
+                </li>
+              </ul>
             </div>
 
-            <!-- ADMIN -->
+            <!-- Admin -->
             <div *ngIf="(role$ | async) === 'admin'">
-                <h3>Estadísticas de uso</h3>
-                <div class="admin-stats-grid">
-                    <div class="admin-stat">
-                        <div class="admin-value">{{ (adminStats$ | async)?.usuariosActivos ?? 0 }}</div>
-                        <div class="admin-label">Usuarios activos</div>
-                    </div>
-                    <div class="admin-stat">
-                        <div class="admin-value">{{ (adminStats$ | async)?.contenidoTop ?? '—' }}</div>
-                        <div class="admin-label">Contenido más visto</div>
-                    </div>
+              <h3 class="h6">Estadísticas de uso</h3>
+              <div class="row g-2 mb-3">
+                <div class="col-6">
+                  <div class="border rounded-3 p-2 text-center">
+                    <div class="display-6 fw-bold text-navy">{{ (adminStats$ | async)?.usuariosActivos ?? 0 }}</div>
+                    <div class="small text-muted">Usuarios activos</div>
+                  </div>
                 </div>
-
-                <button class="btn btn-primary" (click)="goToAdmin()">Ir a administración</button>
+                <div class="col-6">
+                  <div class="border rounded-3 p-2 text-center">
+                    <div class="fw-bold text-truncate">{{ (adminStats$ | async)?.contenidoTop ?? '—' }}</div>
+                    <div class="small text-muted">Contenido más visto</div>
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-primary w-100" (click)="goToAdmin()">Ir a administración</button>
             </div>
-        </section>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </section>

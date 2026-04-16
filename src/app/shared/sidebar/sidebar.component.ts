@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -7,7 +7,7 @@ interface MenuItem {
   route: string;
   label: string;
   icon: string;
-  exact: boolean; // Ahora siempre está definido
+  exact: boolean;
 }
 
 interface User {
@@ -26,7 +26,8 @@ interface User {
 export class SidebarComponent implements OnInit {
   @Input() collapsed = false;
 
-  isCollapsed = this.collapsed;
+  isCollapsed = this.collapsed;       // controla estado colapsado (escritorio)
+  isMobileExpanded = false;           // controla apertura manual en móvil
   user: User | null = null;
   userInitials = '';
 
@@ -55,8 +56,18 @@ export class SidebarComponent implements OnInit {
     });
   }
 
+  // Alterna colapso en escritorio (clase .sidebar--collapsed)
   toggleCollapse(): void {
     this.isCollapsed = !this.isCollapsed;
+    // Si se expande manualmente en escritorio, también reflejamos en móvil
+    if (!this.isCollapsed) {
+      this.isMobileExpanded = true;
+    }
+  }
+
+  // Botón hamburguesa para móvil
+  toggleMobile(): void {
+    this.isMobileExpanded = !this.isMobileExpanded;
   }
 
   logout(): void {

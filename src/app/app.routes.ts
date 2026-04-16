@@ -2,9 +2,11 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './modules/login/login.component';
 import { DashboardComponent } from './modules/dashboard/dashboard.component';
 import { AuthGuard } from './core/guards/auth.guard'; 
+//import { FoilHomeComponent } from './foil-home/foil-home.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  //{ path: 'foil-home', component: FoilHomeComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { 
     path: 'contenidos', 

@@ -1,9 +1,17 @@
+@use 'variable' as *;
+
 .footer {
   background-color: var(--card-bg);
-  border-top: 1px solid var(--surface-elev);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-cyan-alpha);
   padding: var(--gap) 0;
-  margin-top: calc(var(--gap) * 2);
+  // Eliminamos el margin-top que provocaba que el footer subiera al medio de la pantalla
+  // y lo reemplazamos por un margen superior automático que solo funciona si el padre es flex column.
+  // Asegúrate de que el contenedor padre (app-root o main) tenga:
+  // display: flex; flex-direction: column; min-height: 100vh;
+  margin-top: auto;
   color: var(--text);
+  width: 100%;
 
   &__container {
     max-width: var(--max-width);

@@ -5,27 +5,69 @@
   top: 0;
   left: 0;
   height: 100vh;
-  width: 260px;
-  background-color: var(--card-bg, #ffffff);
-  box-shadow: 2px 0 8px var(--surface-elev, rgba(0,0,0,0.1));
+  width: 72px; // colapsado por defecto
+  background-color: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid var(--border-cyan-alpha);
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, background-color 0.2s;
   z-index: 1000;
+  overflow-x: hidden;
 
+  // Expansión por hover (solo escritorio)
+  @media (hover: hover) and (min-width: 769px) {
+    &:hover {
+      width: 260px;
+      .sidebar__label {
+        display: inline-block;
+      }
+      .sidebar__user-info {
+        display: flex;
+      }
+      .sidebar__logo img {
+        width: auto;
+      }
+    }
+  }
+
+  // Estado colapsado (clase .sidebar--collapsed)
   &--collapsed {
     width: 72px;
-
     .sidebar__label {
       display: none;
     }
-
     .sidebar__user-info {
       display: none;
     }
-
     .sidebar__logo img {
       width: 32px;
+    }
+    .sidebar__toggle {
+      display: flex;
+    }
+    .sidebar__toggle-mobile {
+      display: none;
+    }
+  }
+
+  // Estado expandido (manual o por hover)
+  &--expanded {
+    width: 260px;
+    .sidebar__label {
+      display: inline-block;
+    }
+    .sidebar__user-info {
+      display: flex;
+    }
+    .sidebar__logo img {
+      width: auto;
+    }
+    .sidebar__toggle {
+      display: flex;
+    }
+    .sidebar__toggle-mobile {
+      display: none;
     }
   }
 
@@ -34,13 +76,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 1rem;
-    border-bottom: 1px solid var(--surface-elev, rgba(0,0,0,0.1));
+    border-bottom: 1px solid var(--border-cyan-alpha);
   }
 
   &__logo {
     display: flex;
     align-items: center;
-
     img {
       height: 40px;
       width: auto;
@@ -48,6 +89,7 @@
     }
   }
 
+  // Botón de colapso (escritorio)
   &__toggle {
     background: none;
     border: none;
@@ -56,14 +98,12 @@
     flex-direction: column;
     gap: 4px;
     padding: 4px;
-
     span {
       display: block;
       width: 20px;
       height: 2px;
-      background-color: var(--navy, #1a2b4c);
+      background-color: var(--cyan);
       transition: transform 0.3s;
-
       &:first-child {
         transform-origin: left center;
       }
@@ -71,9 +111,27 @@
         transform-origin: left center;
       }
     }
-
     &:hover span {
-      background-color: var(--cyan, #4aa3c2);
+      background-color: var(--cyan);
+    }
+  }
+
+  // Botón hamburguesa (móvil)
+  &__toggle-mobile {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 30px;
+    span {
+      width: 100%;
+      height: 3px;
+      background: var(--cyan);
+      border-radius: 3px;
+      transition: all 0.3s ease;
     }
   }
 
@@ -94,18 +152,19 @@
     align-items: center;
     gap: 12px;
     padding: 0.75rem 1rem;
-    color: var(--text, #1e2f47);
+    color: var(--text);
     text-decoration: none;
     transition: background-color 0.2s;
+    white-space: nowrap;
 
     &:hover {
-      background-color: var(--surface-elev, rgba(0,0,0,0.05));
+      background-color: rgba(0, 230, 214, 0.1);
     }
 
     &.active {
-      background-color: color-mix(in srgb, var(--cyan, #4aa3c2) 15%, transparent);
-      border-left: 3px solid var(--cyan, #4aa3c2);
-      color: var(--cyan, #4aa3c2);
+      background-color: rgba(0, 230, 214, 0.15);
+      border-left: 3px solid var(--cyan);
+      color: var(--cyan);
     }
   }
 
@@ -113,6 +172,7 @@
     font-size: 1.3rem;
     min-width: 24px;
     text-align: center;
+    color: var(--cyan);
   }
 
   &__label {
@@ -122,7 +182,7 @@
   }
 
   &__footer {
-    border-top: 1px solid var(--surface-elev, rgba(0,0,0,0.1));
+    border-top: 1px solid var(--border-cyan-alpha);
     padding: 1rem;
   }
 
@@ -144,7 +204,6 @@
     justify-content: center;
     color: white;
     font-weight: 600;
-
     img {
       width: 100%;
       height: 100%;
@@ -165,12 +224,12 @@
   &__user-name {
     font-size: 0.9rem;
     font-weight: 600;
-    color: var(--text, #1e2f47);
+    color: var(--text);
   }
 
   &__user-role {
     font-size: 0.75rem;
-    color: var(--muted, #61708b);
+    color: var(--muted);
   }
 
   &__logout {
@@ -182,15 +241,36 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--muted, #61708b);
+    color: var(--muted);
     transition: color 0.2s;
-
     &:hover {
-      color: var(--orange, #f39c12);
+      color: var(--orange);
     }
-
     .sidebar__icon {
       font-size: 1.2rem;
+    }
+  }
+}
+
+// Reglas para móvil (max-width: 768px)
+@media (max-width: 768px) {
+  .sidebar {
+    width: 0;
+    transition: width 0.3s ease;
+    background-color: var(--card-bg);
+    backdrop-filter: blur(16px);
+    border-right: none;
+    overflow: hidden;
+
+    &--expanded {
+      width: 260px;
+    }
+
+    &__toggle-mobile {
+      display: flex;
+    }
+    &__toggle {
+      display: none;
     }
   }
 }

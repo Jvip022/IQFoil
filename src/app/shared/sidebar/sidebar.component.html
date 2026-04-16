@@ -1,8 +1,17 @@
-<aside class="sidebar" [class.sidebar--collapsed]="isCollapsed">
+<aside class="sidebar" 
+       [class.sidebar--collapsed]="isCollapsed && !isMobileExpanded" 
+       [class.sidebar--expanded]="!isCollapsed || isMobileExpanded">
   <div class="sidebar__header">
     <a routerLink="/" class="sidebar__logo">
       <img src="assets/logo.svg" alt="Mutimedia Vela" />
     </a>
+    <!-- Botón hamburguesa (visible solo en móvil) -->
+    <button class="sidebar__toggle-mobile" (click)="toggleMobile()" aria-label="Abrir menú">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <!-- Botón de colapso (escritorio) -->
     <button class="sidebar__toggle" (click)="toggleCollapse()" aria-label="Toggle sidebar">
       <span></span>
       <span></span>
@@ -33,14 +42,14 @@
           <span class="sidebar__initials">{{ userInitials }}</span>
         </ng-template>
       </div>
-      <div class="sidebar__user-info" *ngIf="!isCollapsed">
+      <div class="sidebar__user-info" *ngIf="(!isCollapsed || isMobileExpanded)">
         <span class="sidebar__user-name">{{ user.name }}</span>
         <span class="sidebar__user-role">{{ user.role }}</span>
       </div>
     </div>
-    <button class="sidebar__logout" (click)="logout()" *ngIf="user" [attr.aria-label]="isCollapsed ? 'Cerrar sesión' : null">
+    <button class="sidebar__logout" (click)="logout()" *ngIf="user" [attr.aria-label]="(!isCollapsed || isMobileExpanded) ? null : 'Cerrar sesión'">
       <i class="sidebar__icon">🚪</i>
-      <span class="sidebar__label" *ngIf="!isCollapsed">Cerrar sesión</span>
+      <span class="sidebar__label" *ngIf="(!isCollapsed || isMobileExpanded)">Cerrar sesión</span>
     </button>
   </div>
 </aside>

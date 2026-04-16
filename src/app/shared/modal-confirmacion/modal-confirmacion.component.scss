@@ -6,8 +6,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(2, 24, 38, 0.7);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,9 +16,11 @@
 }
 
 .modal-container {
-  background-color: var(--card-bg, #ffffff);
-  border-radius: var(--radius, 12px);
-  box-shadow: 0 20px 40px var(--surface-elev, rgba(0,0,0,0.2));
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-cyan-alpha);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   max-width: 90vw;
   max-height: 90vh;
   overflow-y: auto;
@@ -29,15 +31,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem var(--gap, 16px);
-  border-bottom: 1px solid var(--surface-elev, rgba(0,0,0,0.1));
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--border-cyan-alpha);
 }
 
 .modal-title {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text, #1e2f47);
+  color: var(--text);
 }
 
 .modal-close {
@@ -46,21 +48,21 @@
   font-size: 1.8rem;
   line-height: 1;
   cursor: pointer;
-  color: var(--muted, #61708b);
+  color: var(--muted);
   transition: color 0.2s;
 
   &:hover {
-    color: var(--navy, #1a2b4c);
+    color: var(--cyan);
   }
 }
 
 .modal-body {
-  padding: 1.5rem var(--gap, 16px);
+  padding: 1.5rem;
 }
 
 .modal-message {
   margin: 0;
-  color: var(--text, #1e2f47);
+  color: var(--text);
   font-size: 1rem;
   line-height: 1.5;
 }
@@ -69,34 +71,39 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
-  padding: 1rem var(--gap, 16px);
-  border-top: 1px solid var(--surface-elev, rgba(0,0,0,0.1));
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-cyan-alpha);
 }
 
 .btn {
-  padding: 0.6rem 1.2rem;
-  border-radius: calc(var(--radius, 12px) / 2);
+  padding: 0.5rem 1.2rem;
+  border-radius: 40px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   border: none;
 
   &-primary {
-    background-color: var(--cyan, #4aa3c2);
-    color: white;
+    background: var(--cyan);
+    color: #02121e;
+    box-shadow: 0 4px 12px rgba(0, 230, 214, 0.2);
 
     &:hover {
-      background-color: color-mix(in srgb, var(--cyan, #4aa3c2) 90%, black);
+      background: #00ffee;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 230, 214, 0.4);
     }
   }
 
   &-secondary {
-    background-color: transparent;
-    border: 1px solid var(--muted, #61708b);
-    color: var(--text, #1e2f47);
+    background: transparent;
+    border: 1px solid var(--border-cyan-alpha);
+    color: var(--text);
 
     &:hover {
-      background-color: var(--surface-elev, rgba(0,0,0,0.05));
+      background: rgba(0, 230, 214, 0.1);
+      border-color: var(--cyan);
+      transform: translateY(-2px);
     }
   }
 }
