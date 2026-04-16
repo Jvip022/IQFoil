@@ -1,0 +1,82 @@
+<div class="calculadora-ajustes">
+  <!-- Encabezado con estilo foil -->
+  <header class="calculadora-ajustes__header">
+    <div class="badge">
+      <i class="fas fa-sliders-h"></i> AJUSTES FOIL · IQFOIL
+    </div>
+    <h1 class="calculadora-ajustes__title">⚙️ Calculadora de <span class="title-accent">ajustes</span></h1>
+    <p class="calculadora-ajustes__subtitle">Configuración óptima según condiciones de mar y viento</p>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="calculadora-ajustes__connection"></app-estado-conexion>
+
+  <div class="calculadora-ajustes__layout">
+    <!-- Panel de parámetros -->
+    <div class="panel card">
+      <h3 class="panel-title">📊 Parámetros de entrada</h3>
+
+      <div class="input-group">
+        <label>🌬️ Velocidad del viento: <strong>{{ params.viento }} nudos</strong></label>
+        <input type="range" min="0" max="30" step="0.5" [(ngModel)]="params.viento" (input)="calcular()" class="slider" />
+      </div>
+
+      <div class="input-group">
+        <label>🌊 Altura de ola: <strong>{{ params.ola }} m</strong></label>
+        <input type="range" min="0" max="5" step="0.1" [(ngModel)]="params.ola" (input)="calcular()" class="slider" />
+      </div>
+
+      <div class="input-group">
+        <label>⚖️ Peso del navegante: <strong>{{ params.peso }} kg</strong></label>
+        <input type="range" min="50" max="120" step="1" [(ngModel)]="params.peso" (input)="calcular()" class="slider" />
+      </div>
+
+      <div class="input-group">
+        <label>📐 Ángulo de foil base: <strong>{{ params.anguloFoil }}°</strong></label>
+        <input type="range" min="0" max="10" step="0.5" [(ngModel)]="params.anguloFoil" (input)="calcular()" class="slider" />
+      </div>
+
+      <div class="input-group checkbox">
+        <label>
+          <input type="checkbox" [(ngModel)]="params.olaGrande" (change)="calcular()" />
+          🌊 Condiciones de ola grande (+2° ajuste)
+        </label>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-outline" (click)="resetear()">🔄 Restablecer</button>
+        <button class="btn btn-primary" (click)="guardarConfiguracion()">💾 Guardar configuración</button>
+      </div>
+    </div>
+
+    <!-- Panel de resultados -->
+    <div class="panel card">
+      <h3 class="panel-title">📈 Resultados recomendados</h3>
+
+      <div class="result-item">
+        <span class="label">Ángulo óptimo de foil:</span>
+        <span class="value">{{ resultados.anguloOptimo }}°</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Tensión del stay:</span>
+        <span class="value">{{ resultados.tensionStay }} kg</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Posición del carro:</span>
+        <span class="value">{{ resultados.posicionCarro }} cm</span>
+      </div>
+      <div class="result-item">
+        <span class="label">Ángulo de orza:</span>
+        <span class="value">{{ resultados.anguloOrza }}°</span>
+      </div>
+      <div class="result-item recomendacion">
+        <span class="label">📌 Recomendación:</span>
+        <span class="value">{{ resultados.recomendacion }}</span>
+      </div>
+
+      <div class="glow-tip">
+        <i class="fas fa-lightbulb"></i> Ajusta los parámetros y guarda tu configuración favorita.
+      </div>
+    </div>
+  </div>
+</div>

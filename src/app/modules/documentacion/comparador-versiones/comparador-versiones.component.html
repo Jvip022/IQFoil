@@ -1,0 +1,87 @@
+<div class="comparador-versiones">
+  <!-- Encabezado con estilo foil -->
+  <header class="comparador-versiones__header">
+    <div class="badge">
+      <i class="fas fa-code-branch"></i> COMPARADOR · IQFOIL
+    </div>
+    <h1 class="comparador-versiones__title">📑 Comparador de <span class="title-accent">versiones</span></h1>
+    <p class="comparador-versiones__subtitle">Compara diferentes versiones de documentos y reglamentos</p>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="comparador-versiones__connection"></app-estado-conexion>
+
+  <!-- Selector de documento -->
+  <div class="comparador-versiones__selector card">
+    <div class="form-group">
+      <label for="documento">Seleccionar documento</label>
+      <select id="documento" [(ngModel)]="documentoSeleccionadoId" (change)="cargarVersiones()" class="form-control">
+        <option value="">-- Elige un documento --</option>
+        <option *ngFor="let doc of documentosDisponibles" [value]="doc.id">{{ doc.titulo }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Versiones a comparar -->
+  <div class="comparador-versiones__versiones" *ngIf="versiones.length >= 2">
+    <div class="versiones-selector">
+      <div class="form-group">
+        <label for="versionA">Versión A (original)</label>
+        <select id="versionA" [(ngModel)]="versionAId" (change)="cargarComparacion()" class="form-control">
+          <option *ngFor="let v of versiones" [value]="v.id">{{ v.nombre }} ({{ v.fecha | date:'dd/MM/yyyy' }})</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="versionB">Versión B (nueva)</label>
+        <select id="versionB" [(ngModel)]="versionBId" (change)="cargarComparacion()" class="form-control">
+          <option *ngFor="let v of versiones" [value]="v.id">{{ v.nombre }} ({{ v.fecha | date:'dd/MM/yyyy' }})</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loader mientras compara -->
+  <app-loading-spinner *ngIf="comparando" [text]="'Comparando versiones...'"></app-loading-spinner>
+
+  <!-- Resultado de la comparación -->
+  <div class="comparador-versiones__resultado card" *ngIf="resultadoComparacion && !comparando">
+    <h3 class="resultado-titulo">📌 Diferencias encontradas</h3>
+
+    <div class="resumen">
+      <p><strong>Documento:</strong> {{ nombreDocumento }}</p>
+      <p><strong>Versiones:</strong> {{ nombreVersionA }} ↔ {{ nombreVersionB }}</p>
+    </div>
+
+    <div class="diferencias" *ngIf="resultadoComparacion.diferencias.length > 0; else sinDiferencias">
+      <div class="diferencia-item" *ngFor="let diff of resultadoComparacion.diferencias">
+        <div class="diferencia-tipo" [class.adicion]="diff.tipo === 'adicion'" 
+                                     [class.eliminacion]="diff.tipo === 'eliminacion'" 
+                                     [class.modificacion]="diff.tipo === 'modificacion'">
+          {{ diff.tipo | uppercase }}
+        </div>
+        <div class="diferencia-contenido">
+          <div class="diferencia-original" *ngIf="diff.original">
+            <span class="badge-original">Original:</span> {{ diff.original }}
+          </div>
+          <div class="diferencia-nuevo" *ngIf="diff.nuevo">
+            <span class="badge-nuevo">Nuevo:</span> {{ diff.nuevo }}
+          </div>
+          <div class="diferencia-descripcion" *ngIf="diff.descripcion">
+            {{ diff.descripcion }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinDiferencias>
+      <div class="sin-diferencias">
+        <p>No hay diferencias entre las versiones seleccionadas.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Mensaje cuando no hay suficientes versiones -->
+  <div class="comparador-versiones__empty card" *ngIf="documentoSeleccionadoId && versiones.length < 2 && !comparando">
+    <p>Este documento no tiene al menos dos versiones disponibles para comparar.</p>
+  </div>
+</div>

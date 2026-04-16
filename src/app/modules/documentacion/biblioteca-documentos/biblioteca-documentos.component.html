@@ -1,0 +1,173 @@
+<div class="biblioteca-documentos">
+  <!-- Encabezado con estilo foil -->
+  <header class="biblioteca-documentos__header">
+    <div class="badge">
+      <i class="fas fa-folder-open"></i> BIBLIOTECA · IQFOIL
+    </div>
+    <h1 class="biblioteca-documentos__title">📄 Biblioteca de <span class="title-accent">documentos</span></h1>
+    <p class="biblioteca-documentos__subtitle">Gestiona todos los documentos técnicos y reglamentarios</p>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="biblioteca-documentos__connection"></app-estado-conexion>
+
+  <!-- Barra de acciones -->
+  <div class="biblioteca-documentos__actions">
+    <div class="search-box">
+      <input type="text" placeholder="Buscar por título, autor o descripción..." [(ngModel)]="searchTerm" (input)="filterDocuments()" class="search-input" />
+      <i class="search-icon">🔍</i>
+    </div>
+    <div class="filter-options">
+      <select [(ngModel)]="filtroTipo" (change)="filterDocuments()" class="filter-select">
+        <option value="">Todos los tipos</option>
+        <option value="pdf">PDF</option>
+        <option value="word">Word</option>
+        <option value="excel">Excel</option>
+        <option value="imagen">Imagen</option>
+        <option value="video">Video</option>
+        <option value="otro">Otro</option>
+      </select>
+      <select [(ngModel)]="ordenPor" (change)="ordenarDocumentos()" class="filter-select">
+        <option value="fechaDesc">Más recientes</option>
+        <option value="fechaAsc">Más antiguos</option>
+        <option value="tituloAsc">Título A-Z</option>
+        <option value="tituloDesc">Título Z-A</option>
+        <option value="tamanoDesc">Más pesados</option>
+        <option value="tamanoAsc">Más ligeros</option>
+      </select>
+      <button class="btn-icon" (click)="cambiarVista()" title="Cambiar vista">
+        <span *ngIf="vista === 'grid'">📋</span>
+        <span *ngIf="vista === 'lista'">🔲</span>
+      </button>
+      <button class="btn btn-primary" (click)="abrirModalSubida()">➕ Subir documento</button>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando documentos...'"></app-loading-spinner>
+
+  <!-- Contenido principal -->
+  <div class="biblioteca-documentos__content" *ngIf="!cargando">
+    <ng-container [ngTemplateOutlet]="vista === 'grid' ? gridTemplate : listaTemplate"></ng-container>
+  </div>
+
+  <!-- Mensaje cuando no hay documentos -->
+  <div class="biblioteca-documentos__empty" *ngIf="!cargando && filteredDocuments.length === 0">
+    <p *ngIf="searchTerm || filtroTipo">No se encontraron documentos con los filtros aplicados</p>
+    <p *ngIf="!searchTerm && !filtroTipo">No hay documentos disponibles</p>
+  </div>
+
+  <!-- Template vista cuadrícula -->
+  <ng-template #gridTemplate>
+    <div class="documents-grid">
+      <div class="document-card" *ngFor="let doc of filteredDocuments" (click)="seleccionarDocumento(doc)">
+        <div class="document-card__icon">{{ getFileIcon(doc.tipo) }}</div>
+        <div class="document-card__info">
+          <h3 class="document-card__title">{{ doc.titulo }}</h3>
+          <p class="document-card__meta">
+            <span class="document-card__autor">{{ doc.autor }}</span>
+            <span class="document-card__fecha">{{ doc.fechaSubida | date:'dd/MM/yyyy' }}</span>
+            <span class="document-card__size">{{ doc.tamano | fileSize }}</span>
+          </p>
+        </div>
+        <div class="document-card__actions">
+          <button class="icon-btn" (click)="descargarDocumento(doc, $event)" title="Descargar">⬇️</button>
+          <button class="icon-btn" (click)="editarDocumento(doc, $event)" title="Editar">✏️</button>
+          <button class="icon-btn" (click)="confirmarEliminar(doc, $event)" title="Eliminar">🗑️</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Template vista lista -->
+  <ng-template #listaTemplate>
+    <div class="documents-list">
+      <div class="document-row" *ngFor="let doc of filteredDocuments" (click)="seleccionarDocumento(doc)">
+        <div class="document-row__icon">{{ getFileIcon(doc.tipo) }}</div>
+        <div class="document-row__info">
+          <div class="document-row__title">{{ doc.titulo }}</div>
+          <div class="document-row__meta">
+            {{ doc.autor }} • {{ doc.fechaSubida | date:'dd/MM/yyyy' }} • {{ doc.tamano | fileSize }}
+          </div>
+        </div>
+        <div class="document-row__actions">
+          <button class="icon-btn" (click)="descargarDocumento(doc, $event)" title="Descargar">⬇️</button>
+          <button class="icon-btn" (click)="editarDocumento(doc, $event)" title="Editar">✏️</button>
+          <button class="icon-btn" (click)="confirmarEliminar(doc, $event)" title="Eliminar">🗑️</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Visor de documento (modal) -->
+  <app-modal-confirmacion *ngIf="documentoSeleccionado" 
+                          [isOpen]="true"
+                          [title]="documentoSeleccionado.titulo"
+                          [width]="'800px'"
+                          (cancel)="cerrarVisor()"
+                          [confirmText]="'Cerrar'"
+                          [cancelText]="''"
+                          [closeOnOverlayClick]="true">
+    <div class="document-viewer">
+      <div class="viewer-toolbar">
+        <a [href]="documentoSeleccionado.archivoUrl" target="_blank" class="btn btn-outline btn-sm">Abrir en nueva pestaña</a>
+        <button class="btn btn-outline btn-sm" (click)="descargarDocumento(documentoSeleccionado, $event)">Descargar</button>
+      </div>
+      <div class="viewer-content">
+        <iframe *ngIf="documentoSeleccionado.tipo === 'pdf'" [src]="documentoSeleccionado.archivoUrl | safeUrl" frameborder="0"></iframe>
+        <img *ngIf="documentoSeleccionado.tipo === 'imagen'" [src]="documentoSeleccionado.archivoUrl" [alt]="documentoSeleccionado.titulo" />
+        <div *ngIf="!['pdf','imagen'].includes(documentoSeleccionado.tipo)" class="unsupported-viewer">
+          <p>Vista previa no disponible para este tipo de archivo.</p>
+          <a [href]="documentoSeleccionado.archivoUrl" target="_blank" class="btn btn-primary">Abrir archivo</a>
+        </div>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+
+  <!-- Modal de subida/edición -->
+  <app-modal-confirmacion *ngIf="modalSubidaVisible" 
+                          [isOpen]="true"
+                          [title]="modoEdicion ? 'Editar documento' : 'Subir nuevo documento'"
+                          [width]="'500px'"
+                          (confirm)="guardarDocumento()"
+                          (cancel)="cerrarModalSubida()"
+                          [confirmText]="modoEdicion ? 'Actualizar' : 'Subir'"
+                          [cancelText]="'Cancelar'">
+    <div class="upload-form">
+      <div class="form-group">
+        <label>Título *</label>
+        <input type="text" [(ngModel)]="formData.titulo" class="form-control" required />
+      </div>
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea [(ngModel)]="formData.descripcion" rows="3" class="form-control"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Tipo de archivo</label>
+        <select [(ngModel)]="formData.tipo" class="form-control">
+          <option value="pdf">PDF</option>
+          <option value="word">Word</option>
+          <option value="excel">Excel</option>
+          <option value="imagen">Imagen</option>
+          <option value="video">Video</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group" *ngIf="!modoEdicion">
+        <label>Archivo *</label>
+        <input type="file" (change)="onFileSelected($event)" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.webm" />
+      </div>
+    </div>
+  </app-modal-confirmacion>
+
+  <!-- Modal de confirmación para eliminar -->
+  <app-modal-confirmacion *ngIf="modalEliminarVisible" 
+                          [isOpen]="true"
+                          title="Confirmar eliminación"
+                          [message]="mensajeEliminar"
+                          (confirm)="eliminarDocumento()"
+                          (cancel)="cancelarEliminacion()"
+                          confirmText="Eliminar"
+                          cancelText="Cancelar">
+  </app-modal-confirmacion>
+</div>

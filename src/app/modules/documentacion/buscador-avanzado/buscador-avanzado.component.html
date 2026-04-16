@@ -1,0 +1,126 @@
+<div class="buscador-avanzado">
+  <!-- Encabezado con estilo foil -->
+  <header class="buscador-avanzado__header">
+    <div class="badge">
+      <i class="fas fa-search"></i> BÚSQUEDA AVANZADA · IQFOIL
+    </div>
+    <h1 class="buscador-avanzado__title">🔎 Búsqueda <span class="title-accent">avanzada</span></h1>
+    <p class="buscador-avanzado__subtitle">Encuentra documentos por título, autor, tipo y rango de fechas</p>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="buscador-avanzado__connection"></app-estado-conexion>
+
+  <!-- Formulario de búsqueda -->
+  <div class="buscador-avanzado__form">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="titulo">Título</label>
+        <input type="text" id="titulo" [(ngModel)]="filtros.titulo" placeholder="Palabras en el título..." class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="autor">Autor</label>
+        <input type="text" id="autor" [(ngModel)]="filtros.autor" placeholder="Nombre del autor..." class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="tipo">Tipo de documento</label>
+        <select id="tipo" [(ngModel)]="filtros.tipo" class="form-control">
+          <option value="">Todos los tipos</option>
+          <option value="pdf">PDF</option>
+          <option value="word">Word</option>
+          <option value="excel">Excel</option>
+          <option value="imagen">Imagen</option>
+          <option value="video">Video</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="fechaInicio">Desde fecha</label>
+        <input type="date" id="fechaInicio" [(ngModel)]="filtros.fechaInicio" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="fechaFin">Hasta fecha</label>
+        <input type="date" id="fechaFin" [(ngModel)]="filtros.fechaFin" class="form-control" />
+      </div>
+      <div class="form-group form-group--buttons">
+        <button class="btn btn-primary" (click)="buscar()" [disabled]="buscando">
+          <span *ngIf="!buscando">🔍 Buscar</span>
+          <span *ngIf="buscando">Buscando...</span>
+        </button>
+        <button class="btn btn-outline" (click)="limpiarFiltros()">🧹 Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loader mientras busca -->
+  <app-loading-spinner *ngIf="buscando" [text]="'Buscando documentos...'"></app-loading-spinner>
+
+  <!-- Resultados de la búsqueda -->
+  <div class="buscador-avanzado__resultados" *ngIf="!buscando">
+    <div class="resultados-header">
+      <h3 class="resultados-titulo">
+        Resultados <span class="resultados-count" *ngIf="resultados.length > 0">({{ resultados.length }})</span>
+      </h3>
+      <div class="resultados-orden">
+        <label for="orden">Ordenar por:</label>
+        <select id="orden" [(ngModel)]="ordenPor" (change)="ordenarResultados()" class="orden-select">
+          <option value="relevancia">Relevancia</option>
+          <option value="fechaDesc">Más recientes</option>
+          <option value="fechaAsc">Más antiguos</option>
+          <option value="tituloAsc">Título A-Z</option>
+          <option value="tituloDesc">Título Z-A</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="resultados-grid" *ngIf="resultados.length > 0; else sinResultados">
+      <div class="documento-card" *ngFor="let doc of resultados" (click)="verDocumento(doc)">
+        <div class="documento-card__icon">{{ getFileIcon(doc.tipo) }}</div>
+        <div class="documento-card__info">
+          <h4 class="documento-card__titulo">{{ doc.titulo }}</h4>
+          <p class="documento-card__descripcion">{{ doc.descripcion | slice:0:120 }}...</p>
+          <div class="documento-card__meta">
+            <span class="documento-card__autor">{{ doc.autor }}</span>
+            <span class="documento-card__fecha">{{ doc.fechaSubida | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        <div class="documento-card__acciones">
+          <button class="icon-btn" (click)="descargarDocumento(doc, $event)" title="Descargar">⬇️</button>
+          <a [href]="doc.archivoUrl" target="_blank" class="icon-btn" title="Abrir en nueva pestaña">🔗</a>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinResultados>
+      <div class="sin-resultados">
+        <p *ngIf="busquedaRealizada">No se encontraron documentos con los criterios especificados.</p>
+        <p *ngIf="!busquedaRealizada">Utiliza el formulario para realizar una búsqueda.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de vista previa -->
+  <app-modal-confirmacion *ngIf="documentoSeleccionado" 
+                          [isOpen]="true"
+                          [title]="documentoSeleccionado.titulo"
+                          [width]="'800px'"
+                          (cancel)="cerrarVisor()"
+                          [confirmText]="'Cerrar'"
+                          [cancelText]="''"
+                          [closeOnOverlayClick]="true">
+    <div class="documento-viewer">
+      <div class="viewer-toolbar">
+        <a [href]="documentoSeleccionado.archivoUrl" target="_blank" class="btn btn-outline btn-sm">Abrir en nueva pestaña</a>
+        <button class="btn btn-outline btn-sm" (click)="descargarDocumento(documentoSeleccionado, $event)">Descargar</button>
+      </div>
+      <div class="viewer-content">
+        <iframe *ngIf="documentoSeleccionado.tipo === 'pdf'" [src]="documentoSeleccionado.archivoUrl | safeUrl" frameborder="0"></iframe>
+        <img *ngIf="documentoSeleccionado.tipo === 'imagen'" [src]="documentoSeleccionado.archivoUrl" [alt]="documentoSeleccionado.titulo" />
+        <div *ngIf="!['pdf','imagen'].includes(documentoSeleccionado.tipo)" class="unsupported-viewer">
+          <p>Vista previa no disponible para este tipo de archivo.</p>
+          <a [href]="documentoSeleccionado.archivoUrl" target="_blank" class="btn btn-primary">Abrir archivo</a>
+        </div>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+</div>

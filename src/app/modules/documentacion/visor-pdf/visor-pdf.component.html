@@ -1,0 +1,67 @@
+<div class="visor-pdf">
+  <!-- Encabezado con estilo foil -->
+  <header class="visor-pdf__header">
+    <div class="badge">
+      <i class="fas fa-file-pdf"></i> VISOR PDF · IQFOIL
+    </div>
+    <h1 class="visor-pdf__title">📄 Visor de <span class="title-accent">documentos</span></h1>
+    <p class="visor-pdf__subtitle">Visualiza y gestiona tus archivos PDF</p>
+  </header>
+
+  <!-- Barra de herramientas -->
+  <div class="visor-pdf__toolbar" *ngIf="pdfData">
+    <div class="toolbar-group">
+      <button class="tool-btn" (click)="zoomOut()" [disabled]="zoom <= 0.5" title="Alejar">🔍-</button>
+      <span class="zoom-level">{{ zoom * 100 | number:'1.0-0' }}%</span>
+      <button class="tool-btn" (click)="zoomIn()" [disabled]="zoom >= 2.5" title="Acercar">🔍+</button>
+      <button class="tool-btn" (click)="zoomFit()" title="Ajustar al ancho">⤢</button>
+    </div>
+
+    <div class="toolbar-group">
+      <button class="tool-btn" (click)="paginaAnterior()" [disabled]="paginaActual <= 1">◀</button>
+      <span class="page-info">
+        Página {{ paginaActual }} de {{ totalPaginas }}
+      </span>
+      <button class="tool-btn" (click)="paginaSiguiente()" [disabled]="paginaActual >= totalPaginas">▶</button>
+    </div>
+
+    <div class="toolbar-group">
+      <button class="tool-btn" (click)="rotar()" title="Rotar">🔄</button>
+      <button class="tool-btn" (click)="descargar()" title="Descargar">⬇️</button>
+      <button class="tool-btn" (click)="imprimir()" title="Imprimir">🖨️</button>
+      <a *ngIf="pdfUrl" [href]="pdfUrl" target="_blank" class="tool-btn" title="Abrir en nueva pestaña">🌐</a>
+    </div>
+  </div>
+
+  <!-- Área del visor -->
+  <div class="visor-pdf__viewer" [class.cargando]="cargando">
+    <pdf-viewer
+      *ngIf="pdfData"
+      [src]="pdfData"
+      [page]="paginaActual"
+      [zoom]="zoom"
+      [rotation]="rotacion"
+      (afterLoadComplete)="cargado($event)"
+      (pageChange)="paginaActual = $event"
+      [render-text]="true"
+      [original-size]="false"
+      [fit-to-page]="false"
+      [autoresize]="true"
+      style="width: 100%; height: 100%; display: block;"
+    ></pdf-viewer>
+    <div class="visor-pdf__loader" *ngIf="cargando">
+      <app-loading-spinner [text]="'Cargando PDF...'"></app-loading-spinner>
+    </div>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div class="visor-pdf__error" *ngIf="error">
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="reintentar()">Reintentar</button>
+  </div>
+
+  <!-- Mensaje cuando no hay PDF -->
+  <div class="visor-pdf__empty" *ngIf="!pdfData && !error">
+    <p>No hay ningún documento PDF cargado.</p>
+  </div>
+</div>

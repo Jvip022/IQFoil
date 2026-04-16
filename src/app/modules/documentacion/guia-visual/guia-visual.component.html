@@ -1,0 +1,82 @@
+<div class="guia-visual">
+  <!-- Encabezado con estilo foil -->
+  <header class="guia-visual__header">
+    <div class="badge">
+      <i class="fas fa-book-open"></i> GUÍA VISUAL · IQFOIL
+    </div>
+    <h1 class="guia-visual__title">📘 Guía <span class="title-accent">visual</span></h1>
+    <p class="guia-visual__subtitle">Aprende con imágenes y explicaciones claras</p>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="guia-visual__connection"></app-estado-conexion>
+
+  <!-- Buscador local -->
+  <div class="guia-visual__search">
+    <div class="search-box">
+      <input type="text" placeholder="Buscar por título, descripción o palabra clave..." [(ngModel)]="searchTerm" (input)="filtrarItems()" class="search-input" />
+      <i class="search-icon">🔍</i>
+    </div>
+  </div>
+
+  <!-- Pestañas de categorías -->
+  <div class="guia-visual__tabs">
+    <button class="tab-btn" *ngFor="let cat of categorias" [class.active]="categoriaActiva === cat.id" (click)="cambiarCategoria(cat.id)">
+      <span class="tab-icon">{{ cat.icono }}</span>
+      <span class="tab-label">{{ cat.nombre }}</span>
+    </button>
+  </div>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando contenidos...'"></app-loading-spinner>
+
+  <!-- Grid de items -->
+  <div class="guia-visual__grid" *ngIf="!cargando">
+    <div class="items-grid" *ngIf="itemsFiltrados.length > 0; else sinResultados">
+      <div class="item-card" *ngFor="let item of itemsFiltrados" (click)="seleccionarItem(item)">
+        <div class="item-card__image">
+          <img [src]="item.imagenUrl" [alt]="item.titulo" (error)="$event.target.src='/assets/guia/placeholder.jpg'" />
+          <button class="item-card__zoom" (click)="seleccionarItem(item); $event.stopPropagation()" title="Ver detalle">🔍</button>
+        </div>
+        <div class="item-card__info">
+          <h3 class="item-card__title">{{ item.titulo }}</h3>
+          <p class="item-card__desc">{{ item.descripcionCorta }}</p>
+          <span class="item-card__badge">{{ categoriaActiva | titlecase }}</span>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinResultados>
+      <div class="sin-resultados">
+        <p *ngIf="searchTerm">No se encontraron resultados para "{{ searchTerm }}"</p>
+        <p *ngIf="!searchTerm">No hay contenido en esta categoría todavía.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal de detalle del item -->
+  <app-modal-confirmacion *ngIf="itemSeleccionado"
+                          [isOpen]="true"
+                          [title]="itemSeleccionado.titulo"
+                          [width]="'600px'"
+                          (cancel)="cerrarZoom()"
+                          [confirmText]="'Cerrar'"
+                          [cancelText]="''"
+                          [closeOnOverlayClick]="true">
+    <div class="item-detalle">
+      <div class="detalle-imagen">
+        <img [src]="itemSeleccionado.imagenUrl" [alt]="itemSeleccionado.titulo" />
+      </div>
+      <div class="detalle-info">
+        <p class="detalle-descripcion">{{ itemSeleccionado.descripcionLarga }}</p>
+        <div class="detalle-metadata">
+          <p><strong>Categoría:</strong> {{ itemSeleccionado.categoria | titlecase }}</p>
+          <p *ngIf="itemSeleccionado.keywords?.length"><strong>Palabras clave:</strong> {{ itemSeleccionado.keywords?.join(', ') }}</p>
+          <p *ngIf="itemSeleccionado.enlace">
+            <a [href]="itemSeleccionado.enlace" target="_blank">Más información →</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+</div>
