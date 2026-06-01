@@ -1,7 +1,8 @@
-import { Component, Input, OnInit, HostListener } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+
 
 interface MenuItem {
   route: string;
@@ -25,6 +26,7 @@ interface User {
 })
 export class SidebarComponent implements OnInit {
   @Input() collapsed = false;
+  @Output() collapsedChange = new EventEmitter<boolean>();
 
   isCollapsed = this.collapsed;       // controla estado colapsado (escritorio)
   isMobileExpanded = false;           // controla apertura manual en móvil
@@ -40,7 +42,7 @@ export class SidebarComponent implements OnInit {
     { route: '/administracion', label: 'Administración', icon: '⚙️', exact: false },
   ];
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
     this.authService.getAuthStatus().subscribe((isAuthenticated: boolean) => {
@@ -59,7 +61,7 @@ export class SidebarComponent implements OnInit {
   // Alterna colapso en escritorio (clase .sidebar--collapsed)
   toggleCollapse(): void {
     this.isCollapsed = !this.isCollapsed;
-    // Si se expande manualmente en escritorio, también reflejamos en móvil
+    this.collapsedChange.emit(this.isCollapsed);
     if (!this.isCollapsed) {
       this.isMobileExpanded = true;
     }

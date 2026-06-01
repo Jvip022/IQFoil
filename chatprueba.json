@@ -1,0 +1,115 @@
+[
+  {
+    "id": "msg1",
+    "conversationId": "conv_001",
+    "sender": {
+      "id": "user_123",
+      "name": "Joel",
+      "avatar": "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    "receiver": {
+      "id": "user_456",
+      "name": "Carlos",
+      "avatar": "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    "content": "¡Hola! ¿Viste el nuevo video de foil?",
+    "timestamp": "2025-05-28T10:15:00Z",
+    "status": "read",
+    "type": "text"
+  },
+  {
+    "id": "msg2",
+    "conversationId": "conv_001",
+    "sender": {
+      "id": "user_456",
+      "name": "Carlos",
+      "avatar": "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    "receiver": {
+      "id": "user_123",
+      "name": "Joel",
+      "avatar": "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    "content": "Sí, muy bueno. Aprendí mucho sobre la técnica de virada.",
+    "timestamp": "2025-05-28T10:17:30Z",
+    "status": "read",
+    "type": "text"
+  },
+  {
+    "id": "msg3",
+    "conversationId": "conv_001",
+    "sender": {
+      "id": "user_123",
+      "name": "Joel",
+      "avatar": "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    "receiver": {
+      "id": "user_456",
+      "name": "Carlos",
+      "avatar": "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    "content": "¿Cuándo practicamos juntos?",
+    "timestamp": "2025-05-28T10:20:15Z",
+    "status": "delivered",
+    "type": "text"
+  },
+  {
+    "id": "msg4",
+    "conversationId": "conv_001",
+    "sender": {
+      "id": "user_456",
+      "name": "Carlos",
+      "avatar": "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    "receiver": {
+      "id": "user_123",
+      "name": "Joel",
+      "avatar": "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    "content": "El fin de semana en la playa. Allí podemos probar los ajustes.",
+    "timestamp": "2025-05-28T10:22:45Z",
+    "status": "sent",
+    "type": "text"
+  },
+  {
+    "id": "msg5",
+    "conversationId": "conv_001",
+    "sender": {
+      "id": "user_123",
+      "name": "Joel",
+      "avatar": "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    "receiver": {
+      "id": "user_456",
+      "name": "Carlos",
+      "avatar": "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    "content": "https://example.com/imagen-foil.jpg",
+    "timestamp": "2025-05-28T10:25:00Z",
+    "status": "read",
+    "type": "image",
+    "metadata": {
+      "width": 800,
+      "height": 600,
+      "thumbnail": "https://example.com/thumb-foil.jpg"
+    }
+  },
+  {
+    "id": "msg6",
+    "conversationId": "conv_001",
+    "sender": {
+      "id": "user_456",
+      "name": "Carlos",
+      "avatar": "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    "receiver": {
+      "id": "user_123",
+      "name": "Joel",
+      "avatar": "https://randomuser.me/api/portraits/men/1.jpg"
+    },
+    "content": "¡Qué buena foto! El foil se ve impresionante.",
+    "timestamp": "2025-05-28T10:27:10Z",
+    "status": "read",
+    "type": "text"
+  }
+]
