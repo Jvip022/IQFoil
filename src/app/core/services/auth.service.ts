@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export interface User {
   uid?: string;
@@ -9,57 +12,48 @@ export interface User {
   roles?: string[];
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private isLoggedIn = false;
-  private currentUser: User | null = null;
+  private apiUrl = environment.apiUrl;
+  private authStatusSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
 
-  constructor() {
-    this.isLoggedIn = !!localStorage.getItem('token');
-    // Simula un usuario mock si está logueado
-    if (this.isLoggedIn) {
-      this.currentUser = {
-        uid: '123',
-        displayName: 'Usuario Demo',
-        nombre: 'Demo',
-        avatarUrl: '',
-        roles: ['atleta']
-      };
-    }
+  constructor(private http: HttpClient) {}
+
+  // Observable del estado de autenticación
+  getAuthStatus(): Observable<boolean> {
+    return this.authStatusSubject.asObservable();
   }
 
-  login(username: string, password: string): Observable<boolean> {
-    if (username === 'demo' && password === 'demo') {
-      localStorage.setItem('token', 'fake-jwt-token');
-      this.isLoggedIn = true;
-      this.currentUser = {
-        uid: '123',
-        displayName: 'Usuario Demo',
-        nombre: 'Demo',
-        roles: ['atleta']
-      };
-      return of(true);
-    }
-    return of(false);
+  login(email: string, password: string): Observable<{ user: User; token: string }> {
+    return this.http.post<{ user: User; token: string }>(`${this.apiUrl}/auth/login`, { email, password })
+      .pipe(
+        tap(response => {
+          localStorage.setItem('token', response.token);
+          this.authStatusSubject.next(true);
+        })
+      );
+  }
+
+  register(email: string, password: string, nombre: string): Observable<{ user: User; token: string }> {
+    return this.http.post<{ user: User; token: string }>(`${this.apiUrl}/auth/register`, { email, password, nombre })
+      .pipe(
+        tap(response => {
+          localStorage.setItem('token', response.token);
+          this.authStatusSubject.next(true);
+        })
+      );
   }
 
   logout(): void {
     localStorage.removeItem('token');
-    this.isLoggedIn = false;
-    this.currentUser = null;
+    this.authStatusSubject.next(false);
   }
 
   isAuthenticated(): boolean {
-    return this.isLoggedIn;
-  }
-
-  getAuthStatus(): Observable<boolean> {
-    return of(this.isLoggedIn);
+    return !!localStorage.getItem('token');
   }
 
   getUser(): Observable<User | null> {
-    return of(this.currentUser);
+    return this.http.get<User | null>(`${this.apiUrl}/usuarios/perfil`);
   }
 }

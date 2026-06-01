@@ -1,1 +1,99 @@
-<p>reporte-progreso works!</p>
+<div class="reporte-progreso">
+  <!-- Encabezado -->
+  <header class="reporte-progreso__header">
+    <div class="header-left">
+      <h2 class="reporte-progreso__title">📊 Reporte de progreso</h2>
+      <p class="reporte-progreso__subtitle">Resumen de tu avance en módulos y evaluaciones</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-outline" (click)="exportarReporte()" [disabled]="exportando">
+        <span *ngIf="!exportando">📥 Exportar</span>
+        <span *ngIf="exportando">Exportando...</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="reporte-progreso__connection"></app-estado-conexion>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Generando reporte...'"></app-loading-spinner>
+
+  <!-- Contenido principal -->
+  <div class="reporte-progreso__content" *ngIf="!cargando">
+    <!-- Tarjetas de KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-card__icon">📚</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Módulos completados</span>
+          <span class="kpi-card__value">{{ progreso.modulosCompletados }} / {{ progreso.totalModulos }}</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon">🎥</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Videos vistos</span>
+          <span class="kpi-card__value">{{ progreso.videosVistos }} / {{ progreso.totalVideos }}</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon">📝</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Evaluaciones realizadas</span>
+          <span class="kpi-card__value">{{ progreso.evaluacionesRealizadas }}</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon">🏆</div>
+        <div class="kpi-card__info">
+          <span class="kpi-card__label">Puntuación media</span>
+          <span class="kpi-card__value">{{ progreso.puntuacionMedia }} / 100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráficos (simulados con barras) -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3 class="chart-card__title">Progreso por módulo</h3>
+        <div class="barras-container">
+          <div class="barra-item" *ngFor="let mod of progreso.modulos">
+            <span class="barra-label">{{ mod.nombre }}</span>
+            <div class="barra-bg">
+              <div class="barra-fill" [style.width.%]="mod.progreso" [style.background-color]="mod.color"></div>
+            </div>
+            <span class="barra-valor">{{ mod.progreso }}%</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3 class="chart-card__title">Evolución de puntuaciones</h3>
+        <div class="lineas-container">
+          <div class="linea-item" *ngFor="let ev of progreso.evolucion; let i = index">
+            <span class="linea-mes">{{ ev.mes }}</span>
+            <div class="linea-barra" [style.height.px]="ev.puntuacion * 2" [style.background-color]="coloresEvolucion[i % coloresEvolucion.length]"></div>
+            <span class="linea-valor">{{ ev.puntuacion }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de actividad reciente -->
+    <div class="actividad-card">
+      <h3 class="actividad-card__title">Actividad reciente</h3>
+      <div class="actividad-list" *ngIf="progreso.actividadReciente.length > 0; else sinActividad">
+        <div class="actividad-item" *ngFor="let act of progreso.actividadReciente">
+          <span class="actividad-icon">{{ act.icono }}</span>
+          <div class="actividad-content">
+            <span class="actividad-desc">{{ act.descripcion }}</span>
+            <span class="actividad-fecha">{{ act.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+      </div> 
+      <ng-template #sinActividad>
+        <p class="sin-actividad">No hay actividad reciente.</p>
+      </ng-template>
+    </div>
+  </div>
+</div>

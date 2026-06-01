@@ -1,1 +1,59 @@
-<p>lista-evaluaciones works!</p>
+<div class="lista-evaluaciones">
+  <header class="lista-evaluaciones__header">
+    <div class="header-left">
+      <h2 class="lista-evaluaciones__title">📋 Lista de evaluaciones</h2>
+      <p class="lista-evaluaciones__subtitle">Consulta y gestiona las evaluaciones realizadas</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="irANuevaEvaluacion()">➕ Nueva evaluación</button>
+    </div>
+  </header>
+
+  <app-estado-conexion class="lista-evaluaciones__connection"></app-estado-conexion>
+
+  <div class="lista-evaluaciones__filters">
+    <div class="search-box">
+      <input type="text" placeholder="Buscar por usuario o título..." [(ngModel)]="searchTerm" (input)="filtrarEvaluaciones()" class="search-input" />
+      <i class="search-icon">🔍</i>
+    </div>
+    <div class="filter-options">
+      <select [(ngModel)]="filtroEstado" (change)="filtrarEvaluaciones()" class="filter-select">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="evaluado">Evaluado</option>
+      </select>
+    </div>
+  </div>
+
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando evaluaciones...'"></app-loading-spinner>
+
+  <div class="lista-evaluaciones__content" *ngIf="!cargando">
+    <div class="evaluaciones-list" *ngIf="evaluacionesFiltradas.length > 0; else sinEvaluaciones">
+      <div class="evaluacion-card" *ngFor="let ev of evaluacionesFiltradas" (click)="evaluar(ev, $event)">
+        <div class="evaluacion-card__header">
+          <span class="evaluacion-estado" [class.estado-pendiente]="ev.estado === 'pendiente'" [class.estado-evaluado]="ev.estado === 'evaluado'">
+            {{ ev.estado }}
+          </span>
+        </div>
+        <div class="evaluacion-card__body">
+          <h3 class="evaluacion-titulo">{{ ev.titulo }}</h3>
+          <p class="evaluacion-usuario"><strong>Usuario:</strong> {{ ev.usuarioNombre }}</p>
+          <p class="evaluacion-fecha"><strong>Fecha:</strong> {{ ev.fecha | date:'dd/MM/yyyy' }}</p>
+          <p class="evaluacion-puntuacion" *ngIf="ev.puntuacionTotal !== undefined">
+            <strong>Puntuación:</strong> {{ ev.puntuacionTotal }} / 15
+          </p>
+        </div>
+        <div class="evaluacion-card__footer">
+          <button class="btn-icon" *ngIf="ev.estado === 'pendiente' && esEvaluador" (click)="evaluar(ev, $event)" title="Evaluar">📝</button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinEvaluaciones>
+      <div class="sin-evaluaciones">
+        <p *ngIf="searchTerm || filtroEstado">No se encontraron evaluaciones con los filtros aplicados.</p>
+        <p *ngIf="!searchTerm && !filtroEstado">No hay evaluaciones disponibles.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

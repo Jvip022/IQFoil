@@ -1,0 +1,138 @@
+<div class="gestion-contenido">
+  <!-- Encabezado -->
+  <header class="gestion-contenido__header">
+    <div class="header-left">
+      <h2 class="gestion-contenido__title">📦 Gestión de contenido</h2>
+      <p class="gestion-contenido__subtitle">Administra videos, documentos y hilos del foro</p>
+    </div>
+  </header>
+
+  <app-estado-conexion class="gestion-contenido__connection"></app-estado-conexion>
+
+  <!-- Pestañas -->
+  <div class="gestion-contenido__tabs">
+    <button class="tab-btn" *ngFor="let tab of tabs" [class.active]="tabActivo === tab.id"
+            (click)="tabActivo = tab.id">
+      <span class="tab-icon">{{ tab.icono }}</span>
+      <span class="tab-label">{{ tab.nombre }}</span>
+    </button>
+  </div>
+
+  <!-- Contenido de cada pestaña -->
+  <div class="gestion-contenido__content">
+    <!-- VIDEOS -->
+    <div *ngIf="tabActivo === 'videos'">
+      <div class="upload-section card">
+        <h3>Subir nuevo video</h3>
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevoVideo.titulo" />
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea class="form-control" [(ngModel)]="nuevoVideo.descripcion" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Nivel</label>
+          <select class="form-control" [(ngModel)]="nuevoVideo.nivel">
+            <option value="principiante">Principiante</option>
+            <option value="intermedio">Intermedio</option>
+            <option value="avanzado">Avanzado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Archivo de video</label>
+          <input type="file" accept="video/*" (change)="onVideoFileSelected($event)" class="form-control" />
+        </div>
+        <button class="btn btn-primary" (click)="subirVideo()">Subir video</button>
+      </div>
+
+      <div class="list-section">
+        <h3>Videos existentes</h3>
+        <app-loading-spinner *ngIf="cargandoVideos" [text]="'Cargando...'"></app-loading-spinner>
+        <div class="items-grid" *ngIf="!cargandoVideos">
+          <div class="item-card" *ngFor="let video of videos">
+            <div class="item-info">
+              <strong>{{ video.titulo }}</strong>
+              <span class="badge">{{ video.nivel }}</span>
+            </div>
+            <button class="btn-icon delete" (click)="confirmarEliminar('video', video.id, video.titulo)">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS -->
+    <div *ngIf="tabActivo === 'documentos'">
+      <div class="upload-section card">
+        <h3>Subir nuevo documento</h3>
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevoDocumento.titulo" />
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea class="form-control" [(ngModel)]="nuevoDocumento.descripcion" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <select class="form-control" [(ngModel)]="nuevoDocumento.tipo">
+            <option value="pdf">PDF</option>
+            <option value="word">Word</option>
+            <option value="excel">Excel</option>
+            <option value="imagen">Imagen</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Archivo</label>
+          <input type="file" (change)="onDocumentoFileSelected($event)" class="form-control" />
+        </div>
+        <button class="btn btn-primary" (click)="subirDocumento()">Subir documento</button>
+      </div>
+
+      <div class="list-section">
+        <h3>Documentos existentes</h3>
+        <app-loading-spinner *ngIf="cargandoDocumentos" [text]="'Cargando...'"></app-loading-spinner>
+        <div class="items-grid" *ngIf="!cargandoDocumentos">
+          <div class="item-card" *ngFor="let doc of documentos">
+            <div class="item-info">
+              <strong>{{ doc.titulo }}</strong>
+              <span class="badge">{{ doc.tipo }}</span>
+            </div>
+            <button class="btn-icon delete" (click)="confirmarEliminar('documento', doc.id, doc.titulo)">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORO (HILOS) -->
+    <div *ngIf="tabActivo === 'foro'">
+      <div class="list-section">
+        <h3>Hilos del foro</h3>
+        <app-loading-spinner *ngIf="cargandoHilos" [text]="'Cargando...'"></app-loading-spinner>
+        <div class="items-grid" *ngIf="!cargandoHilos">
+          <div class="item-card" *ngFor="let hilo of hilos">
+            <div class="item-info">
+              <strong>{{ hilo.titulo }}</strong>
+              <span class="badge">Respuestas: {{ hilo.respuestas }}</span>
+            </div>
+            <button class="btn-icon delete" (click)="confirmarEliminar('hilo', hilo.id, hilo.titulo)">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación para eliminar -->
+  <app-modal-confirmacion
+    *ngIf="modalEliminarVisible"
+    [isOpen]="true"
+    title="Confirmar eliminación"
+    [message]="mensajeEliminar"
+    (confirm)="eliminarElemento()"
+    (cancel)="cancelarEliminar()"
+    confirmText="Eliminar"
+    cancelText="Cancelar">
+  </app-modal-confirmacion>
+</div>

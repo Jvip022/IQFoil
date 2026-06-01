@@ -1,1 +1,92 @@
-<p>evaluar-con-rubrica works!</p>
+<div class="evaluar-con-rubrica">
+  <!-- Encabezado -->
+  <header class="evaluar-con-rubrica__header">
+    <div class="header-left">
+      <h2 class="evaluar-con-rubrica__title">📝 Evaluar con rúbrica</h2>
+      <p class="evaluar-con-rubrica__subtitle">Asigna puntuaciones según los criterios establecidos</p>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="evaluar-con-rubrica__connection"></app-estado-conexion>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando datos de evaluación...'"></app-loading-spinner>
+
+  <!-- Contenido principal -->
+  <div class="evaluar-con-rubrica__content" *ngIf="!cargando && evaluacion">
+    <!-- Información de la práctica -->
+    <div class="info-practica card">
+      <div class="info-practica__header">
+        <h3>{{ evaluacion.titulo || 'Práctica' }}</h3>
+        <span class="estado-badge" [class.estado--evaluado]="evaluacion.estado === 'evaluado'">
+          {{ evaluacion.estado === 'evaluado' ? 'Evaluado' : 'Pendiente' }}
+        </span>
+      </div>
+      <div class="info-practica__detalles">
+        <p><strong>Usuario:</strong> {{ evaluacion.usuarioNombre }}</p>
+        <p><strong>Fecha de entrega:</strong> {{ evaluacion.fechaEntrega | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p *ngIf="evaluacion.videoUrl">
+          <strong>Video:</strong> 
+          <a [href]="evaluacion.videoUrl" target="_blank">Ver práctica</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Rúbrica de evaluación -->
+    <div class="rubrica card">
+      <h3 class="rubrica__titulo">Rúbrica: {{ rubrica?.titulo }}</h3>
+      <div class="rubrica__criterios">
+        <div class="criterio" *ngFor="let criterio of rubrica?.criterios; let i = index">
+          <div class="criterio__info">
+            <span class="criterio__nombre">{{ criterio.descripcion }}</span>
+            <span class="criterio__max">Máx: {{ criterio.puntuacionMaxima }}</span>
+          </div>
+          <div class="criterio__puntuacion">
+            <input 
+              type="range" 
+              [min]="0" 
+              [max]="criterio.puntuacionMaxima" 
+              [step]="0.5"
+              [(ngModel)]="puntuaciones[criterio.id]"
+              (input)="calcularTotal()"
+              class="slider" />
+            <input 
+              type="number" 
+              [min]="0" 
+              [max]="criterio.puntuacionMaxima" 
+              [step]="0.5"
+              [(ngModel)]="puntuaciones[criterio.id]"
+              (input)="calcularTotal()"
+              class="number-input" />
+          </div>
+        </div>
+      </div>
+      <div class="rubrica__total">
+        <span class="total-label">Puntuación total:</span>
+        <span class="total-valor">{{ puntuacionTotal }} / {{ puntuacionMaxima }}</span>
+      </div>
+    </div>
+
+    <!-- Comentarios adicionales -->
+    <div class="comentarios card">
+      <h3>Comentarios (opcional)</h3>
+      <textarea 
+        [(ngModel)]="comentarios" 
+        rows="4" 
+        class="form-control" 
+        placeholder="Escribe observaciones sobre la práctica..."></textarea>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="acciones">
+      <button class="btn btn-outline" (click)="cancelar()" [disabled]="guardando">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="guardarEvaluacion()" [disabled]="guardando || !evaluacion">
+        <span *ngIf="!guardando">Guardar evaluación</span>
+        <span *ngIf="guardando">Guardando...</span>
+      </button>
+    </div>
+  </div>
+</div>

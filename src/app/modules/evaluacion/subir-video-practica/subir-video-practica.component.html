@@ -1,1 +1,48 @@
-<p>subir-video-practica works!</p>
+<div class="subir-video-practica">
+  <header class="subir-video-practica__header">
+    <div class="header-left">
+      <h2 class="subir-video-practica__title">🎥 Subir práctica</h2>
+      <p class="subir-video-practica__subtitle">Comparte tu video para ser evaluado</p>
+    </div>
+  </header>
+
+  <app-estado-conexion class="subir-video-practica__connection"></app-estado-conexion>
+
+  <div class="subir-video-practica__form card">
+    <form (ngSubmit)="subirVideo()" #uploadForm="ngForm">
+      <div class="form-group">
+        <label for="titulo">Título de la práctica *</label>
+        <input type="text" id="titulo" [(ngModel)]="videoData.titulo" name="titulo" class="form-control" required />
+      </div>
+
+      <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea id="descripcion" [(ngModel)]="videoData.descripcion" name="descripcion" rows="4" class="form-control"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="rubrica">Rúbrica asociada *</label>
+        <select id="rubrica" [(ngModel)]="videoData.rubricaId" name="rubrica" class="form-control" required>
+          <option value="">-- Selecciona una rúbrica --</option>
+          <option *ngFor="let r of rubricas" [value]="r.id">{{ r.titulo }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="archivo">Archivo de video *</label>
+        <input type="file" id="archivo" (change)="onFileSelected($event)" accept="video/*" class="form-control" required />
+        <div *ngIf="archivoSeleccionado" class="file-info">
+          <span>{{ archivoSeleccionado.name }}</span> ({{ archivoSeleccionado.size | fileSize }})
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" (click)="cancelar()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="uploadForm.invalid || subiendo">
+          <span *ngIf="!subiendo">Subir práctica</span>
+          <span *ngIf="subiendo">Subiendo...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

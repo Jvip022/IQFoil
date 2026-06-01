@@ -1,0 +1,184 @@
+@use 'variable' as *;
+
+.gestion-rubricas {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+
+    .gestion-rubricas__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .gestion-rubricas__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+}
+
+.rubricas-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.rubrica-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 2px 8px var(--surface-elev);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px var(--surface-elev);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--surface-elev);
+
+    .rubrica-card__titulo {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--navy);
+    }
+
+    .rubrica-card__acciones {
+      display: flex;
+      gap: 8px;
+
+      .btn-icon {
+        background: transparent;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 50%;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: var(--surface-elev);
+        }
+      }
+    }
+  }
+
+  &__criterios {
+    .criterio-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--surface-elev);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .criterio-desc {
+        font-size: 0.95rem;
+        color: var(--text);
+      }
+      .criterio-max {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--cyan);
+        background: rgba(74, 163, 194, 0.1);
+        padding: 2px 8px;
+        border-radius: 20px;
+      }
+    }
+  }
+}
+
+.sin-rubricas {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  background: var(--card-bg);
+  border-radius: var(--radius);
+}
+
+// Formulario de rúbrica en modal
+.rubrica-form {
+  .form-group {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--surface-elev);
+      border-radius: calc(var(--radius) / 2);
+      background: var(--bg);
+      color: var(--text);
+
+      &:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+
+      &.small {
+        width: 80px;
+      }
+    }
+  }
+}
+
+.criterios-lista {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+
+  .criterio-input {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    input {
+      flex: 1;
+    }
+
+    .small {
+      flex: 0 0 70px;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      color: var(--muted);
+
+      &:hover {
+        color: var(--orange);
+        background: var(--surface-elev);
+      }
+    }
+  }
+}

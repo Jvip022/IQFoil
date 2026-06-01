@@ -1,1 +1,33 @@
-<p>realizar-evaluacion works!</p>
+<div class="realizar-evaluacion">
+  <header class="realizar-evaluacion__header">
+    <div class="header-left">
+      <h2 class="realizar-evaluacion__title">📝 Realizar evaluación</h2>
+      <p class="realizar-evaluacion__subtitle">Selecciona una práctica pendiente para evaluar</p>
+    </div>
+  </header>
+
+  <app-estado-conexion class="realizar-evaluacion__connection"></app-estado-conexion>
+
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando prácticas pendientes...'"></app-loading-spinner>
+
+  <div class="realizar-evaluacion__content" *ngIf="!cargando">
+    <div class="pendientes-list" *ngIf="pendientes.length > 0; else sinPendientes">
+      <div class="pendiente-card" *ngFor="let item of pendientes" (click)="evaluar(item)">
+        <div class="pendiente-card__info">
+          <h3 class="pendiente-titulo">{{ item.titulo }}</h3>
+          <p class="pendiente-usuario"><strong>Usuario:</strong> {{ item.usuarioId }}</p>
+          <p class="pendiente-fecha"><strong>Entregado:</strong> {{ item.fechaSubida | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+        <div class="pendiente-card__accion">
+          <button class="btn btn-primary">Evaluar</button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinPendientes>
+      <div class="sin-pendientes">
+        <p>No hay prácticas pendientes de evaluación.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

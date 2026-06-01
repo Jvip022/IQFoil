@@ -14,7 +14,7 @@ export interface Hilo {
   id: string;
   foroId: string;
   titulo: string;
-  contenido: string;          // <-- Asegúrate de que esté presente
+  contenido: string;
   autor: string;
   fechaCreacion: Date;
   ultimaRespuesta: Date;
@@ -81,6 +81,7 @@ export class ComunidadService {
     return of(this.hilosMock).pipe(delay(500));
   }
 
+  // Método getHilo (que faltaba)
   getHilo(id: string): Observable<Hilo | undefined> {
     return of(this.hilosMock.find(h => h.id === id)).pipe(delay(200));
   }

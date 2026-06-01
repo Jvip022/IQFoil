@@ -1,70 +1,40 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { User } from './auth.service'; // Ajusta la ruta si es necesario
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { User } from './auth.service';
 
-export interface PreferenciasUsuario {
-  idioma: string;
-  notificacionesEmail: boolean;
-  tema: 'claro' | 'oscuro' | 'sistema';
-}
+export interface PreferenciasUsuario { idioma: string; notificacionesEmail: boolean; tema: 'claro' | 'oscuro' | 'sistema'; }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private perfilMock: User = {
-    uid: '123',
-    displayName: 'Usuario Demo',
-    nombre: 'Demo',
-    avatarUrl: '',
-    roles: ['atleta']
-  };
+  private apiUrl = environment.apiUrl;
 
-  private preferenciasMock: PreferenciasUsuario = {
-    idioma: 'es',
-    notificacionesEmail: true,
-    tema: 'sistema'
-  };
+  constructor(private http: HttpClient) {}
 
-  constructor() {}
-
-  /** Obtiene el perfil del usuario actual */
   getPerfil(): Observable<User | null> {
-    return of(this.perfilMock).pipe(delay(300));
+    return this.http.get<User | null>(`${this.apiUrl}/usuarios/perfil`);
   }
 
-  /** Actualiza el perfil del usuario */
   actualizarPerfil(perfil: Partial<User>): Observable<User> {
-    this.perfilMock = { ...this.perfilMock, ...perfil };
-    return of(this.perfilMock).pipe(delay(500));
+    return this.http.put<User>(`${this.apiUrl}/usuarios/perfil`, perfil);
   }
 
-  /** Obtiene las preferencias del usuario */
   getPreferencias(): Observable<PreferenciasUsuario> {
-    return of(this.preferenciasMock).pipe(delay(300));
+    return this.http.get<PreferenciasUsuario>(`${this.apiUrl}/usuarios/preferencias`);
   }
 
-  /** Actualiza las preferencias */
   actualizarPreferencias(pref: Partial<PreferenciasUsuario>): Observable<PreferenciasUsuario> {
-    this.preferenciasMock = { ...this.preferenciasMock, ...pref };
-    return of(this.preferenciasMock).pipe(delay(400));
+    return this.http.put<PreferenciasUsuario>(`${this.apiUrl}/usuarios/preferencias`, pref);
   }
 
-  /** Sube una foto de avatar (simulado) */
   subirAvatar(imagen: File): Observable<string> {
-    console.log('Subiendo avatar...', imagen.name);
-    return of(URL.createObjectURL(imagen)).pipe(delay(800));
+    const formData = new FormData();
+    formData.append('avatar', imagen);
+    return this.http.post<string>(`${this.apiUrl}/usuarios/avatar`, formData);
   }
 
-  /** Cambia la contraseña (simulado) */
   cambiarPassword(oldPass: string, newPass: string): Observable<boolean> {
-    console.log('Cambiando contraseña');
-    return of(true).pipe(delay(500));
-  }
-
-  /** Obtiene la lista de roles del usuario */
-  getRoles(): Observable<string[]> {
-    return of(this.perfilMock.roles || []).pipe(delay(200));
+    return this.http.post<boolean>(`${this.apiUrl}/usuarios/cambiar-password`, { oldPass, newPass });
   }
 }

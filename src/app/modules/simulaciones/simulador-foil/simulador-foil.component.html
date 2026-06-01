@@ -1,1 +1,81 @@
-<p>simulador-foil works!</p>
+<div class="simulador-foil">
+  <!-- Encabezado -->
+  <header class="simulador-foil__header">
+    <div class="badge">
+      <i class="fas fa-sliders-h"></i> SIMULADOR · IQFOIL
+    </div>
+    <h1 class="simulador-foil__title">⚙️ Simulador de <span class="title-accent">foil</span></h1>
+    <p class="simulador-foil__subtitle">Ajusta los parámetros y visualiza el rendimiento</p>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="simulador-foil__connection"></app-estado-conexion>
+
+  <div class="simulador-foil__layout">
+    <!-- Panel de controles -->
+    <div class="card">
+      <h3>📊 Parámetros de entrada</h3>
+
+      <div class="control-group">
+        <label>🌬️ Velocidad del viento: <strong>{{ velocidadViento }} nudos</strong></label>
+        <input type="range" min="0" max="30" step="0.5" [(ngModel)]="velocidadViento" (input)="calcular()" class="slider" />
+      </div>
+
+      <div class="control-group">
+        <label>📐 Ángulo de ataque: <strong>{{ anguloAtaque }}°</strong></label>
+        <input type="range" min="-5" max="15" step="0.5" [(ngModel)]="anguloAtaque" (input)="calcular()" class="slider" />
+      </div>
+
+      <div class="control-group">
+        <label>🛸 Superficie alar: <strong>{{ superficieAlar }} dm²</strong></label>
+        <input type="range" min="50" max="200" step="1" [(ngModel)]="superficieAlar" (input)="calcular()" class="slider" />
+      </div>
+
+      <div class="control-group">
+        <label>⚖️ Peso del navegante: <strong>{{ pesoNavegante }} kg</strong></label>
+        <input type="range" min="50" max="120" step="1" [(ngModel)]="pesoNavegante" (input)="calcular()" class="slider" />
+      </div>
+
+      <div class="control-group checkbox">
+        <label>
+          <input type="checkbox" [(ngModel)]="olaGrande" (change)="calcular()" />
+          🌊 Condiciones de ola grande
+        </label>
+      </div>
+
+      <button class="btn btn-outline btn-block" (click)="resetear()">🔄 Restablecer valores</button>
+    </div>
+
+    <!-- Panel de resultados -->
+    <div class="card">
+      <h3>📈 Resultados</h3>
+
+      <div class="resultado-item">
+        <span class="label">Sustentación (lift):</span>
+        <span class="value">{{ sustentacion.toFixed(1) }} N</span>
+      </div>
+      <div class="resultado-item">
+        <span class="label">Resistencia (drag):</span>
+        <span class="value">{{ resistencia.toFixed(1) }} N</span>
+      </div>
+      <div class="resultado-item">
+        <span class="label">Relación L/D:</span>
+        <span class="value">{{ relacionLD.toFixed(2) }}</span>
+      </div>
+      <div class="resultado-item">
+        <span class="label">Velocidad de despegue:</span>
+        <span class="value">{{ velocidadDespegue.toFixed(1) }} nudos</span>
+      </div>
+      <div class="resultado-item" [class.alerta]="sustentacion < pesoNavegante * 9.81">
+        <span class="label">Estado:</span>
+        <span class="value">{{ sustentacion >= pesoNavegante * 9.81 ? '🟢 Vuelo' : '🔴 No vuela' }}</span>
+      </div>
+
+      <!-- Canvas para representación gráfica -->
+      <div class="canvas-container">
+        <canvas #foilCanvas width="300" height="150"></canvas>
+        <p class="small text-muted text-center mt-2">Perfil esquemático del foil (ángulo y deformación visual)</p>
+      </div>
+    </div>
+  </div>
+</div>

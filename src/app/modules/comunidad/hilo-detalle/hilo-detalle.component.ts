@@ -13,7 +13,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 
-// Interfaces (asumimos que están definidas en comunidad.service)
+// Interfaces
 import { Hilo, Mensaje } from '../../../core/services/comunidad.service';
 
 @Component({
@@ -31,7 +31,7 @@ import { Hilo, Mensaje } from '../../../core/services/comunidad.service';
 })
 export class HiloDetalleComponent implements OnInit, OnDestroy {
   hiloId: string | null = null;
-  hilo: Hilo | null = null; 
+  hilo: Hilo | null = null;
   respuestas: Mensaje[] = [];
   cargando = false;
   enviando = false;
@@ -59,11 +59,11 @@ export class HiloDetalleComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-    cargarHilo(id: string): void {
+  cargarHilo(id: string): void {
     this.cargando = true;
     this.comunidadService.getHilo(id).subscribe({
-      next: (hilo) => {
-        if (hilo) {                  // <-- comprobación de undefined
+      next: (hilo: Hilo | undefined) => {  // ✅ tipo explícito
+        if (hilo) {
           this.hilo = hilo;
           this.cargarRespuestas(id);
         } else {
@@ -71,7 +71,7 @@ export class HiloDetalleComponent implements OnInit, OnDestroy {
           this.cargando = false;
         }
       },
-      error: (err) => {
+      error: (err: any) => {  // ✅ tipo explícito
         console.error('Error cargando hilo', err);
         this.notificacionService.mostrarError('No se pudo cargar el hilo');
         this.cargando = false;
@@ -81,11 +81,11 @@ export class HiloDetalleComponent implements OnInit, OnDestroy {
 
   cargarRespuestas(hiloId: string): void {
     this.comunidadService.getMensajes(hiloId).subscribe({
-      next: (mensajes) => {
+      next: (mensajes: Mensaje[]) => {
         this.respuestas = mensajes;
         this.cargando = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error cargando respuestas', err);
         this.notificacionService.mostrarError('No se pudieron cargar las respuestas');
         this.cargando = false;
@@ -98,7 +98,6 @@ export class HiloDetalleComponent implements OnInit, OnDestroy {
 
     this.enviando = true;
 
-    // Obtener usuario actual
     this.authService.getUser().subscribe(user => {
       const autor = user?.nombre || user?.displayName || 'Usuario';
 
@@ -109,9 +108,8 @@ export class HiloDetalleComponent implements OnInit, OnDestroy {
       };
 
       this.comunidadService.enviarMensaje(nuevoMensaje).subscribe({
-        next: (mensaje) => {
+        next: (mensaje: Mensaje) => {
           this.respuestas.push(mensaje);
-          // Actualizar contador de respuestas en el hilo
           if (this.hilo) {
             this.hilo.respuestas = (this.hilo.respuestas || 0) + 1;
             this.hilo.ultimaRespuesta = new Date();
@@ -120,7 +118,7 @@ export class HiloDetalleComponent implements OnInit, OnDestroy {
           this.enviando = false;
           this.notificacionService.mostrarExito('Respuesta enviada');
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Error enviando respuesta', err);
           this.notificacionService.mostrarError('No se pudo enviar la respuesta');
           this.enviando = false;

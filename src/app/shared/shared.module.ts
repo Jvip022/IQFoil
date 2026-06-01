@@ -13,10 +13,9 @@ import { ModalConfirmacionComponent } from './modal-confirmacion/modal-confirmac
 
 @NgModule({
   imports: [
-    CommonModule,           // Proporciona directivas como ngIf, ngFor
-    RouterModule,           // Proporciona directivas como routerLink, router-outlet
-    // Los componentes standalone se importan directamente en el array 'imports'
-    NavbarComponent,
+    CommonModule,           
+    RouterModule,          
+    //NavbarComponent,
     SidebarComponent,
     FooterComponent,
     BibliotecaOfflineComponent,
@@ -29,8 +28,8 @@ import { ModalConfirmacionComponent } from './modal-confirmacion/modal-confirmac
     // tengan acceso a estas directivas sin necesidad de importarlas individualmente.
     CommonModule,
     RouterModule,
-    // Exportamos todos los componentes para que estén disponibles donde se importe SharedModule
-    NavbarComponent,
+    
+    //NavbarComponent,
     SidebarComponent,
     FooterComponent,
     BibliotecaOfflineComponent,

@@ -1,145 +1,136 @@
 // ==========================================
-// Variables personalizadas IQFoil
+// Estilos del Dashboard con tema foil
 // ==========================================
-@use 'sass:color';
-$iqf-navy: #1a2b4c;
-$iqf-cyan: #00e6d6;
-$iqf-orange: #f39c12;
-$iqf-bg: #f8fafc;
-$iqf-card-bg: #ffffff;
-$iqf-text: #1e293b;
-$iqf-muted: #64748b;
+@use 'variable' as *;
 
-// Sobrescribir variables de Bootstrap
-$primary: $iqf-navy;
-$info: $iqf-cyan;
-$warning: $iqf-orange;
-$body-bg: $iqf-bg;
-$body-color: $iqf-text;
-$border-radius: 0.75rem;
-$border-radius-lg: 1rem;
-$border-radius-sm: 0.5rem;
-$card-border-width: 0;
-$card-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-$progress-height: 0.5rem;
-$progress-border-radius: 1rem;
-$list-group-border-width: 0;
-
-// Importar Bootstrap completo (sin @use)
-@import "bootstrap/scss/bootstrap";
-
-// ==========================================
-// Estilos personalizados
-// ==========================================
 .dashboard {
   min-height: 100vh;
-  background-color: $iqf-bg;
-  color: $iqf-text;
+  background: var(--bg);
+  color: var(--text);
+  padding: var(--gap);
 }
 
 .greeting .username {
-  color: $iqf-cyan;
-
-  background: linear-gradient(
-    135deg,
-    $iqf-cyan,
-    color.adjust($iqf-cyan, $lightness: -10%)
-  );
+  background: linear-gradient(135deg, var(--cyan), color-mix(in srgb, var(--cyan) 80%, white));
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  font-weight: 700;
 }
 
 .btn-icon {
   background: transparent;
   border: none;
-  color: $iqf-navy;
+  color: var(--text);
   transition: all 0.2s;
+  font-size: 1.2rem;
   &:hover {
-    color: $iqf-cyan;
+    color: var(--cyan);
     transform: scale(1.05);
   }
 }
 
 .bg-orange {
-  background-color: $iqf-orange;
+  background-color: var(--orange);
 }
 .bg-soft-cyan {
-  background-color: rgba($iqf-cyan, 0.1);
+  background-color: rgba(0, 230, 214, 0.1);
 }
 .text-cyan {
-  color: $iqf-cyan;
+  color: var(--cyan);
 }
 .text-navy {
-  color: $iqf-navy;
+  color: var(--navy);
 }
 
 .avatar .initials {
-  background-color: rgba($iqf-cyan, 0.15);
-  color: $iqf-navy;
+  background-color: rgba(0, 230, 214, 0.15);
+  color: var(--text);
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
 }
 
 .progress-bar.bg-gradient-cyan-navy {
-  background: linear-gradient(90deg, $iqf-cyan, $iqf-navy);
+  background: linear-gradient(90deg, var(--cyan), var(--navy));
   transition: width 400ms ease;
 }
 
 .stat-card {
-  background-color: rgba($iqf-cyan, 0.03);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-cyan-alpha);
+  border-radius: var(--radius);
+  transition: transform 0.2s, box-shadow 0.2s;
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 12px 24px -12px rgba(0, 230, 214, 0.3);
+    border-color: var(--cyan);
+  }
+  .stat-value {
+    color: var(--cyan);
+  }
+  .stat-label {
+    color: var(--muted);
   }
 }
 
 .access-link {
-  background-color: rgba($iqf-cyan, 0.05);
+  background: rgba(0, 230, 214, 0.05);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
   transition: all 0.2s;
   .access-icon {
-    color: $iqf-cyan;
+    color: var(--cyan);
+    font-size: 1.8rem;
   }
   .access-label {
-    color: $iqf-navy;
+    color: var(--text);
   }
   &:hover {
-    background-color: rgba($iqf-cyan, 0.15);
+    background: rgba(0, 230, 214, 0.15);
+    border-color: var(--cyan);
     transform: translateY(-3px);
   }
 }
 
 .list-group-item {
+  background: transparent;
+  border-bottom: 1px solid var(--border-cyan-alpha);
   transition: background-color 0.2s;
   cursor: pointer;
   &:hover {
-    background-color: rgba($iqf-cyan, 0.05);
+    background: rgba(0, 230, 214, 0.05);
   }
 }
 
 .btn-outline-cyan {
-  color: $iqf-cyan;
-  border-color: $iqf-cyan;
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: transparent;
   &:hover {
-    background-color: $iqf-cyan;
-    color: $iqf-navy;
+    background: var(--cyan);
+    color: #02121e;
   }
 }
 
 .evolution-chart canvas {
   max-height: 200px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius);
+  padding: 0.5rem;
 }
 
-@include media-breakpoint-down(md) {
+// Responsive
+@media (max-width: 768px) {
   .dashboard {
-    padding-top: 0.5rem;
+    padding: 0.5rem;
   }
   .stat-card {
     margin-bottom: 0.5rem;
-  }
-  .access-link {
-    padding: 0.5rem;
   }
 }

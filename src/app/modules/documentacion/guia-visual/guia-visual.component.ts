@@ -2,10 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-// Servicios
 import { NotificacionService } from '../../../core/services/notificacion.service';
 
-// Componentes compartidos
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 import { ModalConfirmacionComponent } from '../../../shared/modal-confirmacion/modal-confirmacion.component';
@@ -37,8 +35,8 @@ export interface ItemGuia {
     LoadingSpinnerComponent,
     ModalConfirmacionComponent
   ],
-  templateUrl: './guia-visual.component.html',
-  styleUrls: ['./guia-visual.component.scss']
+  templateUrl: 'guia-visual.component.html',
+  styleUrls: ['guia-visual.component.scss']
 })
 export class GuiaVisualComponent implements OnInit {
   categorias: CategoriaGuia[] = [
@@ -187,5 +185,12 @@ export class GuiaVisualComponent implements OnInit {
 
   cerrarZoom(): void {
     this.itemSeleccionado = null;
+  }
+
+  handleImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.src = '/assets/guia/placeholder.jpg';
+    }
   }
 }

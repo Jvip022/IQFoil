@@ -1,0 +1,75 @@
+@use 'variable' as *;
+
+.subir-video-practica {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    margin-bottom: 25px;
+
+    .subir-video-practica__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .subir-video-practica__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 25px;
+    box-shadow: 0 2px 8px var(--surface-elev);
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--surface-elev);
+      border-radius: calc(var(--radius) / 2);
+      background: var(--bg);
+      color: var(--text);
+
+      &:focus {
+        outline: none;
+        border-color: var(--cyan);
+      }
+
+      &[type="file"] {
+        padding: 8px;
+      }
+    }
+
+    .file-info {
+      margin-top: 5px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 25px;
+  }
+}

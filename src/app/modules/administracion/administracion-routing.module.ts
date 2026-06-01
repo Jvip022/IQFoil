@@ -24,6 +24,10 @@ const routes: Routes = [
         loadComponent: () => import('./moderacion/moderacion.component').then(m => m.ModeracionComponent)
       },
       {
+        path: 'contenido',           
+        loadComponent: () => import('./gestion-contenido/gestion-contenido.component').then(m => m.GestionContenidoComponent)
+      },
+      {
         path: '',
         redirectTo: 'estadisticas',
         pathMatch: 'full'

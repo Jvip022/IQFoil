@@ -1,1 +1,90 @@
-<p>gestion-rubricas works!</p>
+<div class="gestion-rubricas">
+  <!-- Encabezado -->
+  <header class="gestion-rubricas__header">
+    <div class="header-left">
+      <h2 class="gestion-rubricas__title">📋 Gestión de rúbricas</h2>
+      <p class="gestion-rubricas__subtitle">Administra las rúbricas para evaluaciones</p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="abrirModalRubrica()">
+        ➕ Nueva rúbrica
+      </button>
+    </div>
+  </header>
+
+  <!-- Estado de conexión -->
+  <app-estado-conexion class="gestion-rubricas__connection"></app-estado-conexion>
+
+  <!-- Loader mientras carga -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando rúbricas...'"></app-loading-spinner>
+
+  <!-- Listado de rúbricas -->
+  <div class="gestion-rubricas__content" *ngIf="!cargando">
+    <div class="rubricas-list" *ngIf="rubricas.length > 0; else sinRubricas">
+      <div class="rubrica-card" *ngFor="let rubrica of rubricas">
+        <div class="rubrica-card__header">
+          <h3 class="rubrica-card__titulo">{{ rubrica.titulo }}</h3>
+          <div class="rubrica-card__acciones">
+            <button class="btn-icon" (click)="editarRubrica(rubrica)" title="Editar">✏️</button>
+            <button class="btn-icon" (click)="confirmarEliminar(rubrica)" title="Eliminar">🗑️</button>
+          </div>
+        </div>
+        <div class="rubrica-card__criterios">
+          <div class="criterio-item" *ngFor="let criterio of rubrica.criterios">
+            <span class="criterio-desc">{{ criterio.descripcion }}</span>
+            <span class="criterio-max">{{ criterio.puntuacionMaxima }} pts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinRubricas>
+      <div class="sin-rubricas">
+        <p>No hay rúbricas creadas aún.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Modal para crear/editar rúbrica -->
+  <app-modal-confirmacion 
+    *ngIf="modalRubricaVisible"
+    [isOpen]="true"
+    [title]="modoEdicion ? 'Editar rúbrica' : 'Nueva rúbrica'"
+    [width]="'500px'"
+    (confirm)="guardarRubrica()"
+    (cancel)="cerrarModalRubrica()"
+    [confirmText]="modoEdicion ? 'Actualizar' : 'Crear'"
+    [cancelText]="'Cancelar'">
+    
+    <div class="rubrica-form">
+      <div class="form-group">
+        <label for="titulo">Título de la rúbrica</label>
+        <input type="text" id="titulo" [(ngModel)]="rubricaActual.titulo" class="form-control" required />
+      </div>
+
+      <div class="form-group">
+        <label>Criterios</label>
+        <div class="criterios-lista">
+          <div class="criterio-input" *ngFor="let criterio of rubricaActual.criterios; let i = index">
+            <input type="text" [(ngModel)]="criterio.descripcion" placeholder="Descripción" class="form-control" />
+            <input type="number" [(ngModel)]="criterio.puntuacionMaxima" placeholder="Máx" min="1" step="1" class="form-control small" />
+            <button type="button" class="btn-icon" (click)="eliminarCriterio(i)" title="Eliminar criterio">🗑️</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" (click)="agregarCriterio()">+ Agregar criterio</button>
+      </div>
+    </div>
+  </app-modal-confirmacion>
+
+  <!-- Modal de confirmación para eliminar -->
+  <app-modal-confirmacion 
+    *ngIf="modalEliminarVisible"
+    [isOpen]="true"
+    title="Confirmar eliminación"
+    [message]="mensajeEliminar"
+    (confirm)="eliminarRubrica()"
+    (cancel)="cancelarEliminar()"
+    confirmText="Eliminar"
+    cancelText="Cancelar">
+  </app-modal-confirmacion>
+</div> 

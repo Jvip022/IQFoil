@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
+
+
 
 // ========== Interfaz para notificaciones persistentes (listas) ==========
 export interface NotificacionPersistente {
@@ -20,10 +25,16 @@ export interface NotificacionToast {
   duracion?: number; // en milisegundos
 }
 
-@Injectable({
-  providedIn: 'root'
-})
-export class NotificacionService {
+@Injectable({ providedIn: 'root' })
+
+  export class NotificacionService {
+  private apiUrl = environment.apiUrl;
+
+  getNotificaciones(): Observable<NotificacionPersistente[]> {
+    return this.http.get<NotificacionPersistente[]>(`${this.apiUrl}/notificaciones`);
+  }
+
+
   // ========== Notificaciones persistentes (mock) ==========
   private notificacionesMock: NotificacionPersistente[] = [
     {
@@ -48,12 +59,9 @@ export class NotificacionService {
   private toastSubject = new Subject<NotificacionToast>();
   toast$ = this.toastSubject.asObservable();
 
-  constructor() {}
+  constructor(private http: HttpClient) { }
 
   // ========== Métodos para notificaciones persistentes ==========
-  getNotificaciones(): Observable<NotificacionPersistente[]> {
-    return of(this.notificacionesMock).pipe(delay(300));
-  }
 
   getUnreadCount(): Observable<number> {
     const count = this.notificacionesMock.filter(n => !n.leida).length;
@@ -98,4 +106,7 @@ export class NotificacionService {
   mostrarInfo(mensaje: string, duracion: number = 3000): void {
     this.toastSubject.next({ tipo: 'info', mensaje, duracion });
   }
+
 }
+
+

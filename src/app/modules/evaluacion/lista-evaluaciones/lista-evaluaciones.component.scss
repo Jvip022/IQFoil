@@ -1,0 +1,183 @@
+@use 'variable' as *;
+
+.lista-evaluaciones {
+  padding: 20px;
+  max-width: $max-width;
+  margin: 0 auto;
+  color: var(--text);
+
+  &__header {
+    margin-bottom: 25px;
+
+    .lista-evaluaciones__title {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+      color: var(--navy);
+    }
+    .lista-evaluaciones__subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+  }
+
+  &__connection {
+    margin-bottom: 20px;
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 30px;
+
+    .search-box {
+      flex: 2;
+      min-width: 250px;
+      position: relative;
+
+      .search-input {
+        width: 100%;
+        padding: 10px 15px 10px 40px;
+        border: 1px solid var(--surface-elev);
+        border-radius: calc(var(--radius) / 2);
+        background: var(--card-bg);
+        color: var(--text);
+        font-size: 0.95rem;
+
+        &:focus {
+          outline: none;
+          border-color: var(--cyan);
+        }
+      }
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+      }
+    }
+
+    .filter-options {
+      flex: 1;
+      min-width: 150px;
+
+      .filter-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--surface-elev);
+        border-radius: calc(var(--radius) / 2);
+        background: var(--card-bg);
+        color: var(--text);
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+          border-color: var(--cyan);
+        }
+      }
+    }
+  }
+}
+
+.evaluaciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.evaluacion-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px var(--surface-elev);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--surface-elev);
+  }
+
+  &__icon {
+    font-size: 1.8rem;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+
+    .evaluacion-card__titulo {
+      margin: 0 0 5px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--navy);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .evaluacion-card__usuario {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    .evaluacion-card__meta {
+      display: flex;
+      gap: 15px;
+      font-size: 0.85rem;
+      color: var(--muted);
+
+      .evaluacion-card__rubrica {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  &__estado {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.9rem;
+    min-width: 90px;
+
+    &.estado-pendiente {
+      color: var(--orange);
+    }
+    &.estado-evaluado {
+      color: #4caf50;
+    }
+
+    .puntuacion {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-top: 2px;
+    }
+  }
+
+  &__arrow {
+    font-size: 1.2rem;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+
+  &:hover &__arrow {
+    transform: translateX(4px);
+    color: var(--cyan);
+  }
+}
+
+.sin-evaluaciones {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+}

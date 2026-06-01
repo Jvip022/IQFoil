@@ -35,7 +35,7 @@
     <div class="items-grid" *ngIf="itemsFiltrados.length > 0; else sinResultados">
       <div class="item-card" *ngFor="let item of itemsFiltrados" (click)="seleccionarItem(item)">
         <div class="item-card__image">
-          <img [src]="item.imagenUrl" [alt]="item.titulo" (error)="$event.target.src='/assets/guia/placeholder.jpg'" />
+          <img [src]="item.imagenUrl" [alt]="item.titulo" (error)="handleImageError($event)" />
           <button class="item-card__zoom" (click)="seleccionarItem(item); $event.stopPropagation()" title="Ver detalle">🔍</button>
         </div>
         <div class="item-card__info">
