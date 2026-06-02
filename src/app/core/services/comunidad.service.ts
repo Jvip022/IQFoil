@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 export interface Foro {
   id: string;
@@ -40,103 +41,56 @@ export interface Mentoria {
   fechaInicio?: Date;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ComunidadService {
-  private forosMock: Foro[] = [
-    { id: '1', titulo: 'Reglamento', descripcion: 'Dudas sobre las reglas de competición', totalHilos: 23, ultimaActividad: new Date() },
-    { id: '2', titulo: 'Técnica', descripcion: 'Consejos y preguntas sobre técnica', totalHilos: 45, ultimaActividad: new Date(Date.now() - 3600000) },
-    { id: '3', titulo: 'Material', descripcion: 'Equipamiento y embarcaciones', totalHilos: 17, ultimaActividad: new Date(Date.now() - 7200000) }
-  ];
+  private apiUrl = environment.apiUrl;
 
-  private hilosMock: Hilo[] = [
-    { id: '101', foroId: '1', titulo: '¿Cómo se penaliza un fuera de línea?', contenido: 'Texto del hilo...', autor: 'Juan', fechaCreacion: new Date(Date.now() - 86400000), ultimaRespuesta: new Date(), respuestas: 5, vistas: 120 },
-    { id: '102', foroId: '2', titulo: 'Mejorar la virada', contenido: 'Contenido del hilo...', autor: 'Ana', fechaCreacion: new Date(Date.now() - 172800000), ultimaRespuesta: new Date(Date.now() - 3600000), respuestas: 8, vistas: 210 }
-  ];
+  constructor(private http: HttpClient) {}
 
-  private mensajesMock: Mensaje[] = [
-    { id: '1001', hiloId: '101', autor: 'Carlos', contenido: 'Depende de la situación...', fecha: new Date(Date.now() - 86400000) },
-    { id: '1002', hiloId: '101', autor: 'María', contenido: 'Según la regla 42...', fecha: new Date(Date.now() - 43200000) }
-  ];
-
-  private mentoriasMock: Mentoria[] = [
-    { id: '1', mentor: 'Pedro Gómez', aprendiz: 'Luis Fernández', area: 'Técnica de foils', estado: 'activa', fechaInicio: new Date(Date.now() - 604800000) }
-  ];
-
-  constructor() {}
-
+  // Foros
   getForos(): Observable<Foro[]> {
-    return of(this.forosMock).pipe(delay(400));
+    return this.http.get<Foro[]>(`${this.apiUrl}/foro`);
   }
 
   getForo(id: string): Observable<Foro | undefined> {
-    return of(this.forosMock.find(f => f.id === id)).pipe(delay(200));
+    return this.http.get<Foro | undefined>(`${this.apiUrl}/foro/${id}`);
   }
 
+  // Hilos
   getHilos(foroId?: string): Observable<Hilo[]> {
-    if (foroId) {
-      return of(this.hilosMock.filter(h => h.foroId === foroId)).pipe(delay(500));
-    }
-    return of(this.hilosMock).pipe(delay(500));
+    const url = foroId ? `${this.apiUrl}/foro/hilos?foroId=${foroId}` : `${this.apiUrl}/foro/hilos`;
+    return this.http.get<Hilo[]>(url);
   }
 
-  // Método getHilo (que faltaba)
   getHilo(id: string): Observable<Hilo | undefined> {
-    return of(this.hilosMock.find(h => h.id === id)).pipe(delay(200));
+    return this.http.get<Hilo | undefined>(`${this.apiUrl}/foro/hilos/${id}`);
   }
 
   crearHilo(hilo: Partial<Hilo>): Observable<Hilo> {
-    const nuevoHilo: Hilo = {
-      id: Date.now().toString(),
-      foroId: hilo.foroId || '1',
-      titulo: hilo.titulo || 'Nuevo hilo',
-      contenido: hilo.contenido || '',
-      autor: hilo.autor || 'Usuario actual',
-      fechaCreacion: new Date(),
-      ultimaRespuesta: new Date(),
-      respuestas: 0,
-      vistas: 0
-    };
-    this.hilosMock.push(nuevoHilo);
-    return of(nuevoHilo).pipe(delay(600));
+    return this.http.post<Hilo>(`${this.apiUrl}/foro/hilos`, hilo);
   }
 
+  /** Elimina un hilo por su ID (y todos sus mensajes asociados) */
+  eliminarHilo(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/foro/hilos/${id}`);
+  }
+
+  // Mensajes
   getMensajes(hiloId: string): Observable<Mensaje[]> {
-    return of(this.mensajesMock.filter(m => m.hiloId === hiloId)).pipe(delay(300));
+    return this.http.get<Mensaje[]>(`${this.apiUrl}/foro/hilos/${hiloId}/mensajes`);
   }
 
   enviarMensaje(mensaje: Partial<Mensaje>): Observable<Mensaje> {
-    const nuevoMensaje: Mensaje = {
-      id: Date.now().toString(),
-      hiloId: mensaje.hiloId || '',
-      autor: mensaje.autor || 'Usuario',
-      contenido: mensaje.contenido || '',
-      fecha: new Date()
-    };
-    this.mensajesMock.push(nuevoMensaje);
-
-    const hilo = this.hilosMock.find(h => h.id === mensaje.hiloId);
-    if (hilo) {
-      hilo.ultimaRespuesta = new Date();
-      hilo.respuestas++;
-    }
-    return of(nuevoMensaje).pipe(delay(400));
+    return this.http.post<Mensaje>(`${this.apiUrl}/foro/mensajes`, mensaje);
   }
 
+  // Mentorías
   getMentorias(usuarioId?: string): Observable<Mentoria[]> {
-    return of(this.mentoriasMock).pipe(delay(500));
+    const url = usuarioId ? `${this.apiUrl}/foro/mentorias?usuarioId=${usuarioId}` : `${this.apiUrl}/foro/mentorias`;
+    return this.http.get<Mentoria[]>(url);
   }
 
   solicitarMentoria(mentoria: Partial<Mentoria>): Observable<Mentoria> {
-    const nueva: Mentoria = {
-      id: Date.now().toString(),
-      mentor: mentoria.mentor || '',
-      aprendiz: mentoria.aprendiz || '',
-      area: mentoria.area || 'General',
-      estado: 'pendiente'
-    };
-    this.mentoriasMock.push(nueva);
-    return of(nueva).pipe(delay(600));
+    return this.http.post<Mentoria>(`${this.apiUrl}/foro/mentorias`, mentoria);
   }
 }

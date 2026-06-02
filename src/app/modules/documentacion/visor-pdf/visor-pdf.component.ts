@@ -21,7 +21,7 @@ import { SafeUrlPipe } from '../../../shared/biblioteca-offline/biblioteca-offli
     FormsModule,
     PdfViewerModule,
     LoadingSpinnerComponent,
-    SafeUrlPipe
+    //SafeUrlPipe
   ],
   templateUrl: './visor-pdf.component.html',
   styleUrls: ['./visor-pdf.component.scss']

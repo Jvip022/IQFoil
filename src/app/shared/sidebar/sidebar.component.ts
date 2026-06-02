@@ -4,7 +4,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 interface MenuItem {
-  route?: string;               // opcional si tiene hijos
+  route?: string;               
   label: string;
   icon: string;
   exact?: boolean;
