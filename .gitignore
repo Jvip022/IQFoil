@@ -6,4 +6,8 @@
 **angular.json
 **package-lock.json
 **Mutimedia Vela.code-workspace
-**backend_flask
+**/__pycache__
+**.env
+**.env.example
+**/venv
+**.pyc
