@@ -3,7 +3,17 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export interface Documento { id: string; titulo: string; descripcion: string; archivoUrl: string; tipo: string; fechaSubida: Date; tamano: number; autor: string; version?: number; }
+export interface Documento {
+  id?: string;
+  titulo: string;
+  descripcion: string;
+  archivoUrl: string;
+  tipo: string;
+  fechaSubida: Date;
+  tamano: number;
+  autor: string;
+  version?: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class DocumentoService {
@@ -12,14 +22,19 @@ export class DocumentoService {
   constructor(private http: HttpClient) {}
 
   getDocumentos(): Observable<Documento[]> {
-    return this.http.get<Documento[]>(`${this.apiUrl}/documentos`);
+    // Asegurar la barra final para evitar redirección 308
+    return this.http.get<Documento[]>(`${this.apiUrl}/documentos/`);
   }
 
   subirDocumento(documento: Partial<Documento>, archivo: File): Observable<Documento> {
     const formData = new FormData();
+    // Campos individuales como espera el backend
+    formData.append('titulo', documento.titulo || '');
+    formData.append('descripcion', documento.descripcion || '');
+    formData.append('tipo', documento.tipo || 'pdf');
     formData.append('archivo', archivo);
-    formData.append('datos', JSON.stringify(documento));
-    return this.http.post<Documento>(`${this.apiUrl}/documentos`, formData);
+    // No establecer Content-Type, el navegador lo hará automáticamente
+    return this.http.post<Documento>(`${this.apiUrl}/documentos/`, formData);
   }
 
   eliminarDocumento(id: string): Observable<any> {

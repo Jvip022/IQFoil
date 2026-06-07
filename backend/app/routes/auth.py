@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app import db
 from app.models.usuario import Usuario
+from app.models.rol import Rol
 
-bp = Blueprint('auth', __name__)
+bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 @bp.route('/register', methods=['POST'])
 def register():
@@ -23,4 +24,27 @@ def login():
     if not user or not user.check_password(data['password']):
         return jsonify({'error': 'Credenciales inválidas'}), 401
     access_token = create_access_token(identity=str(user.id))
-    return jsonify({'token': access_token, 'user': {'id': user.id, 'email': user.email, 'nombre': user.nombre}})
+    return jsonify({
+        'token': access_token,
+        'user': {
+            'id': user.id,
+            'email': user.email,
+            'nombre': user.nombre,
+            'rol_id': user.rol_id
+        }
+    })
+
+@bp.route('/perfil', methods=['GET'])
+@jwt_required()
+def perfil():
+    user_id = get_jwt_identity()
+    user = Usuario.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    return jsonify({
+        'id': user.id,
+        'email': user.email,
+        'nombre': user.nombre,
+        'avatarUrl': user.avatar,   # antes era avatar_url, ahora avatar
+        'rol_id': user.rol_id
+    })

@@ -11,3 +11,4 @@
 **.env.example
 **/venv
 **.pyc
+**estructura.txt

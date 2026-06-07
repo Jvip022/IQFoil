@@ -1,3 +1,4 @@
+# app/models/__init__.py
 from .usuario import Usuario
 from .rol import Rol
 from .video import VideoTutorial

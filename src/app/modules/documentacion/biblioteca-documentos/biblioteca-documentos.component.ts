@@ -3,17 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
-// Servicios
 import { DocumentoService, Documento } from '../../../core/services/documento.service';
 import { NotificacionService } from '../../../core/services/notificacion.service';
 import { OfflineService } from '../../../core/services/offline.service';
-
-// Componentes compartidos
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 import { ModalConfirmacionComponent } from '../../../shared/modal-confirmacion/modal-confirmacion.component';
-
-// Pipes
 import { FileSizePipe, SafeUrlPipe } from '../../../shared/biblioteca-offline/biblioteca-offline.component';
 
 @Component({
@@ -41,19 +36,12 @@ export class BibliotecaDocumentosComponent implements OnInit, OnDestroy {
   vista: 'grid' | 'lista' = 'grid';
 
   documentoSeleccionado: Documento | null = null;
-
-  // Modales
   modalSubidaVisible = false;
   modoEdicion = false;
   modalEliminarVisible = false;
   documentoAEliminar: Documento | null = null;
 
-  // Formulario de subida/edición
-  formData: Partial<Documento> = {
-    titulo: '',
-    descripcion: '',
-    tipo: 'pdf'
-  };
+  formData: Partial<Documento> = { titulo: '', descripcion: '', tipo: 'pdf' };
   archivoSeleccionado: File | null = null;
 
   get mensajeEliminar(): string {
@@ -82,7 +70,10 @@ export class BibliotecaDocumentosComponent implements OnInit, OnDestroy {
     this.cargando = true;
     this.documentoService.getDocumentos().subscribe({
       next: (docs: Documento[]) => {
-        this.documentos = docs;
+        this.documentos = docs.map(doc => ({
+          ...doc,
+          fechaSubida: new Date(doc.fechaSubida)
+        }));
         this.filterDocuments();
         this.cargando = false;
       },
@@ -155,7 +146,6 @@ export class BibliotecaDocumentosComponent implements OnInit, OnDestroy {
     this.vista = this.vista === 'grid' ? 'lista' : 'grid';
   }
 
-  // Visor de documento
   seleccionarDocumento(doc: Documento): void {
     this.documentoSeleccionado = doc;
   }
@@ -164,7 +154,6 @@ export class BibliotecaDocumentosComponent implements OnInit, OnDestroy {
     this.documentoSeleccionado = null;
   }
 
-  // Subir/Editar documento
   abrirModalSubida(): void {
     this.modoEdicion = false;
     this.formData = { titulo: '', descripcion: '', tipo: 'pdf' };
@@ -198,6 +187,7 @@ export class BibliotecaDocumentosComponent implements OnInit, OnDestroy {
     }
 
     if (this.modoEdicion && this.formData.id) {
+      // Verificar que el ID existe antes de actualizar
       this.documentoService.actualizarDocumento(this.formData.id, this.formData).subscribe({
         next: (docActualizado: Documento | undefined) => {
           if (docActualizado) {
@@ -220,7 +210,7 @@ export class BibliotecaDocumentosComponent implements OnInit, OnDestroy {
       }
       this.documentoService.subirDocumento(this.formData, this.archivoSeleccionado).subscribe({
         next: (nuevoDoc: Documento) => {
-          this.documentos.push(nuevoDoc);
+          this.documentos.push({ ...nuevoDoc, fechaSubida: new Date(nuevoDoc.fechaSubida) });
           this.filterDocuments();
           this.notificacionService.mostrarExito('Documento subido correctamente');
           this.cerrarModalSubida();
@@ -246,6 +236,12 @@ export class BibliotecaDocumentosComponent implements OnInit, OnDestroy {
 
   eliminarDocumento(): void {
     if (!this.documentoAEliminar) return;
+    // Verificar que el ID existe antes de eliminar
+    if (!this.documentoAEliminar.id) {
+      this.notificacionService.mostrarError('No se puede eliminar el documento: ID no válido');
+      this.cancelarEliminacion();
+      return;
+    }
     this.documentoService.eliminarDocumento(this.documentoAEliminar.id).subscribe({
       next: () => {
         this.documentos = this.documentos.filter(d => d.id !== this.documentoAEliminar!.id);

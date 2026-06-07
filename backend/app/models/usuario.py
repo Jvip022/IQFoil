@@ -9,6 +9,11 @@ class Usuario(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     rol_id = db.Column(db.Integer, db.ForeignKey('rol.id'), default=3)
     activo = db.Column(db.Boolean, default=True)
+    avatar = db.Column(db.String(255), nullable=True)
+    preferencias = db.Column(db.JSON, nullable=True, default={'idioma': 'es', 'notificacionesEmail': True, 'tema': 'claro'})
+
+    # Relación con Rol
+    rol = db.relationship('Rol', backref='usuarios')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

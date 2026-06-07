@@ -1,20 +1,23 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from .. import db
-from ..models.usuario import Usuario
-from ..models.foro import Foro, Hilo, Mensaje
+from app import db
+from app.models.foro import Foro
+from app.models.hilo import Hilo
+from app.models.mensaje import Mensaje
+from app.models.usuario import Usuario
 
-bp = Blueprint('foro', __name__)
+bp = Blueprint('foro', __name__, url_prefix='/api/foro')
 
 @bp.route('/', methods=['GET'])
+@jwt_required()
 def get_foros():
     foros = Foro.query.order_by(Foro.orden).all()
     return jsonify([{
         'id': f.id,
         'titulo': f.titulo,
         'descripcion': f.descripcion,
-        'totalHilos': f.hilos.count(),
-        'ultimaActividad': f.hilos.order_by(Hilo.ultima_respuesta.desc()).first().ultima_respuesta if f.hilos.first() else None
+        'totalHilos': Hilo.query.filter_by(foro_id=f.id).count(),
+        'ultimaActividad': Hilo.query.filter_by(foro_id=f.id).order_by(Hilo.ultima_respuesta.desc()).first().ultima_respuesta.isoformat() if Hilo.query.filter_by(foro_id=f.id).first() else None
     } for f in foros])
 
 @bp.route('/hilos', methods=['GET'])
@@ -50,13 +53,12 @@ def crear_hilo():
     )
     db.session.add(nuevo_hilo)
     db.session.commit()
-    return jsonify({'id': nuevo_hilo.id, 'mensaje': 'Hilo creado'}), 201
+    return jsonify({'id': nuevo_hilo.id, 'message': 'Hilo creado'}), 201
 
 @bp.route('/hilos/<int:hilo_id>', methods=['GET'])
 @jwt_required()
 def get_hilo(hilo_id):
     hilo = Hilo.query.get_or_404(hilo_id)
-    # Incrementar vistas
     hilo.vistas += 1
     db.session.commit()
     return jsonify({
@@ -92,10 +94,9 @@ def enviar_mensaje():
         autor_id=user_id,
         contenido=data['contenido']
     )
-    # Actualizar hilo
     hilo = Hilo.query.get(data['hiloId'])
     hilo.respuestas += 1
     hilo.ultima_respuesta = db.func.now()
     db.session.add(nuevo_mensaje)
     db.session.commit()
-    return jsonify({'id': nuevo_mensaje.id, 'mensaje': 'Respuesta enviada'}), 201
+    return jsonify({'id': nuevo_mensaje.id, 'message': 'Respuesta enviada'}), 201

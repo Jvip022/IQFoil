@@ -1,47 +1,45 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './modules/login/login.component';
 import { DashboardComponent } from './modules/dashboard/dashboard.component';
-import { AuthGuard } from './core/guards/auth.guard';
-// import { FoilHomeComponent } from './foil-home/foil-home.component';
+import { autenticacionGuard } from './core/guards/autenticacion.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  // { path: 'foil-home', component: FoilHomeComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { path: 'dashboard', component: DashboardComponent, canActivate: [autenticacionGuard] },
   {
     path: 'contenidos',
     loadChildren: () => import('./modules/contenidos/contenidos.module').then(m => m.ContenidosModule),
-    canActivate: [AuthGuard]
+    canActivate: [autenticacionGuard]
   },
   {
     path: 'documentacion',
     loadChildren: () => import('./modules/documentacion/documentacion.module').then(m => m.DocumentacionModule),
-    canActivate: [AuthGuard]
+    canActivate: [autenticacionGuard]
   },
   {
     path: 'talentos',
     loadChildren: () => import('./modules/talentos/talentos.module').then(m => m.TalentosModule),
-    canActivate: [AuthGuard]
+    canActivate: [autenticacionGuard]
   },
   {
     path: 'comunidad',
     loadChildren: () => import('./modules/comunidad/comunidad.module').then(m => m.ComunidadModule),
-    canActivate: [AuthGuard]
+    canActivate: [autenticacionGuard]
   },
   {
     path: 'administracion',
     loadChildren: () => import('./modules/administracion/administracion.module').then(m => m.AdministracionModule),
-    canActivate: [AuthGuard]
+    canActivate: [autenticacionGuard]
   },
   {
     path: 'evaluacion',
     loadChildren: () => import('./modules/evaluacion/evaluacion.module').then(m => m.EvaluacionModule),
-    canActivate: [AuthGuard]
+    canActivate: [autenticacionGuard]
   },
   {
     path: 'simulaciones',
     loadChildren: () => import('./modules/simulaciones/simulaciones.module').then(m => m.SimulacionesModule),
-    canActivate: [AuthGuard]
+    canActivate: [autenticacionGuard]
   },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' }

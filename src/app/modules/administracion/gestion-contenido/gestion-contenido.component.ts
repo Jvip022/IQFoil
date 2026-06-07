@@ -24,8 +24,8 @@ import { ModalConfirmacionComponent } from '../../../shared/modal-confirmacion/m
     LoadingSpinnerComponent,
     ModalConfirmacionComponent
   ],
-  templateUrl: 'gestion-contenido.component.html',
-  styleUrls: ['gestion-contenido.component.scss']
+  templateUrl: './gestion-contenido.component.html',
+  styleUrls: ['./gestion-contenido.component.scss']
 })
 export class GestionContenidoComponent implements OnInit, OnDestroy {
   // Pestañas
@@ -66,7 +66,7 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
     private documentoService: DocumentoService,
     private comunidadService: ComunidadService,
     private notificacionService: NotificacionService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.cargarVideos();
@@ -105,8 +105,7 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
       this.notificacionService.mostrarAdvertencia('Título y archivo son obligatorios');
       return;
     }
-    // Aquí se llamaría al servicio real para subir el video
-    // Simulación:
+    // Simulación de subida
     setTimeout(() => {
       const nuevo: Video = {
         id: Date.now().toString(),
@@ -187,7 +186,11 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
   }
 
   // ==================== ELIMINACIÓN GENÉRICA ====================
-  confirmarEliminar(tipo: string, id: string, nombre: string): void {
+  confirmarEliminar(tipo: string, id: string | undefined, nombre: string): void {
+    if (!id) {
+      this.notificacionService.mostrarError('ID no válido para eliminar');
+      return;
+    }
     this.elementoAEliminar = { tipo, id, nombre };
     this.mensajeEliminar = `¿Estás seguro de que deseas eliminar "${nombre}"? Esta acción no se puede deshacer.`;
     this.modalEliminarVisible = true;
@@ -196,9 +199,9 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
   eliminarElemento(): void {
     if (!this.elementoAEliminar) return;
     const { tipo, id, nombre } = this.elementoAEliminar;
+
     switch (tipo) {
       case 'video':
-        // Llamar al servicio de eliminación de video (simulado)
         this.videos = this.videos.filter(v => v.id !== id);
         this.notificacionService.mostrarExito(`Video "${nombre}" eliminado`);
         break;
@@ -212,7 +215,7 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
         });
         break;
       case 'hilo':
-        // Llamar al servicio de eliminación de hilo (simulado, porque no existe en ComunidadService)
+        // Aquí llamarías al servicio real de eliminación de hilos si existe
         this.hilos = this.hilos.filter(h => h.id !== id);
         this.notificacionService.mostrarExito(`Hilo "${nombre}" eliminado`);
         break;

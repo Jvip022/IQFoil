@@ -1,5 +1,5 @@
 from app import create_app, db
-from app.models import usuario, rol  # importa todos los modelos
+from app.models import usuario, rol  # importa modelos para que SQLAlchemy los detecte
 
 app = create_app()
 
