@@ -2,32 +2,71 @@
   <header class="realizar-evaluacion__header">
     <div class="header-left">
       <h2 class="realizar-evaluacion__title">📝 Realizar evaluación</h2>
-      <p class="realizar-evaluacion__subtitle">Selecciona una práctica pendiente para evaluar</p>
+      <p class="realizar-evaluacion__subtitle">Selecciona una práctica pendiente o un examen teórico</p>
     </div>
   </header>
 
   <app-estado-conexion class="realizar-evaluacion__connection"></app-estado-conexion>
 
-  <app-loading-spinner *ngIf="cargando" [text]="'Cargando prácticas pendientes...'"></app-loading-spinner>
+  <!-- Pestañas (opcional) -->
+  <div class="realizar-evaluacion__tabs">
+    <button class="tab-btn" [class.active]="tabActivo === 'practicas'" (click)="tabActivo = 'practicas'">
+      📹 Prácticas pendientes
+    </button>
+    <button class="tab-btn" [class.active]="tabActivo === 'teoricos'" (click)="tabActivo = 'teoricos'">
+      📚 Exámenes teóricos
+    </button>
+  </div>
 
-  <div class="realizar-evaluacion__content" *ngIf="!cargando">
-    <div class="pendientes-list" *ngIf="pendientes.length > 0; else sinPendientes">
-      <div class="pendiente-card" *ngFor="let item of pendientes" (click)="evaluar(item)">
-        <div class="pendiente-card__info">
-          <h3 class="pendiente-titulo">{{ item.titulo }}</h3>
-          <p class="pendiente-usuario"><strong>Usuario:</strong> {{ item.usuarioId }}</p>
-          <p class="pendiente-fecha"><strong>Entregado:</strong> {{ item.fechaSubida | date:'dd/MM/yyyy HH:mm' }}</p>
-        </div>
-        <div class="pendiente-card__accion">
-          <button class="btn btn-primary">Evaluar</button>
+  <!-- Contenido de prácticas pendientes -->
+  <div class="realizar-evaluacion__content" *ngIf="tabActivo === 'practicas'">
+    <app-loading-spinner *ngIf="cargandoPracticas" [text]="'Cargando prácticas pendientes...'"></app-loading-spinner>
+    <div *ngIf="!cargandoPracticas">
+      <div class="pendientes-list" *ngIf="pendientes.length > 0; else sinPendientes">
+        <div class="pendiente-card" *ngFor="let item of pendientes" (click)="evaluarPractica(item)">
+          <div class="pendiente-card__info">
+            <h3 class="pendiente-titulo">{{ item.titulo }}</h3>
+            <p class="pendiente-usuario"><strong>Usuario:</strong> {{ item.usuarioId }}</p>
+            <p class="pendiente-fecha"><strong>Entregado:</strong> {{ item.fechaSubida | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="pendiente-card__accion">
+            <button class="btn btn-primary">Evaluar</button>
+          </div>
         </div>
       </div>
+      <ng-template #sinPendientes>
+        <div class="sin-elementos">
+          <p>No hay prácticas pendientes de evaluación.</p>
+        </div>
+      </ng-template>
     </div>
+  </div>
 
-    <ng-template #sinPendientes>
-      <div class="sin-pendientes">
-        <p>No hay prácticas pendientes de evaluación.</p>
+  <!-- Contenido de exámenes teóricos -->
+  <div class="realizar-evaluacion__content" *ngIf="tabActivo === 'teoricos'">
+    <app-loading-spinner *ngIf="cargandoTeoricos" [text]="'Cargando exámenes teóricos...'"></app-loading-spinner>
+    <div *ngIf="!cargandoTeoricos">
+      <div class="examenes-list" *ngIf="examenesTeoricos.length > 0; else sinExamenes">
+        <div class="examen-card" *ngFor="let examen of examenesTeoricos" (click)="tomarExamen(examen)">
+          <div class="examen-card__info">
+            <h3 class="examen-titulo">{{ examen.titulo }}</h3>
+            <p class="examen-descripcion">{{ examen.descripcion }}</p>
+            <p class="examen-meta">
+              <strong>Nivel:</strong> {{ examen.nivel }} |
+              <strong>Tiempo límite:</strong> {{ examen.tiempoLimiteMinutos ? examen.tiempoLimiteMinutos + ' min' : 'Sin límite' }} |
+              <strong>Nota aprobación:</strong> {{ examen.puntajeAprobacion }}%
+            </p>
+          </div>
+          <div class="examen-card__accion">
+            <button class="btn btn-primary">Comenzar examen</button>
+          </div>
+        </div>
       </div>
-    </ng-template>
+      <ng-template #sinExamenes>
+        <div class="sin-elementos">
+          <p>No hay exámenes teóricos disponibles en este momento.</p>
+        </div>
+      </ng-template>
+    </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 @use 'variable' as *;
 
-.lista-evaluaciones {
+.realizar-evaluacion {
   padding: 20px;
   max-width: $max-width;
   margin: 0 auto;
@@ -12,12 +12,12 @@
     align-items: center;
     margin-bottom: 25px;
 
-    .lista-evaluaciones__title {
+    .realizar-evaluacion__title {
       margin: 0 0 0.5rem;
       font-size: 1.8rem;
       color: var(--navy);
     }
-    .lista-evaluaciones__subtitle {
+    .realizar-evaluacion__subtitle {
       margin: 0;
       color: var(--muted);
     }
@@ -27,167 +27,96 @@
     margin-bottom: 20px;
   }
 
-  &__filters {
+  &__tabs {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 30px;
-
-    .search-box {
-      flex: 2;
-      min-width: 250px;
-      position: relative;
-
-      .search-input {
-        width: 100%;
-        padding: 10px 15px 10px 40px;
-        border: 1px solid var(--surface-elev);
-        border-radius: calc(var(--radius) / 2);
-        background: var(--card-bg);
-        color: var(--text);
-        font-size: 0.95rem;
-
-        &:focus {
-          outline: none;
-          border-color: var(--cyan);
-        }
-      }
-      .search-icon {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--muted);
-      }
-    }
-
-    .filter-options {
-      flex: 1;
-      display: flex;
-      gap: 10px;
-
-      .filter-select {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid var(--surface-elev);
-        border-radius: calc(var(--radius) / 2);
-        background: var(--card-bg);
-        color: var(--text);
-        cursor: pointer;
-
-        &:focus {
-          outline: none;
-          border-color: var(--cyan);
-        }
-      }
-    }
-  }
-}
-
-.evaluaciones-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
-}
-
-.evaluacion-card {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: 0 2px 8px var(--surface-elev);
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 16px var(--surface-elev);
-  }
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: var(--surface-elev);
+    gap: 10px;
+    margin-bottom: 25px;
     border-bottom: 1px solid var(--surface-elev);
 
-    .evaluacion-tipo {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .evaluacion-estado {
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 20px;
-
-      &.estado-pendiente {
-        background: rgba(243, 156, 18, 0.2);
-        color: var(--orange);
-      }
-      &.estado-evaluado {
-        background: rgba(76, 175, 80, 0.2);
-        color: #4caf50;
-      }
-    }
-  }
-
-  &__body {
-    padding: 16px;
-
-    .evaluacion-titulo {
-      margin: 0 0 10px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--navy);
-    }
-    p {
-      margin: 5px 0;
-      color: var(--text);
-    }
-  }
-
-  &__footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    padding: 10px 16px 16px;
-    border-top: 1px solid var(--surface-elev);
-
-    .btn-icon {
+    .tab-btn {
       background: transparent;
       border: none;
-      font-size: 1.2rem;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
       cursor: pointer;
-      padding: 6px;
-      border-radius: 50%;
-      transition: background-color 0.2s;
+      transition: all 0.2s;
+      position: relative;
 
       &:hover {
-        background: var(--surface-elev);
+        color: var(--cyan);
+      }
+
+      &.active {
+        color: var(--cyan);
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: var(--cyan);
+        }
       }
     }
   }
-}
 
-.sin-evaluaciones {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--muted);
-  background: var(--card-bg);
-  border-radius: var(--radius);
-}
-
-// Modal de detalle
-.detalle-evaluacion {
-  p {
-    margin: 8px 0;
+  .pendientes-list, .examenes-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
   }
-  .comentarios-texto {
-    background: var(--surface-elev);
-    padding: 10px;
-    border-radius: calc(var(--radius) / 2);
-    font-style: italic;
+
+  .pendiente-card, .examen-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--surface-elev);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px var(--surface-elev);
+    }
+
+    &__info {
+      padding: 16px;
+
+      .pendiente-titulo, .examen-titulo {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--navy);
+      }
+      p {
+        margin: 5px 0;
+        color: var(--text);
+      }
+      .examen-descripcion {
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .examen-meta {
+        font-size: 0.8rem;
+      }
+    }
+
+    &__accion {
+      padding: 10px 16px 16px;
+      border-top: 1px solid var(--surface-elev);
+      text-align: right;
+    }
+  }
+
+  .sin-elementos {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    background: var(--card-bg);
+    border-radius: var(--radius);
   }
 }

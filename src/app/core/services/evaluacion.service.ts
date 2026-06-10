@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+// ==================== EVALUACIÓN PRÁCTICA (existente) ====================
 export interface Criterio {
   id: string;
   descripcion: string;
@@ -38,13 +39,53 @@ export interface VideoPractica {
   evaluacionId?: string;
 }
 
+// ==================== EVALUACIÓN TEÓRICA (nuevo) ====================
+export type TipoPregunta = 'opcion_unica' | 'opcion_multiple' | 'verdadero_falso' | 'texto_corto';
+
+export interface Pregunta {
+  id: string;
+  texto: string;
+  tipo: TipoPregunta;
+  opciones?: string[];           // para opción única/múltiple
+  respuestaCorrecta?: string | string[]; // para opción única o múltiple
+  puntaje: number;
+  explicacion?: string;          // retroalimentación
+  nivel?: string;                // principiante, intermedio, avanzado
+  categoria?: string;            // reglamento, meteorología, técnica, etc.
+}
+
+export interface ExamenTeorico {
+  id: string;
+  titulo: string;
+  descripcion?: string;
+  nivel: string;
+  preguntas: Pregunta[];         // lista de IDs o preguntas completas
+  tiempoLimiteMinutos?: number;
+  puntajeAprobacion: number;
+  fechaCreacion: Date;
+  activo: boolean;
+}
+
+export interface RespuestaUsuario {
+  id?: string;
+  examenId: string;
+  usuarioId: string;
+  respuestas: { preguntaId: string; respuesta: string | string[] }[];
+  fechaInicio: Date;
+  fechaEnvio?: Date;
+  puntajeObtenido?: number;
+  porcentaje?: number;
+  aprobado?: boolean;
+  estado: 'en_curso' | 'finalizado';
+}
+
 @Injectable({ providedIn: 'root' })
 export class EvaluacionService {
   private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
-  // ==================== RÚBRICAS ====================
+  // ==================== RÚBRICAS (práctica) ====================
   getRubricas(): Observable<Rubrica[]> {
     return this.http.get<Rubrica[]>(`${this.apiUrl}/evaluaciones/rubricas`);
   }
@@ -65,7 +106,7 @@ export class EvaluacionService {
     return this.http.delete<void>(`${this.apiUrl}/evaluaciones/rubricas/${id}`);
   }
 
-  // ==================== EVALUACIONES ====================
+  // ==================== EVALUACIONES PRÁCTICAS ====================
   getEvaluaciones(usuarioId?: string): Observable<Evaluacion[]> {
     const url = usuarioId ? `${this.apiUrl}/evaluaciones?usuarioId=${usuarioId}` : `${this.apiUrl}/evaluaciones`;
     return this.http.get<Evaluacion[]>(url);
@@ -94,5 +135,77 @@ export class EvaluacionService {
 
   getProgresoUsuario(usuarioId: string): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/evaluaciones/progreso/${usuarioId}`);
+  }
+
+  // ==================== EVALUACIÓN TEÓRICA ====================
+  // Preguntas
+  getPreguntas(filtros?: { nivel?: string; categoria?: string }): Observable<Pregunta[]> {
+    let url = `${this.apiUrl}/evaluaciones/teoricas/preguntas`;
+    if (filtros) {
+      const params = new URLSearchParams();
+      if (filtros.nivel) params.set('nivel', filtros.nivel);
+      if (filtros.categoria) params.set('categoria', filtros.categoria);
+      if (params.toString()) url += `?${params.toString()}`;
+    }
+    return this.http.get<Pregunta[]>(url);
+  }
+
+  getPregunta(id: string): Observable<Pregunta> {
+    return this.http.get<Pregunta>(`${this.apiUrl}/evaluaciones/teoricas/preguntas/${id}`);
+  }
+
+  crearPregunta(pregunta: Omit<Pregunta, 'id'>): Observable<Pregunta> {
+    return this.http.post<Pregunta>(`${this.apiUrl}/evaluaciones/teoricas/preguntas`, pregunta);
+  }
+
+  actualizarPregunta(id: string, pregunta: Partial<Pregunta>): Observable<Pregunta> {
+    return this.http.put<Pregunta>(`${this.apiUrl}/evaluaciones/teoricas/preguntas/${id}`, pregunta);
+  }
+
+  eliminarPregunta(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/evaluaciones/teoricas/preguntas/${id}`);
+  }
+
+  // Exámenes teóricos
+  getExamenesTeoricos(): Observable<ExamenTeorico[]> {
+    return this.http.get<ExamenTeorico[]>(`${this.apiUrl}/evaluaciones/teoricas/examenes`);
+  }
+
+  getExamenTeorico(id: string): Observable<ExamenTeorico> {
+    return this.http.get<ExamenTeorico>(`${this.apiUrl}/evaluaciones/teoricas/examenes/${id}`);
+  }
+
+  crearExamenTeorico(examen: Omit<ExamenTeorico, 'id'>): Observable<ExamenTeorico> {
+    return this.http.post<ExamenTeorico>(`${this.apiUrl}/evaluaciones/teoricas/examenes`, examen);
+  }
+
+  actualizarExamenTeorico(id: string, examen: Partial<ExamenTeorico>): Observable<ExamenTeorico> {
+    return this.http.put<ExamenTeorico>(`${this.apiUrl}/evaluaciones/teoricas/examenes/${id}`, examen);
+  }
+
+  eliminarExamenTeorico(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/evaluaciones/teoricas/examenes/${id}`);
+  }
+
+  // Respuestas de usuarios
+  iniciarExamenTeorico(examenId: string): Observable<RespuestaUsuario> {
+    return this.http.post<RespuestaUsuario>(`${this.apiUrl}/evaluaciones/teoricas/iniciar`, { examenId });
+  }
+
+  guardarRespuestas(respuesta: Partial<RespuestaUsuario>): Observable<RespuestaUsuario> {
+    return this.http.post<RespuestaUsuario>(`${this.apiUrl}/evaluaciones/teoricas/guardar`, respuesta);
+  }
+
+  finalizarExamenTeorico(respuestaId: string): Observable<RespuestaUsuario> {
+    return this.http.post<RespuestaUsuario>(`${this.apiUrl}/evaluaciones/teoricas/finalizar/${respuestaId}`, {});
+  }
+
+  getResultadosTeoricos(usuarioId?: string): Observable<RespuestaUsuario[]> {
+    const url = usuarioId ? `${this.apiUrl}/evaluaciones/teoricas/resultados?usuarioId=${usuarioId}` : `${this.apiUrl}/evaluaciones/teoricas/resultados`;
+    return this.http.get<RespuestaUsuario[]>(url);
+  }
+
+  getResultadoTeorico(id: string): Observable<RespuestaUsuario> {
+    return this.http.get<RespuestaUsuario>(`${this.apiUrl}/evaluaciones/teoricas/resultados/${id}`);
   }
 }
