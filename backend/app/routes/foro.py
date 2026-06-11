@@ -12,32 +12,36 @@ bp = Blueprint('foro', __name__, url_prefix='/api/foro')
 @jwt_required()
 def get_foros():
     foros = Foro.query.order_by(Foro.orden).all()
-    return jsonify([{
-        'id': f.id,
-        'titulo': f.titulo,
-        'descripcion': f.descripcion,
-        'totalHilos': Hilo.query.filter_by(foro_id=f.id).count(),
-        'ultimaActividad': Hilo.query.filter_by(foro_id=f.id).order_by(Hilo.ultima_respuesta.desc()).first().ultima_respuesta.isoformat() if Hilo.query.filter_by(foro_id=f.id).first() else None
-    } for f in foros])
+    result = []
+    for f in foros:
+        ultimo_hilo = Hilo.query.filter_by(foro_id=f.id).order_by(Hilo.ultima_respuesta.desc()).first()
+        ultima_actividad = ultimo_hilo.ultima_respuesta.isoformat() if ultimo_hilo and ultimo_hilo.ultima_respuesta else None
+        result.append({
+            'id': f.id,
+            'titulo': f.titulo,
+            'descripcion': f.descripcion,
+            'totalHilos': Hilo.query.filter_by(foro_id=f.id).count(),
+            'ultimaActividad': ultima_actividad
+        })
+    return jsonify(result)
 
 @bp.route('/hilos', methods=['GET'])
 @jwt_required()
 def get_hilos():
-    foro_id = request.args.get('foroId', type=int)
-    query = Hilo.query.filter_by(activo=True)
-    if foro_id:
-        query = query.filter_by(foro_id=foro_id)
-    hilos = query.order_by(Hilo.ultima_respuesta.desc()).all()
-    return jsonify([{
-        'id': h.id,
-        'foroId': h.foro_id,
-        'titulo': h.titulo,
-        'autor': h.autor.nombre,
-        'fechaCreacion': h.fecha_creacion.isoformat(),
-        'ultimaRespuesta': h.ultima_respuesta.isoformat(),
-        'respuestas': h.respuestas,
-        'vistas': h.vistas
-    } for h in hilos])
+    hilos = Hilo.query.order_by(Hilo.fecha_creacion.desc()).all()
+    result = []
+    for h in hilos:
+        # Contar mensajes usando consulta (evita list.count())
+        num_respuestas = Mensaje.query.filter_by(hilo_id=h.id).count()
+        result.append({
+            'id': h.id,
+            'titulo': h.titulo,
+            'autor': h.autor.nombre if h.autor else 'Anónimo',
+            'fechaCreacion': h.fecha_creacion.isoformat(),
+            'respuestas': num_respuestas,
+            'ultimaRespuesta': h.ultima_respuesta.isoformat() if h.ultima_respuesta else None
+        })
+    return jsonify(result)
 
 @bp.route('/hilos', methods=['POST'])
 @jwt_required()
@@ -68,8 +72,8 @@ def get_hilo(hilo_id):
         'contenido': hilo.contenido,
         'autor': hilo.autor.nombre,
         'fechaCreacion': hilo.fecha_creacion.isoformat(),
-        'ultimaRespuesta': hilo.ultima_respuesta.isoformat(),
-        'respuestas': hilo.respuestas,
+        'ultimaRespuesta': hilo.ultima_respuesta.isoformat() if hilo.ultima_respuesta else None,
+        'respuestas': Mensaje.query.filter_by(hilo_id=hilo.id).count(),
         'vistas': hilo.vistas
     })
 
@@ -95,7 +99,8 @@ def enviar_mensaje():
         contenido=data['contenido']
     )
     hilo = Hilo.query.get(data['hiloId'])
-    hilo.respuestas += 1
+    if not hilo:
+        return jsonify({'error': 'Hilo no encontrado'}), 404
     hilo.ultima_respuesta = db.func.now()
     db.session.add(nuevo_mensaje)
     db.session.commit()

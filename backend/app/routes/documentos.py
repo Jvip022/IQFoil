@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 import os
@@ -13,7 +13,6 @@ ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png',
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Decorador que responde directamente a OPTIONS sin ejecutar la función
 def handle_options(fn):
     from functools import wraps
     @wraps(fn)
@@ -27,17 +26,24 @@ def handle_options(fn):
 @handle_options
 def get_documentos():
     documentos = Documento.query.order_by(Documento.fecha_subida.desc()).all()
-    return jsonify([{
-        'id': d.id,
-        'titulo': d.titulo,
-        'descripcion': d.descripcion,
-        'tipo': d.tipo,
-        'archivoUrl': d.url_archivo,
-        'fechaSubida': d.fecha_subida.isoformat(),
-        'tamano': d.tamano_bytes,
-        'autor': Usuario.query.get(d.autor_id).nombre if d.autor_id else 'Anónimo',
-        'version': d.version
-    } for d in documentos])
+    # Construir URL base para archivos (sin /api)
+    base_url = request.host_url.rstrip('/')  # ej: http://localhost:5000
+    result = []
+    for d in documentos:
+        # Convertir ruta local a URL pública
+        file_url = f"{base_url}/{d.url_archivo}" if d.url_archivo else None
+        result.append({
+            'id': d.id,
+            'titulo': d.titulo,
+            'descripcion': d.descripcion,
+            'tipo': d.tipo,
+            'archivoUrl': file_url,
+            'fechaSubida': d.fecha_subida.isoformat(),
+            'tamano': d.tamano_bytes,
+            'autor': Usuario.query.get(d.autor_id).nombre if d.autor_id else 'Anónimo',
+            'version': d.version
+        })
+    return jsonify(result)
 
 @bp.route('/', methods=['POST', 'OPTIONS'])
 @handle_options
@@ -55,16 +61,19 @@ def subir_documento():
         return jsonify({'error': 'Tipo de archivo no permitido'}), 400
 
     filename = secure_filename(archivo.filename)
-    upload_dir = 'uploads/documentos'
+    upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'documentos')
     os.makedirs(upload_dir, exist_ok=True)
     filepath = os.path.join(upload_dir, filename)
     archivo.save(filepath)
+
+    # Guardar ruta relativa (ej: uploads/documentos/archivo.pdf)
+    relative_path = os.path.join('uploads', 'documentos', filename).replace('\\', '/')
 
     nuevo_doc = Documento(
         titulo=titulo,
         descripcion=descripcion,
         tipo=tipo,
-        url_archivo=filepath,
+        url_archivo=relative_path,
         tamano_bytes=os.path.getsize(filepath),
         autor_id=user_id,
         version=1,
@@ -73,16 +82,21 @@ def subir_documento():
     db.session.add(nuevo_doc)
     db.session.commit()
 
+    base_url = request.host_url.rstrip('/')
+    file_url = f"{base_url}/{relative_path}"
+
     return jsonify({
         'id': nuevo_doc.id,
         'titulo': nuevo_doc.titulo,
         'descripcion': nuevo_doc.descripcion,
         'tipo': nuevo_doc.tipo,
-        'archivoUrl': nuevo_doc.url_archivo,
+        'archivoUrl': file_url,
         'fechaSubida': nuevo_doc.fecha_subida.isoformat(),
         'tamano': nuevo_doc.tamano_bytes,
         'autor': Usuario.query.get(nuevo_doc.autor_id).nombre
     }), 201
+
+
 
 @bp.route('/<int:id>', methods=['PUT', 'OPTIONS'])
 @handle_options

@@ -26,7 +26,7 @@ export interface Modulo {
 export class ContenidoService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getModulos(): Observable<Modulo[]> {
     return this.http.get<Modulo[]>(`${this.apiUrl}/videos/modulos`);
@@ -35,9 +35,12 @@ export class ContenidoService {
   marcarVideoComoVisto(moduloId: string, videoId: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/videos/progreso`, { moduloId, videoId, progreso: 100 });
   }
+  subirVideo(formData: FormData): Observable<Video> {
+    return this.http.post<Video>(`${this.apiUrl}/videos/`, formData);
+  }
 
-  actualizarProgreso(moduloId: string, videoId: string, progreso: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/videos/progreso`, { moduloId, videoId, progreso });
+  actualizarProgreso(videoId: string, progreso: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/videos/progreso`, { videoId, progreso });
   }
 
   /** Elimina un video por su ID */

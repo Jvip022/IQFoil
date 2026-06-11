@@ -46,7 +46,7 @@ export class ListaVideosComponent implements OnInit, OnDestroy {
   constructor(
     private contenidoService: ContenidoService,
     private notificacionService: NotificacionService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.cargarVideos();
@@ -93,10 +93,18 @@ export class ListaVideosComponent implements OnInit, OnDestroy {
     const ordenados = [...this.videosFiltrados];
     switch (this.ordenPor) {
       case 'fechaDesc':
-        ordenados.sort((a, b) => b.id.localeCompare(a.id));
+        ordenados.sort((a, b) => {
+          const idA = typeof a.id === 'number' ? a.id : parseInt(a.id, 10);
+          const idB = typeof b.id === 'number' ? b.id : parseInt(b.id, 10);
+          return idB - idA;
+        });
         break;
       case 'fechaAsc':
-        ordenados.sort((a, b) => a.id.localeCompare(b.id));
+        ordenados.sort((a, b) => {
+          const idA = typeof a.id === 'number' ? a.id : parseInt(a.id, 10);
+          const idB = typeof b.id === 'number' ? b.id : parseInt(b.id, 10);
+          return idA - idB;
+        });
         break;
       case 'tituloAsc':
         ordenados.sort((a, b) => a.titulo.localeCompare(b.titulo));
