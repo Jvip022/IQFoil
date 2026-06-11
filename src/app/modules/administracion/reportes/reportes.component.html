@@ -1,0 +1,98 @@
+<p>reportes works!</p>
+<div class="reportes">
+  <header class="reportes__header">
+    <h2>📊 Reportes y estadísticas</h2>
+    <p>Visualización avanzada de datos para la toma de decisiones</p>
+  </header>
+
+  <app-estado-conexion></app-estado-conexion>
+
+  <div class="reportes__tabs">
+    <button *ngFor="let tab of tabs" class="tab-btn" [class.active]="tabActivo === tab.id" (click)="cambiarTab(tab.id)">
+      <span class="tab-icon">{{ tab.icono }}</span>
+      {{ tab.nombre }}
+    </button>
+  </div>
+
+  <app-loading-spinner *ngIf="cargando"></app-loading-spinner>
+
+  <div class="reportes__content" *ngIf="!cargando">
+    <!-- Progreso individual -->
+    <div *ngIf="tabActivo === 'progreso' && progresoIndividual">
+      <div class="card mb-3">
+        <div class="card-header">📈 Progreso de {{ progresoIndividual.nombre }}</div>
+        <div class="card-body">
+          <p><strong>Progreso global:</strong> {{ progresoIndividual.progreso_global }}%</p>
+          <p><strong>Videos vistos:</strong> {{ progresoIndividual.videos_vistos }} / {{ progresoIndividual.total_videos }}</p>
+          <p><strong>Evaluaciones realizadas:</strong> {{ progresoIndividual.evaluaciones_realizadas }}</p>
+          <p><strong>Nota promedio:</strong> {{ progresoIndividual.nota_promedio }}</p>
+          <h5>Insignias</h5>
+          <ul>
+            <li *ngFor="let ins of progresoIndividual.insignias">{{ ins.nombre }} ({{ ins.fecha | date }})</li>
+          </ul>
+          <h5>Evolución mensual</h5>
+          <table class="table table-sm">
+            <thead><tr><th>Mes</th><th>Videos completados</th></tr></thead>
+            <tbody><tr *ngFor="let e of progresoIndividual.evolucion"><td>{{ e.mes }}</td><td>{{ e.videos_completados }}</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparativo provincial (simplificado) -->
+    <div *ngIf="tabActivo === 'comparativo' && comparativo.length">
+      <div class="card">
+        <div class="card-header">🏙️ Comparativo por provincia</div>
+        <div class="card-body">
+          <table class="table table-striped">
+            <thead><tr><th>Usuario</th><th>Provincia</th><th>Progreso</th><th>Evaluaciones</th></tr></thead>
+            <tbody><tr *ngFor="let item of comparativo"><td>{{ item.nombre }}</td><td>{{ item.provincia }}</td><td>{{ item.progreso_global }}%</td><td>{{ item.evaluaciones }}</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Talentos -->
+    <div *ngIf="tabActivo === 'talentos' && talentos.length">
+      <div class="card">
+        <div class="card-header">🌟 Talentos detectados</div>
+        <div class="card-body">
+          <table class="table">
+            <thead><tr><th>Nombre</th><th>Progreso</th><th>Insignias</th><th>Nota</th><th>Score</th></tr></thead>
+            <tbody><tr *ngFor="let t of talentos"><td>{{ t.nombre }}</td><td>{{ t.progreso }}%</td><td>{{ t.insignias }}</td><td>{{ t.nota_promedio }}</td><td>{{ t.score }}</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Uso plataforma -->
+    <div *ngIf="tabActivo === 'uso' && usoPlataforma">
+      <div class="card">
+        <div class="card-header">📊 Uso de la plataforma</div>
+        <div class="card-body">
+          <p>Usuarios totales: {{ usoPlataforma.usuarios_totales }}</p>
+          <p>Usuarios activos último mes: {{ usoPlataforma.usuarios_activos_mes }}</p>
+          <p>Total videos: {{ usoPlataforma.total_videos }}</p>
+          <p>Reproducciones totales: {{ usoPlataforma.reproducciones_totales }}</p>
+          <p>Documentos subidos: {{ usoPlataforma.documentos_subidos }}</p>
+          <p>Evaluaciones realizadas: {{ usoPlataforma.evaluaciones_realizadas }}</p>
+          <h5>Actividad mensual</h5>
+          <table class="table"><tr *ngFor="let m of usoPlataforma.uso_mensual"><td>{{ m.mes }}</td><td>{{ m.actividades }} actividades</td></tr></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentos desactualizados -->
+    <div *ngIf="tabActivo === 'documentos' && documentosDesactualizados.length">
+      <div class="card">
+        <div class="card-header">📄 Documentos desactualizados (>180 días)</div>
+        <div class="card-body">
+          <table class="table">
+            <thead><tr><th>Título</th><th>Tipo</th><th>Autor</th><th>Días antiguo</th></tr></thead>
+            <tbody><tr *ngFor="let doc of documentosDesactualizados"><td>{{ doc.titulo }}</td><td>{{ doc.tipo }}</td><td>{{ doc.autor }}</td><td>{{ doc.dias_antiguo }}</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

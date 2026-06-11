@@ -1,48 +1,60 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
-    <div class="login-container">
-      <h2>Iniciar sesión</h2>
-      <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
-        <div>
-          <label>Usuario:</label>
-          <input type="text" [(ngModel)]="username" name="username" required>
-        </div>
-        <div>
-          <label>Contraseña:</label>
-          <input type="password" [(ngModel)]="password" name="password" required>
-        </div>
-        <button type="submit" [disabled]="loginForm.invalid">Entrar</button>
-      </form>
-      <p *ngIf="error" class="error">{{ error }}</p>
-    </div>
-  `,
-  styles: [`
-    .login-container { max-width: 300px; margin: 50px auto; }
-    .error { color: red; }
-  `]
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  username = '';
-  password = '';
-  error = '';
+  loginForm: FormGroup;
+  loading = false;
+  errorMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
 
   onSubmit(): void {
-    this.authService.login(this.username, this.password).subscribe(success => {
-      if (success) {
-        this.router.navigate(['/dashboard']);
-      } else {
-        this.error = 'Credenciales incorrectas';
+    if (this.loginForm.invalid) {
+      this.errorMessage = 'Por favor complete los campos correctamente';
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    const { email, password } = this.loginForm.value;
+
+    this.authService.login(email, password).subscribe({
+      next: (response) => {
+        this.loading = false;
+        if (response && response.token) {
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.errorMessage = 'Error al iniciar sesión';
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error en login:', err);
+        if (err.status === 401) {
+          this.errorMessage = 'Credenciales incorrectas';
+        } else {
+          this.errorMessage = 'Error del servidor. Intente más tarde.';
+        }
       }
     });
   }

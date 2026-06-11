@@ -103,7 +103,8 @@ export class SidebarComponent implements OnInit {
         { label: 'Usuarios', icon: '👥', route: '/administracion/usuarios' },
         { label: 'Moderación', icon: '🛡️', route: '/administracion/moderacion' },
         { label: 'Configuración', icon: '⚙️', route: '/administracion/configuracion' },
-        { label: 'Gestión de contenido', icon: '📦', route: '/administracion/contenido' }
+        { label: 'Gestión de contenido', icon: '📦', route: '/administracion/contenido' },
+        { label: 'Ver reportes', icon: '📋', route: '/administracion/reportes' }
       ]
     }
   ];

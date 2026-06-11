@@ -28,6 +28,10 @@ const routes: Routes = [
         loadComponent: () => import('./gestion-contenido/gestion-contenido.component').then(m => m.GestionContenidoComponent)
       },
       {
+        path: 'reportes',           
+        loadComponent: () => import('./reportes/reportes.component').then(m => m.ReportesComponent)
+      },
+      {
         path: '',
         redirectTo: 'estadisticas',
         pathMatch: 'full'
