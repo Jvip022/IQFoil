@@ -101,28 +101,48 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
   }
 
   subirVideo(): void {
-    if (!this.nuevoVideo.titulo || !this.archivoVideo) {
-      this.notificacionService.mostrarAdvertencia('Título y archivo son obligatorios');
-      return;
-    }
-    // Simulación de subida
-    setTimeout(() => {
-      const nuevo: Video = {
-        id: Date.now().toString(),
-        titulo: this.nuevoVideo.titulo,
-        descripcion: this.nuevoVideo.descripcion,
-        url: URL.createObjectURL(this.archivoVideo!),
-        duracion: 0,
-        nivel: this.nuevoVideo.nivel as any,
-        progreso: 0,
-        completado: false
-      };
-      this.videos.unshift(nuevo);
+  if (!this.nuevoVideo.titulo || !this.archivoVideo) {
+    this.notificacionService.mostrarAdvertencia('Título y archivo son obligatorios');
+    return;
+  }
+  const formData = new FormData();
+  formData.append('titulo', this.nuevoVideo.titulo);
+  formData.append('descripcion', this.nuevoVideo.descripcion || '');
+  formData.append('nivel', this.nuevoVideo.nivel);
+  formData.append('duracion_segundos', '0'); // opcional, se puede calcular
+  formData.append('archivo', this.archivoVideo);
+
+  this.contenidoService.subirVideo(formData).subscribe({
+    next: (nuevoVideo) => {
+      this.videos.unshift(nuevoVideo);
       this.notificacionService.mostrarExito('Video subido correctamente');
       this.nuevoVideo = { titulo: '', descripcion: '', nivel: 'principiante', url: '' };
       this.archivoVideo = null;
-    }, 1000);
-  }
+    },
+    error: (err) => {
+      console.error('Error al subir video', err);
+      this.notificacionService.mostrarError('Error al subir el video');
+    }
+  });
+}
+    // Simulación de subida
+  //    setTimeout(() => {
+  //     const nuevo: Video = {
+  //       id: Date.now().toString(),
+  //       titulo: this.nuevoVideo.titulo,
+  //       descripcion: this.nuevoVideo.descripcion,
+  //       url: URL.createObjectURL(this.archivoVideo!),
+  //       duracion: 0,
+  //       nivel: this.nuevoVideo.nivel as any,
+  //       progreso: 0,
+  //       completado: false
+  //     };
+  //     this.videos.unshift(nuevo);
+  //     this.notificacionService.mostrarExito('Video subido correctamente');
+  //     this.nuevoVideo = { titulo: '', descripcion: '', nivel: 'principiante', url: '' };
+  //     this.archivoVideo = null;
+  //   }, 1000);
+  // }
 
   // ==================== DOCUMENTOS ====================
   cargarDocumentos(): void {

@@ -26,12 +26,11 @@ def handle_options(fn):
 @handle_options
 def get_documentos():
     documentos = Documento.query.order_by(Documento.fecha_subida.desc()).all()
-    # Construir URL base para archivos (sin /api)
-    base_url = request.host_url.rstrip('/')  # ej: http://localhost:5000
+    base_url = request.host_url.rstrip('/')
     result = []
     for d in documentos:
-        # Convertir ruta local a URL pública
-        file_url = f"{base_url}/{d.url_archivo}" if d.url_archivo else None
+        # Construir URL pública: /uploads/ + ruta_relativa
+        file_url = f"{base_url}/uploads/{d.url_archivo}" if d.url_archivo else None
         result.append({
             'id': d.id,
             'titulo': d.titulo,
@@ -56,24 +55,24 @@ def subir_documento():
 
     if not titulo or not archivo or not tipo:
         return jsonify({'error': 'Faltan campos obligatorios'}), 400
-
     if not allowed_file(archivo.filename):
         return jsonify({'error': 'Tipo de archivo no permitido'}), 400
 
     filename = secure_filename(archivo.filename)
-    upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'documentos')
-    os.makedirs(upload_dir, exist_ok=True)
-    filepath = os.path.join(upload_dir, filename)
+    subfolder = 'documentos'
+    upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], subfolder)
+    os.makedirs(upload_folder, exist_ok=True)
+    filepath = os.path.join(upload_folder, filename)
     archivo.save(filepath)
 
-    # Guardar ruta relativa (ej: uploads/documentos/archivo.pdf)
-    relative_path = os.path.join('uploads', 'documentos', filename).replace('\\', '/')
+    # Guardar ruta relativa (sin 'uploads/')
+    relative_path = os.path.join(subfolder, filename).replace('\\', '/')
 
     nuevo_doc = Documento(
         titulo=titulo,
         descripcion=descripcion,
         tipo=tipo,
-        url_archivo=relative_path,
+        url_archivo=relative_path,   # ej: "documentos/miarchivo.pdf"
         tamano_bytes=os.path.getsize(filepath),
         autor_id=user_id,
         version=1,
@@ -83,7 +82,7 @@ def subir_documento():
     db.session.commit()
 
     base_url = request.host_url.rstrip('/')
-    file_url = f"{base_url}/{relative_path}"
+    file_url = f"{base_url}/uploads/{relative_path}"
 
     return jsonify({
         'id': nuevo_doc.id,
@@ -95,8 +94,6 @@ def subir_documento():
         'tamano': nuevo_doc.tamano_bytes,
         'autor': Usuario.query.get(nuevo_doc.autor_id).nombre
     }), 201
-
-
 
 @bp.route('/<int:id>', methods=['PUT', 'OPTIONS'])
 @handle_options
@@ -114,8 +111,11 @@ def actualizar_documento(id):
 @handle_options
 def eliminar_documento(id):
     doc = Documento.query.get_or_404(id)
-    if os.path.exists(doc.url_archivo):
-        os.remove(doc.url_archivo)
+    if doc.url_archivo:
+        # Construir ruta absoluta del archivo
+        full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], doc.url_archivo)
+        if os.path.exists(full_path):
+            os.remove(full_path)
     db.session.delete(doc)
     db.session.commit()
     return jsonify({'message': 'Documento eliminado'})

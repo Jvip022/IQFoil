@@ -36,8 +36,8 @@ export class ContenidoService {
     return this.http.post(`${this.apiUrl}/videos/progreso`, { moduloId, videoId, progreso: 100 });
   }
   subirVideo(formData: FormData): Observable<Video> {
-    return this.http.post<Video>(`${this.apiUrl}/videos/`, formData);
-  }
+  return this.http.post<Video>(`${this.apiUrl}/videos/`, formData);
+}
 
   actualizarProgreso(videoId: string, progreso: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/videos/progreso`, { videoId, progreso });

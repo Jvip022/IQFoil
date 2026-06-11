@@ -2,6 +2,7 @@
 **/node_modules/
 **/resource/
 **/public/
+**/uploads/
 **/.angular/
 **angular.json
 **package-lock.json
@@ -12,3 +13,4 @@
 **/venv
 **.pyc
 **estructura.txt
+**/descargas/

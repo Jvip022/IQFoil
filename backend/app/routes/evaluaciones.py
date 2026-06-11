@@ -90,3 +90,29 @@ def guardar_evaluacion(id):
         punt.puntuacion = p['puntuacion']
     db.session.commit()
     return jsonify({'message': 'Evaluación guardada'})
+
+
+
+# ==================== EVALUACIÓN TEÓRICA ====================
+@bp.route('/teoricas/examenes', methods=['GET', 'OPTIONS'])
+@jwt_required(optional=True)
+def get_examenes_teoricos():
+    """Retorna lista de exámenes teóricos activos"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    # Por ahora devolver lista vacía hasta que implementes la lógica real
+    return jsonify([]), 200
+
+@bp.route('/teoricas/examenes/<int:id>', methods=['GET', 'OPTIONS'])
+@jwt_required(optional=True)
+def get_examen_teorico(id):
+    if request.method == 'OPTIONS':
+        return '', 200
+    return jsonify({'error': 'No implementado'}), 404
+
+@bp.route('/teoricas/preguntas', methods=['GET', 'OPTIONS'])
+@jwt_required(optional=True)
+def get_preguntas_teoricas():
+    if request.method == 'OPTIONS':
+        return '', 200
+    return jsonify([]), 200

@@ -1,0 +1,200 @@
+Debugger PIN: 230-918-113
+127.0.0.1 - - [10/Jun/2026 22:24:55] "OPTIONS /api/usuarios/perfil HTTP/1.1" 200 -
+/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/jwt/api_jwt.py:368: InsecureKeyLengthWarning: The HMAC key is 12 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+127.0.0.1 - - [10/Jun/2026 22:24:55] "GET /api/usuarios/perfil HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:08] "OPTIONS /api/usuarios/perfil HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:08] "GET /api/usuarios/perfil HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:18] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 12 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+127.0.0.1 - - [10/Jun/2026 22:25:18] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:27] "OPTIONS /api/videos/modulos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:27] "OPTIONS /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:27] "OPTIONS /api/foro/hilos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:28] "GET /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:28] "GET /api/videos/modulos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:28] "GET /api/foro/hilos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:25:46] "OPTIONS /api/videos/ HTTP/1.1" 200 -
+Error en subir_video: Traceback (most recent call last):
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.CheckViolation: new row for relation "video_tutorial" violates check constraint "video_tutorial_duracion_seg_check"
+DETAIL:  Failing row contains (23, prueba, , uploads/videos/calm-in-the-forest-moewalls-com.mp4, 0, principiante, null, 2026-06-10 22:25:46.017907, t).
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/app/routes/videos.py", line 106, in subir_video
+    db.session.commit()
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/scoping.py", line 597, in commit
+    return self._proxied.commit()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2034, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1315, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1290, in _prepare_impl
+    self.session.flush()
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4352, in flush
+    self._flush(objects)
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4487, in _flush
+    with util.safe_reraise():
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4448, in _flush
+    flush_context.execute()
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 465, in execute
+    rec.execute(self)
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 641, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 94, in save_obj
+    _emit_insert_statements(
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1228, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+           ^^^^^
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/media/joel/TOSHIBA_EXT/code/Web/Angular/Iqfoil/backend/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (psycopg2.errors.CheckViolation) new row for relation "video_tutorial" violates check constraint "video_tutorial_duracion_seg_check"
+DETAIL:  Failing row contains (23, prueba, , uploads/videos/calm-in-the-forest-moewalls-com.mp4, 0, principiante, null, 2026-06-10 22:25:46.017907, t).
+
+[SQL: INSERT INTO video_tutorial (titulo, descripcion, url_video, duracion_seg, nivel, thumbnail_url, fecha_publicacion, activo) VALUES (%(titulo)s, %(descripcion)s, %(url_video)s, %(duracion_seg)s, %(nivel)s, %(thumbnail_url)s, now(), %(activo)s) RETURNING video_tutorial.id, video_tutorial.fecha_publicacion]
+[parameters: {'titulo': 'prueba', 'descripcion': '', 'url_video': 'uploads/videos/calm-in-the-forest-moewalls-com.mp4', 'duracion_seg': 0, 'nivel': 'principiante', 'thumbnail_url': None, 'activo': True}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+127.0.0.1 - - [10/Jun/2026 22:25:46] "POST /api/videos/ HTTP/1.1" 500 -
+127.0.0.1 - - [10/Jun/2026 22:26:27] "OPTIONS /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:26:27] "GET /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:26:49] "OPTIONS /api/videos/modulos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:26:49] "OPTIONS /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:26:49] "OPTIONS /api/foro/hilos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:26:49] "GET /api/videos/modulos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:26:49] "GET /api/foro/hilos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:26:49] "GET /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:27:23] "OPTIONS /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:27:23] "GET /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:27:25] "GET /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:27:32] "OPTIONS /api/videos/modulos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:27:32] "OPTIONS /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:27:32] "OPTIONS /api/foro/hilos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:27:32] "GET /api/videos/modulos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:27:32] "GET /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:27:32] "GET /api/foro/hilos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:00] "OPTIONS /api/usuarios/perfil HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:00] "GET /api/usuarios/perfil HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:02] "OPTIONS /api/videos/modulos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:02] "OPTIONS /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:02] "OPTIONS /api/foro/hilos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:02] "GET /api/videos/modulos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:02] "GET /api/foro/hilos HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:02] "GET /api/documentos/ HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:25] "OPTIONS /api/evaluaciones/rubricas HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:25] "GET /api/evaluaciones/rubricas HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:28] "OPTIONS /api/evaluaciones/teoricas/examenes HTTP/1.1" 404 -
+127.0.0.1 - - [10/Jun/2026 22:28:28] "OPTIONS /api/evaluaciones/videos-pendientes HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:28:28] "GET /api/evaluaciones/videos-pendientes HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:29:01] "OPTIONS /api/usuarios/perfil HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:29:01] "GET /api/usuarios/perfil HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:29:02] "OPTIONS /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:29:02] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:29:08] "OPTIONS /api/evaluaciones HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:29:08] "GET /api/evaluaciones HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:29:10] "OPTIONS /api/evaluaciones/videos-pendientes HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 22:29:10] "OPTIONS /api/evaluaciones/teoricas/examenes HTTP/1.1" 404 -
+127.0.0.1 - - [10/Jun/2026 22:29:10] "GET /api/evaluaciones/videos-pendientes HTTP/1.1" 200 -
+
+
+
+XHROPTIONS
+http://localhost:5000/api/evaluaciones/teoricas/examenes
+CORS Preflight Did Not Succeed
+
+Solicitud de origen cruzado bloqueada: La política de mismo origen no permite la lectura de recursos remotos en http://localhost:5000/api/evaluaciones/teoricas/examenes. (Razón: la respuesta CORS preliminar "preflight" no ha tenido éxito). Código de estado: 404.
+Solicitud de origen cruzado bloqueada: La política de mismo origen no permite la lectura de recursos remotos en http://localhost:5000/api/evaluaciones/teoricas/examenes. (Razón: Solicitud CORS sin éxito). Código de estado: (null).
+Error cargando exámenes teóricos 
+Object { headers: {…}, status: 0, statusText: "Unknown Error", url: "http://localhost:5000/api/evaluaciones/teoricas/examenes", ok: false, type: undefined, name: "HttpErrorResponse", message: "Http failure response for http://localhost:5000/api/evaluaciones/teoricas/examenes: 0 Unknown Error", error: error }
+chunk-HXECUOUV.js:265:17
+
+
+Error en el mapeo fuente: NetworkError when attempting to fetch resource.
+URL del recurso: https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js
+URL del mapa fuente: bootstrap.bundle.min.js.map
+
+
+XHROPTIONS
+http://localhost:5000/api/evaluaciones/teoricas/examenes
+CORS Preflight Did Not Succeed
+
+Error al interpretar el valor para '-webkit-text-size-adjust'.  Declaración rechazada. bootstrap.min.css:5:5541
+Pseudo-clase o pseudo-elemento desconocido '-moz-focus-inner'.  Juego de reglas ignoradas debido a un mal selector. bootstrap.min.css:5:8628
+Pseudo-clase o pseudo-elemento desconocido '-moz-focus-outer'.  Juego de reglas ignoradas debido a un mal selector. bootstrap.min.css:5:38517
+Juego de reglas ignoradas debido a un mal selector. bootstrap.min.css:5:39075
+Juego de reglas ignoradas debido a un mal selector. bootstrap.min.css:5:40253
+Pseudo-clase o pseudo-elemento desconocido '-moz-placeholder-shown'.  Juego de reglas ignoradas debido a un mal selector. bootstrap.min.css:5:41446
+Pseudo-clase o pseudo-elemento desconocido '-moz-placeholder-shown'.  Juego de reglas ignoradas debido a un mal selector. bootstrap.min.css:5:42064
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:167157
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:167222
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:167298
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:167372
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:167443
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:167518
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:186910
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:186978
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:187057
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:187134
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:187208
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:187286
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:194986
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:195054
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:195133
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:195210
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:195284
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:195362
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:203062
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:203130
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:203209
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:203286
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:203360
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:203438
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:211139
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:211207
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:211286
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:211363
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:211437
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:211515
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:219381
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:219450
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:219530
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:219608
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:219683
+Propiedad desconocida '-moz-column-gap'.  Declaración rechazada. bootstrap.min.css:5:219762
+Propiedad desconocida '-moz-osx-font-smoothing'.  Declaración rechazada. bootstrap-icons.min.css:5:528
