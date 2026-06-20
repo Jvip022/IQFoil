@@ -93,6 +93,7 @@ def guardar_evaluacion(id):
 
 
 
+
 # ==================== EVALUACIÓN TEÓRICA ====================
 @bp.route('/teoricas/examenes', methods=['GET', 'OPTIONS'])
 @jwt_required(optional=True)
@@ -100,7 +101,8 @@ def get_examenes_teoricos():
     """Retorna lista de exámenes teóricos activos"""
     if request.method == 'OPTIONS':
         return '', 200
-    # Por ahora devolver lista vacía hasta que implementes la lógica real
+    # Por ahora devolver lista vacía, pero con estructura correcta
+    # En el futuro, aquí se consultaría la base de datos
     return jsonify([]), 200
 
 @bp.route('/teoricas/examenes/<int:id>', methods=['GET', 'OPTIONS'])
@@ -108,7 +110,7 @@ def get_examenes_teoricos():
 def get_examen_teorico(id):
     if request.method == 'OPTIONS':
         return '', 200
-    return jsonify({'error': 'No implementado'}), 404
+    return jsonify({'error': 'Examen no implementado aún'}), 404
 
 @bp.route('/teoricas/preguntas', methods=['GET', 'OPTIONS'])
 @jwt_required(optional=True)

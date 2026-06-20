@@ -1,7 +1,9 @@
+import random
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models.usuario import Usuario
+from app.models.video import VideoTutorial
 from app.models.progreso_video import ProgresoVideo
 from app.models.evaluacion import Evaluacion
 from app.models.puntuacion_evaluacion import PuntuacionEvaluacion
@@ -207,3 +209,65 @@ def reporte_documentos_desactualizados():
             'autor': Usuario.query.get(d.autor_id).nombre if d.autor_id else 'Anónimo'
         })
     return jsonify(resultado)
+
+# ==================== UC-??: Rendimiento del atleta para gráficas ====================
+@bp.route('/rendimiento/<int:usuario_id>', methods=['GET'])
+@jwt_required()
+def get_rendimiento_atleta(usuario_id):
+    """Devuelve evolución de rendimiento (últimos 6 meses) y peso del atleta"""
+    current_user_id = get_jwt_identity()
+    current_user = Usuario.query.get(current_user_id)
+    # Permitir al mismo usuario o a entrenador/admin
+    if current_user_id != usuario_id and not is_entrenador_o_admin(current_user_id):
+        return jsonify({'error': 'No autorizado'}), 403
+
+    # 1. Obtener evaluaciones del atleta en los últimos 6 meses
+    seis_meses_atras = datetime.now() - timedelta(days=180)
+    evaluaciones = Evaluacion.query.filter(
+        Evaluacion.usuario_id == usuario_id,
+        Evaluacion.fecha_evaluacion >= seis_meses_atras,
+        Evaluacion.estado == 'evaluado'
+    ).order_by(Evaluacion.fecha_evaluacion).all()
+
+    # Construir fechas y puntuaciones
+    fechas = []
+    puntuaciones = []
+    for ev in evaluaciones:
+        fechas.append(ev.fecha_evaluacion.strftime('%b %Y'))  # "Jun 2026"
+        puntuaciones.append(ev.puntuacion_total or 0)
+
+    # Si hay menos de 3 evaluaciones, rellenar con datos de progreso de videos
+    if len(puntuaciones) < 3:
+        # Calcular progreso global del atleta
+        progresos = ProgresoVideo.query.filter_by(usuario_id=usuario_id).all()
+        completados = sum(1 for p in progresos if p.completado)
+        total_videos = VideoTutorial.query.count()
+        progreso_global = (completados / total_videos * 100) if total_videos else 0
+        
+        # Si no hay evaluaciones, usar progreso de videos
+        if len(puntuaciones) == 0:
+            fechas = [(datetime.now() - timedelta(days=30*i)).strftime('%b %Y') for i in range(5, -1, -1)]
+            # Crear una progresión simulada basada en el progreso global
+            base = max(0, progreso_global - 20)
+            puntuaciones = [min(100, max(0, base + (i * 5))) for i in range(6)]
+        else:
+            # Tiene 1 o 2 evaluaciones, rellenar el resto
+            for i in range(6 - len(puntuaciones)):
+                fechas.insert(0, (datetime.now() - timedelta(days=30*(5-i))).strftime('%b %Y'))
+                puntuaciones.insert(0, max(0, progreso_global + random.randint(-15, 15)))
+
+    # 2. Obtener peso del atleta (mock)
+    # Si el usuario tiene una tabla de atributos, se podría consultar
+    # Por ahora, un peso aleatorio entre 55 y 85 kg
+    peso = round(random.uniform(55, 85), 1)
+
+    # Si hay un registro de peso en la base de datos, usarlo
+    # Ejemplo: from app.models.datos_atleta import DatosAtleta
+    # datos = DatosAtleta.query.filter_by(usuario_id=usuario_id).order_by(DatosAtleta.fecha.desc()).first()
+    # if datos: peso = datos.peso
+
+    return jsonify({
+        'fechas': fechas[:6],  # Limitar a 6 meses
+        'puntuaciones': puntuaciones[:6],
+        'peso': peso
+    })

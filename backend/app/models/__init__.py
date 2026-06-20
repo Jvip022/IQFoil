@@ -20,3 +20,4 @@ from .usuario_insignia import UsuarioInsignia
 from .mentoria import Mentoria
 from .configuracion_usuario import ConfiguracionUsuario
 from .log_actividad import LogActividad
+from .curso import Curso

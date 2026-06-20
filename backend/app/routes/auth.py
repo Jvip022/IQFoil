@@ -3,6 +3,8 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from app import db
 from app.models.usuario import Usuario
 from app.models.rol import Rol
+from app.models.log_actividad import LogActividad  
+from datetime import datetime
 
 bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
@@ -23,6 +25,21 @@ def login():
     user = Usuario.query.filter_by(email=data['email']).first()
     if not user or not user.check_password(data['password']):
         return jsonify({'error': 'Credenciales inválidas'}), 401
+
+    # Actualizar último acceso
+    user.ultimo_acceso = datetime.now()
+
+    # 🔥 REGISTRAR LOG DE ACTIVIDAD
+    log = LogActividad(
+        usuario_id=user.id,
+        accion='login',
+        detalles={'email': user.email, 'nombre': user.nombre},
+        ip=request.remote_addr
+    )
+    db.session.add(log)
+
+    db.session.commit()
+
     access_token = create_access_token(identity=str(user.id))
     return jsonify({
         'token': access_token,
@@ -30,7 +47,8 @@ def login():
             'id': user.id,
             'email': user.email,
             'nombre': user.nombre,
-            'rol_id': user.rol_id
+            'rol_id': user.rol_id,
+            'provincia': user.provincia
         }
     })
 
@@ -45,6 +63,7 @@ def perfil():
         'id': user.id,
         'email': user.email,
         'nombre': user.nombre,
-        'avatarUrl': user.avatar,   # antes era avatar_url, ahora avatar
-        'rol_id': user.rol_id
+        'avatarUrl': user.avatar,
+        'rol_id': user.rol_id,
+        'provincia': user.provincia
     })

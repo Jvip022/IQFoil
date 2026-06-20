@@ -11,7 +11,7 @@ from .busqueda import bp as busqueda_bp
 from .cursos import bp as cursos_bp           
 from .insignias import bp as insignias_bp     
 from .eventos import bp as eventos_crud_bp   
-from .reportes import bp as reportes_bp
+from .reportes import bp as reportes_bp      
 
 blueprints = [
     auth_bp,
@@ -25,5 +25,6 @@ blueprints = [
     busqueda_bp,
     cursos_bp,
     insignias_bp,
-    eventos_crud_bp
+    eventos_crud_bp,
+    reportes_bp                          
 ]

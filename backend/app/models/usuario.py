@@ -11,8 +11,11 @@ class Usuario(db.Model):
     activo = db.Column(db.Boolean, default=True)
     avatar = db.Column(db.String(255), nullable=True)
     preferencias = db.Column(db.JSON, nullable=True, default={'idioma': 'es', 'notificacionesEmail': True, 'tema': 'claro'})
+    
+    provincia = db.Column(db.String(100), nullable=True)
+    ultimo_acceso = db.Column(db.DateTime, nullable=True)
+    fecha_registro = db.Column(db.DateTime, default=db.func.now())
 
-    # Relación con Rol
     rol = db.relationship('Rol', backref='usuarios')
 
     def set_password(self, password):

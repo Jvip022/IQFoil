@@ -8,6 +8,10 @@ from .config import Config
 db = SQLAlchemy()
 jwt = JWTManager()
 
+from flask_migrate import Migrate
+
+migrate = Migrate()
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
