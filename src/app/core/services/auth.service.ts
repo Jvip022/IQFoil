@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { tap, catchError, map } from 'rxjs/operators';
+import { tap, catchError, map, finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface User {
@@ -10,9 +10,9 @@ export interface User {
   email?: string;
   roles?: string[];
   avatar?: string | null;
-  displayName?: string;   // alias de nombre
-  name?: string;          // alias de nombre
-  role?: string;          // primer rol (opcional, string | undefined)
+  displayName?: string;
+  name?: string;
+  role?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -33,7 +33,6 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<{ user: User; token: string }> {
-    // Backend devuelve { token, user }
     return this.http.post<{ token: string; user: any }>(`${this.apiUrl}/auth/login`, { email, password })
       .pipe(
         map(response => ({
@@ -46,11 +45,11 @@ export class AuthService {
             this.authStatusSubject.next(true);
             const user = this.normalizeUser(response.user);
             this.currentUserSubject.next(user);
-            console.log('Token guardado correctamente');
+            console.log('✅ Token guardado correctamente');
           }
         }),
         catchError(error => {
-          console.error('Error en login:', error);
+          console.error('❌ Error en login:', error);
           throw error;
         })
       );
@@ -85,11 +84,27 @@ export class AuthService {
   }
 
   getUser(): Observable<User | null> {
+    // Si ya tenemos el usuario en memoria, devolverlo
     if (this.currentUserSubject.value) {
       return of(this.currentUserSubject.value);
     }
+    // Si no, hacer la petición al backend
     return this.http.get<any>(`${this.apiUrl}/usuarios/perfil`).pipe(
-      tap(user => this.currentUserSubject.next(this.normalizeUser(user)))
+      map(user => this.normalizeUser(user)),
+      tap(user => {
+        this.currentUserSubject.next(user);
+        if (user) {
+          this.authStatusSubject.next(true);
+        }
+      }),
+      catchError(error => {
+        console.warn('⚠️ Error al cargar perfil:', error);
+        // En caso de error, emitir null y mantener el estado de autenticación false
+        this.currentUserSubject.next(null);
+        this.authStatusSubject.next(false);
+        // Si el error es 401, el interceptor ya redirigirá al login
+        return of(null);
+      })
     );
   }
 
@@ -99,12 +114,10 @@ export class AuthService {
 
   private normalizeUser(user: any): User | null {
     if (!user) return null;
-    // Convertir rol_id (número) a array de roles (string)
     let roles: string[] = [];
     if (user.rol_id === 1) roles = ['admin'];
     else if (user.rol_id === 2) roles = ['entrenador'];
     else if (user.rol_id === 3) roles = ['atleta'];
-    // Si ya viene como array, usarlo
     if (user.roles && Array.isArray(user.roles)) roles = user.roles;
     return {
       uid: user.id?.toString(),
@@ -114,7 +127,7 @@ export class AuthService {
       avatar: user.avatar || null,
       displayName: user.nombre,
       name: user.nombre,
-      role: roles[0] || undefined   // ← cambia null por undefined
+      role: roles[0] || undefined
     };
   }
 }

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './modules/login/login.component';
 import { DashboardComponent } from './modules/dashboard/dashboard.component';
 import { autenticacionGuard } from './core/guards/autenticacion.guard';
+import { rolGuard } from './core/guards/rol.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -19,7 +20,8 @@ export const routes: Routes = [
   {
     path: 'talentos',
     loadChildren: () => import('./modules/talentos/talentos.module').then(m => m.TalentosModule),
-    canActivate: [autenticacionGuard]
+    canActivate: [autenticacionGuard, rolGuard],
+    data: { roles: ['admin', 'entrenador'] }
   },
   {
     path: 'comunidad',
@@ -29,12 +31,14 @@ export const routes: Routes = [
   {
     path: 'administracion',
     loadChildren: () => import('./modules/administracion/administracion.module').then(m => m.AdministracionModule),
-    canActivate: [autenticacionGuard]
+    canActivate: [autenticacionGuard, rolGuard],
+    data: { roles: ['admin'] }
   },
   {
     path: 'evaluacion',
     loadChildren: () => import('./modules/evaluacion/evaluacion.module').then(m => m.EvaluacionModule),
-    canActivate: [autenticacionGuard]
+    canActivate: [autenticacionGuard, rolGuard],
+    data: { roles: ['admin', 'entrenador'] }
   },
   {
     path: 'simulaciones',

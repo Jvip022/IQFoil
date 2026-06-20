@@ -336,3 +336,241 @@ A continuación se listan todas las referencias citadas en este capítulo. Los n
 4. El archivo `capitulo1.docx` resultante tendrá los números entre corchetes convertidos en hipervínculos clicables que llevan directamente a la referencia en la sección 1.10.
 
 Si no puedes usar Pandoc, también puedes convertir el Markdown a Word usando cualquier conversor online (por ejemplo, [CloudConvert](https://cloudconvert.com/md-to-docx)) y los enlaces se mantendrán. En Word, los enlaces aparecerán en azul subrayado y al hacer clic te llevarán a la referencia.
+
+
+
+```mermaid
+flowchart TD
+    subgraph Cliente [Capa de Presentacion Cliente]
+        Browser[Navegador Chrome, Firefox, Android]
+        PWA[Aplicación Web Progresiva<br>Angular + Service Worker]
+        OfflineStorage[(IndexedDB<br>Almacenamiento offline)]
+    end
+
+    subgraph Backend [Capa de Aplicacion Backend]
+        API[API REST<br>Flask Python]
+        Auth[Servicio de Autenticación<br>JWT + bcrypt]
+        Business[Lógica de Negocio<br>Evaluaciones, métricas, talento]
+        OfflineSync[Sincronización offline<br>Colas + resolución de conflictos]
+    end
+
+    subgraph Datos [Capa de Datos]
+        PostgreSQL[(PostgreSQL<br>Datos estructurados)]
+        FileStorage[(Almacenamiento NAS<br>Videos, PDFs, transcripciones)]
+    end
+
+    PWA -->|HTTPS / JSON| API
+    PWA -->|Cache / Lectura| OfflineStorage
+    OfflineStorage -->|Sincronización| OfflineSync
+    API -->|Consulta / Persistencia| PostgreSQL
+    API -->|Subida / Descarga| FileStorage
+    Auth -->|Almacenamiento de credenciales| PostgreSQL
+    Business -->|Cálculo de métricas| PostgreSQL
+    Business -->|Detección de talentos| PostgreSQL
+    OfflineSync -->|Operaciones diferidas| API
+```
+
+
+```markdown
+# Diagrama Lógico de Datos - iQFOiL CUBA
+
+## Modelo Entidad-Relación (MER)
+
+```mermaid
+erDiagram
+    USUARIO {
+        string email
+        string nombre
+        string rol
+        boolean activo
+    }
+
+    ATLETA {
+        date fecha_nacimiento
+        string nivel
+        string provincia
+    }
+
+    ENTRENADOR {
+        string especialidad
+        int anios_experiencia
+    }
+
+    MENTOR {
+        string area_enfoque
+    }
+
+    MODULO_EDUCATIVO {
+        string titulo
+        string descripcion
+        string nivel
+        int orden
+    }
+
+    VIDEO_TUTORIAL {
+        string url
+        int duracion
+        text transcripcion
+        int orden
+    }
+
+    PROGRESO_VIDEO {
+        int ultimo_segundo
+        float porcentaje
+        boolean completado
+        datetime fecha_ultima
+    }
+
+    EVALUACION {
+        string titulo
+        int tiempo_limite
+        int puntaje_maximo
+    }
+
+    RESULTADO_EVALUACION {
+        datetime fecha
+        int puntaje_obtenido
+        json respuestas
+    }
+
+    VIDEO_PRACTICA {
+        datetime fecha_subida
+        string tipo_maniobra
+        text condiciones
+        string url
+    }
+
+    RUBRICA {
+        string nombre
+        string tipo_maniobra
+        json criterios
+    }
+
+    EVALUACION_TECNICA {
+        datetime fecha
+        int puntaje_total
+        text comentarios
+    }
+
+    METRICA_TALENTO {
+        date fecha
+        string tipo_metrica
+        float valor
+        string unidad
+    }
+
+    ALERTA_TALENTO {
+        datetime fecha_generacion
+        string tipo_alerta
+        float valor_destacado
+        float umbral_superado
+        string estado
+    }
+
+    PUBLICACION_FORO {
+        string titulo
+        text contenido
+        datetime fecha_publicacion
+        string estado_moderacion
+    }
+
+    MENSAJE_PRIVADO {
+        text contenido
+        datetime fecha_envio
+        boolean leido
+    }
+
+    MENTORIA {
+        date fecha_inicio
+        date fecha_fin
+        text objetivos
+        boolean activa
+    }
+
+    EVENTO {
+        string titulo
+        string tipo
+        datetime fecha_inicio
+        datetime fecha_fin
+        string ubicacion
+        text descripcion
+    }
+
+    USUARIO ||--|| ATLETA : "puede ser"
+    USUARIO ||--|| ENTRENADOR : "puede ser"
+    USUARIO ||--|| MENTOR : "puede ser"
+    USUARIO ||--o{ PUBLICACION_FORO : "publica"
+    USUARIO ||--o{ MENSAJE_PRIVADO : "envía"
+    USUARIO ||--o{ MENSAJE_PRIVADO : "recibe"
+    ATLETA ||--o{ PROGRESO_VIDEO : "tiene"
+    ATLETA ||--o{ RESULTADO_EVALUACION : "realiza"
+    ATLETA ||--o{ VIDEO_PRACTICA : "sube"
+    ATLETA ||--o{ METRICA_TALENTO : "genera"
+    ATLETA ||--o{ ALERTA_TALENTO : "recibe"
+    ATLETA ||--o{ MENTORIA : "solicita"
+    ENTRENADOR ||--o{ EVALUACION_TECNICA : "realiza"
+    ENTRENADOR ||--o{ MENTORIA : "ejerce como mentor"
+    MODULO_EDUCATIVO ||--o{ VIDEO_TUTORIAL : "contiene"
+    VIDEO_TUTORIAL ||--o{ PROGRESO_VIDEO : "registra"
+    EVALUACION ||--o{ RESULTADO_EVALUACION : "genera"
+    VIDEO_PRACTICA ||--|| EVALUACION_TECNICA : "es evaluada"
+    RUBRICA ||--o{ EVALUACION_TECNICA : "guía"
+```
+
+```mermaid
+flowchart TB
+    subgraph "Cliente Dispositivo del Usuario"
+        Browser[Navegador Web<br>Chrome / Firefox / Android]
+        PWA[Aplicación Web Progresiva<br>Angular + Service Worker]
+        LocalDB[(IndexedDB<br>Almacenamiento offline)]
+    end
+
+    subgraph "Zona Desmilitarizada (DMZ)"
+        Nginx[Nginx<br>API Gateway + Proxy Inverso<br>SSL Termination]
+    end
+
+    subgraph "Servidores de Aplicación (Backend)"
+        direction TB
+        Auth[Servicio de Autenticación<br>Flask + JWT]
+        Users[Servicio de Usuarios<br>Flask]
+        Content[Servicio de Contenidos<br>Flask]
+        Eval[Servicio de Evaluación<br>Flask]
+        Talent[Servicio de Detección de Talentos<br>Flask + scikit-learn]
+        Offline[Servicio de Sincronización Offline<br>Flask]
+        Community[Servicio de Comunidad<br>Flask]
+    end
+
+    subgraph "Servidores de Datos"
+        PostgreSQL[(PostgreSQL<br>Datos estructurados + JSONB<br>usuarios, evaluaciones, foros, métricas)]
+        Elastic[(Elasticsearch<br>Búsqueda en PDFs y documentos)]
+        FileStorage[(Almacenamiento NAS<br>Videos, PDFs, transcripciones)]
+        Redis[(Redis<br>Caché de sesiones y tokens)]
+    end
+
+    %% Comunicaciones principales
+    Browser -->|HTTPS| Nginx
+    PWA -->|HTTPS| Nginx
+    PWA -->|Lectura/escritura offline| LocalDB
+    LocalDB -->|Sincronización diferida| Offline
+
+    Nginx -->|Enrutamiento| Auth
+    Nginx -->|Enrutamiento| Users
+    Nginx -->|Enrutamiento| Content
+    Nginx -->|Enrutamiento| Eval
+    Nginx -->|Enrutamiento| Talent
+    Nginx -->|Enrutamiento| Offline
+    Nginx -->|Enrutamiento| Community
+
+    Auth -->|Almacenamiento de credenciales| PostgreSQL
+    Auth -->|Sesiones| Redis
+    Users -->|CRUD| PostgreSQL
+    Content -->|CRUD + JSONB| PostgreSQL
+    Content -->|Indexación de PDFs| Elastic
+    Content -->|Subida/descarga| FileStorage
+    Eval -->|CRUD| PostgreSQL
+    Talent -->|Lectura de métricas JSONB| PostgreSQL
+    Talent -->|Persistencia de alertas| PostgreSQL
+    Offline -->|Operaciones diferidas| Content
+    Offline -->|Operaciones diferidas| Eval
+    Community -->|CRUD| PostgreSQL
+``

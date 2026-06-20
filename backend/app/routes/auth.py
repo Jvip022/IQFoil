@@ -26,10 +26,9 @@ def login():
     if not user or not user.check_password(data['password']):
         return jsonify({'error': 'Credenciales inválidas'}), 401
 
-    # Actualizar último acceso
     user.ultimo_acceso = datetime.now()
-
-    # 🔥 REGISTRAR LOG DE ACTIVIDAD
+    
+    # Registrar log de actividad
     log = LogActividad(
         usuario_id=user.id,
         accion='login',
@@ -37,7 +36,6 @@ def login():
         ip=request.remote_addr
     )
     db.session.add(log)
-
     db.session.commit()
 
     access_token = create_access_token(identity=str(user.id))
@@ -48,7 +46,8 @@ def login():
             'email': user.email,
             'nombre': user.nombre,
             'rol_id': user.rol_id,
-            'provincia': user.provincia
+            'provincia': user.provincia,
+            'avatar': user.avatar
         }
     })
 

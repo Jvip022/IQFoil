@@ -59,16 +59,16 @@ export class GuiaVisualComponent implements OnInit {
       titulo: 'Regla 10: Babor y Estribor',
       descripcionCorta: 'Prioridad de la embarcación por la derecha',
       descripcionLarga: 'Cuando dos embarcaciones se aproximan en rumbos opuestos, la que navega por babor (vela a la izquierda) se aparta de la que navega por estribor (vela a la derecha).',
-      imagenUrl: '/assets/guia/regla10.jpg',
+      imagenUrl: 'guia/placeholder.jpg',
       keywords: ['babor', 'estribor', 'prioridad', 'cruce']
     },
     {
       id: 'r2',
       categoria: 'reglas',
-      titulo: 'Regla 42: Propulsión',
+      titulo: 'Regla 40: Bandera negra ',
       descripcionCorta: 'Prohibido el bombeo, mecido y movimiento del cuerpo',
-      descripcionLarga: 'Está prohibido bombear la vela, mecer el barco o mover el cuerpo repetidamente para propulsar la embarcación. Solo se permite en condiciones de olas grandes para mantener el planeo.',
-      imagenUrl: '/assets/guia/regla42.jpg',
+      descripcionLarga: 'En caso se salida en falso o adelantada este es descalificado de la regata actual',
+      imagenUrl: 'guia/placeholder.jpg',
       keywords: ['propulsión', 'bombeo', 'prohibido']
     },
     // Nudos
@@ -78,7 +78,7 @@ export class GuiaVisualComponent implements OnInit {
       titulo: 'Nudo de ocho',
       descripcionCorta: 'Nudo de tope para evitar que el cabo se salga',
       descripcionLarga: 'El nudo de ocho es un nudo de tope sencillo y seguro. Se usa al final de las escotas para que no se escapen de las poleas.',
-      imagenUrl: '/assets/guia/nudo-ocho.jpg',
+      imagenUrl: 'guia/placeholder.jpg',
       keywords: ['ocho', 'tope', 'seguro']
     },
     {
@@ -87,7 +87,7 @@ export class GuiaVisualComponent implements OnInit {
       titulo: 'Ballestrinque',
       descripcionCorta: 'Nudo rápido para atar un cabo a un poste',
       descripcionLarga: 'El ballestrinque es ideal para atar un cabo a un noray o a un mástil. Se hace con dos vueltas cruzadas y es fácil de desatar.',
-      imagenUrl: '/assets/guia/ballestrinque.jpg',
+      imagenUrl: 'guia/placeholder.jpg',
       keywords: ['ballestrinque', 'atar', 'poste']
     },
     // Partes del barco
@@ -97,7 +97,7 @@ export class GuiaVisualComponent implements OnInit {
       titulo: 'Mástil',
       descripcionCorta: 'Palo vertical que sostiene la vela',
       descripcionLarga: 'El mástil es el elemento vertical que sujeta la vela mayor y el foque. Puede ser de aluminio o carbono y se apoya en la quilla.',
-      imagenUrl: '/assets/guia/mastil.jpg',
+      imagenUrl: 'guia/placeholder.jpg',
       keywords: ['mástil', 'palo', 'vela']
     },
     {
@@ -106,7 +106,7 @@ export class GuiaVisualComponent implements OnInit {
       titulo: 'Botavara',
       descripcionCorta: 'Palo horizontal en la base de la vela mayor',
       descripcionLarga: 'La botavara es el perfil horizontal que va desde el mástil hasta el puño de escota de la vela mayor. Permite controlar el ángulo de la vela.',
-      imagenUrl: '/assets/guia/botavara.jpg',
+      imagenUrl: 'guia/placeholder.jpg',
       keywords: ['botavara', 'mayor', 'escota']
     },
     // Maniobras
@@ -116,7 +116,7 @@ export class GuiaVisualComponent implements OnInit {
       titulo: 'Virada',
       descripcionCorta: 'Cambio de bordada pasando la proa por el viento',
       descripcionLarga: 'La virada consiste en cambiar de bordada (dirección) pasando la proa del barco a través del viento. Se utiliza para avanzar en zigzag contra el viento.',
-      imagenUrl: '/assets/guia/virada.jpg',
+      imagenUrl: 'guia/placeholder.jpg',
       keywords: ['virada', 'bordada', 'cambio']
     },
     {
@@ -125,7 +125,7 @@ export class GuiaVisualComponent implements OnInit {
       titulo: 'Trasluchada',
       descripcionCorta: 'Cambio de bordada pasando la popa por el viento',
       descripcionLarga: 'La trasluchada es el cambio de bordada cuando el viento viene por la popa. Es una maniobra más rápida y debe controlarse la botavara.',
-      imagenUrl: '/assets/guia/trasluchada.jpg',
+      imagenUrl: 'guia/placeholder.jpg',
       keywords: ['trasluchada', 'popa', 'cambio']
     },
     // Seguridad
@@ -135,7 +135,7 @@ export class GuiaVisualComponent implements OnInit {
       titulo: 'Chaleco salvavidas',
       descripcionCorta: 'Uso obligatorio en competición',
       descripcionLarga: 'El chaleco salvavidas debe estar homologado y llevarse correctamente ajustado. Proporciona flotación y protección contra hipotermia.',
-      imagenUrl: '/assets/guia/chaleco.jpg',
+      imagenUrl: 'guia/placeholder.jpg',
       keywords: ['chaleco', 'salvavidas', 'flotación']
     }
   ];

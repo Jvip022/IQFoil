@@ -43,7 +43,7 @@
   <div class="lista-videos__grid" *ngIf="!cargando">
     <div class="videos-grid" *ngIf="videosFiltrados.length > 0; else sinVideos">
       <div class="video-card" *ngFor="let video of videosFiltrados" (click)="verVideo(video)">
-        <div class="video-card__thumbnail" [style.background-image]="'url(' + (video.thumbnail || '/assets/images/video-placeholder.jpg') + ')'">
+        <div class="video-card__thumbnail" [style.background-image]="'url(' + (video.thumbnail || 'assets/images/video-placeholder.jpg') + ')'">
           <div class="video-card__duration">{{ video.duracion | duracion }}</div>
           <div class="video-card__play-icon">▶</div>
         </div>

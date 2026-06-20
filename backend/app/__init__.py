@@ -3,13 +3,11 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from flask_migrate import Migrate
 from .config import Config
 
 db = SQLAlchemy()
 jwt = JWTManager()
-
-from flask_migrate import Migrate
-
 migrate = Migrate()
 
 def create_app():
@@ -19,7 +17,7 @@ def create_app():
     # Evita redirección 308 por trailing slash
     app.url_map.strict_slashes = False
 
-    # Configuración CORS completa para desarrollo con Angular
+    # Configuración CORS
     CORS(app,
          origins=["http://localhost:4200"],
          supports_credentials=True,
@@ -28,8 +26,9 @@ def create_app():
 
     db.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app, db)
 
-    # Importar y registrar blueprints (debe existir una lista 'blueprints' en routes/__init__.py)
+    # Importar y registrar blueprints
     from .routes import blueprints
     for bp in blueprints:
         app.register_blueprint(bp)

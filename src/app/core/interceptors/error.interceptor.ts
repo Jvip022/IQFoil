@@ -9,12 +9,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error) => {
-      if (error.status === 401) {
-        // Token inválido o expirado: limpiar localStorage y redirigir al login
+      if (error.status === 401 && !req.url.includes('/auth/login')) {
         localStorage.removeItem('token');
         router.navigate(['/login']);
       }
-      // Puedes agregar más lógica para otros códigos de error (403, 500, etc.)
       return throwError(() => error);
     })
   );

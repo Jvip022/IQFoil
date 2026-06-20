@@ -34,7 +34,7 @@
       <button 
         type="submit" 
         class="btn btn-primary"
-        [disabled]="loading">
+        [disabled]="loading || showLogo">
         {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
       </button>
 
@@ -42,12 +42,13 @@
         {{ errorMessage }}
       </div>
     </form>
+  </div>
 
-    <!-- Credenciales de prueba -->
-    <div class="test-credentials">
-      <p><strong>Para probar:</strong></p>
-      <p>Email: usuario&#64;ejemplo.com</p>
-      <p>Contraseña: 123456</p>
+  <!-- Overlay con logo animado -->
+  <div class="login-overlay" *ngIf="showLogo">
+    <div class="logo-container">
+      <img src="/iqfoil.png" alt="IQFOIL" class="logo-animado" />
+      <p class="logo-text">Bienvenido</p>
     </div>
   </div>
 </div>

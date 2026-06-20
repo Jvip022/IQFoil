@@ -19,7 +19,7 @@ class Usuario(db.Model):
     rol = db.relationship('Rol', backref='usuarios')
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, method='bcrypt')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)

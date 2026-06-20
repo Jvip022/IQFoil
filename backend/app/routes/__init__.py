@@ -28,3 +28,4 @@ blueprints = [
     eventos_crud_bp,
     reportes_bp                          
 ]
+

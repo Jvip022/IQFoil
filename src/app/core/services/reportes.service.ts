@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface ProgresoIndividual {
@@ -43,6 +44,12 @@ export interface DocumentoDesactualizado {
   autor: string;
 }
 
+export interface RendimientoAtleta {
+  fechas: string[];
+  puntuaciones: number[];
+  peso: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ReportesService {
   private apiUrl = environment.apiUrl;
@@ -67,5 +74,20 @@ export class ReportesService {
 
   getDocumentosDesactualizados(): Observable<DocumentoDesactualizado[]> {
     return this.http.get<DocumentoDesactualizado[]>(`${this.apiUrl}/reportes/documentos-desactualizados`);
+  }
+
+  getRendimientoAtleta(usuarioId: number): Observable<RendimientoAtleta> {
+    return this.http.get<RendimientoAtleta>(`${this.apiUrl}/reportes/rendimiento/${usuarioId}`)
+      .pipe(
+        catchError(error => {
+          console.warn('Error al obtener rendimiento, usando datos mock:', error);
+          // Datos mock para que la UI no se rompa si el backend falla
+          return of({
+            fechas: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+            puntuaciones: [65, 72, 78, 83, 80, 88],
+            peso: 72.5
+          });
+        })
+      );
   }
 }

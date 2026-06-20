@@ -10,6 +10,7 @@ interface MenuItem {
   exact?: boolean;
   children?: MenuItem[];
   expanded?: boolean;
+  roles?: string[]; // Para control de acceso
 }
 
 @Component({
@@ -27,6 +28,7 @@ export class SidebarComponent implements OnInit {
   isMobileExpanded = false;
   user: User | null = null;
   userInitials = '';
+  loadingUser = true;
 
   menuItems: MenuItem[] = [
     {
@@ -112,8 +114,9 @@ export class SidebarComponent implements OnInit {
   constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
-    this.authService.currentUser$.subscribe(user => {
+     this.authService.currentUser$.subscribe(user => {
       this.user = user;
+      this.loadingUser = false;
       const displayName = user?.nombre || user?.displayName;
       this.userInitials = this.getInitials(displayName);
     });
@@ -122,6 +125,7 @@ export class SidebarComponent implements OnInit {
       if (!isAuthenticated) {
         this.user = null;
         this.userInitials = '';
+        this.loadingUser = false;
       }
     });
   }

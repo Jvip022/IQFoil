@@ -15,6 +15,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   loading = false;
   errorMessage = '';
+  showLogo = false; // Controla la animación del logo
 
   constructor(
     private fb: FormBuilder,
@@ -42,7 +43,11 @@ export class LoginComponent {
       next: (response) => {
         this.loading = false;
         if (response && response.token) {
-          this.router.navigate(['/dashboard']);
+          // Mostrar logo con animación por 1 segundo antes de redirigir
+          this.showLogo = true;
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']);
+          }, 1000);
         } else {
           this.errorMessage = 'Error al iniciar sesión';
         }

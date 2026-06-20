@@ -31,7 +31,6 @@ def get_hilos():
     hilos = Hilo.query.order_by(Hilo.fecha_creacion.desc()).all()
     result = []
     for h in hilos:
-        # Contar mensajes usando consulta (evita list.count())
         num_respuestas = Mensaje.query.filter_by(hilo_id=h.id).count()
         result.append({
             'id': h.id,
@@ -105,3 +104,19 @@ def enviar_mensaje():
     db.session.add(nuevo_mensaje)
     db.session.commit()
     return jsonify({'id': nuevo_mensaje.id, 'message': 'Respuesta enviada'}), 201
+
+# ==================== NUEVO ENDPOINT: ELIMINAR HILO ====================
+@bp.route('/hilos/<int:hilo_id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_hilo(hilo_id):
+    """Elimina un hilo y todos sus mensajes asociados (cascade)"""
+    user_id = get_jwt_identity()
+    user = Usuario.query.get(user_id)
+    # Solo admin o entrenador pueden eliminar hilos
+    if not user or user.rol_id not in [1, 2]:
+        return jsonify({'error': 'No autorizado'}), 403
+
+    hilo = Hilo.query.get_or_404(hilo_id)
+    db.session.delete(hilo)
+    db.session.commit()
+    return jsonify({'message': 'Hilo eliminado correctamente'}), 200
