@@ -4,6 +4,22 @@ import { FormsModule } from '@angular/forms';
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { NotificacionService } from '../../../core/services/notificacion.service';
 
+interface Waypoint {
+  x: number;
+  y: number;
+  tipo: 'ceñida' | 'popa' | 'traves'; // tipo de tramo para calcular velocidad
+}
+
+interface Barco {
+  nombre: string;
+  color: string;
+  x: number;
+  y: number;
+  waypointIndex: number;       // índice del waypoint actual
+  progreso: number;           // 0..1 entre waypoints
+  velocidad: number;          // nudos (escalada para animación)
+}
+
 @Component({
   selector: 'app-simulador-foil',
   standalone: true,
@@ -12,206 +28,451 @@ import { NotificacionService } from '../../../core/services/notificacion.service
   styleUrls: ['./simulador-foil.component.scss']
 })
 export class SimuladorFoilComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('foilCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('regataCanvas') regataCanvasRef!: ElementRef<HTMLCanvasElement>;
 
-  // Parámetros de simulación
-  velocidadViento = 15;
-  anguloAtaque = 5;
-  superficieAlar = 120;
-  pesoNavegante = 75;
-  olaGrande = false;
+  // Parámetros de la regata
+  distanciaRegata = 5;
+  numBarcos = 6;
+  direccionViento = 'N';
+  tipoPista = 'curso';
+  velocidadViento = 15; // nudos (fijo para el cálculo de velocidad estimada)
 
   // Resultados
-  sustentacion = 0;
-  resistencia = 0;
-  relacionLD = 0;
-  velocidadDespegue = 0;
+  anguloOptimo: number | null = null;
+  rumboRecomendado: string = '';
+  velocidadEstimada: number | null = null;
+  tiempoSimulacion = 0;
 
+  // Control de simulación
+  simulando = false;
+  private animationId: any = null;
+  private lastTimestamp = 0;
+
+  // Datos de la regata
+  private waypoints: Waypoint[] = [];
+  private barcos: Barco[] = [];
   private ctx: CanvasRenderingContext2D | null = null;
   private resizeHandler: (() => void) | null = null;
+  private canvasWidth = 0;
+  private canvasHeight = 0;
 
   constructor(private notificacionService: NotificacionService) {}
 
   ngOnInit(): void {
-    this.calcular();
+    this.actualizarRegata();
   }
 
   ngAfterViewInit(): void {
     this.initCanvas();
-    this.dibujarFoil();
+    this.dibujarRegata();
   }
 
   ngOnDestroy(): void {
-    // Eliminar el listener de resize correctamente
+    this.detenerSimulacion();
     if (this.resizeHandler) {
       window.removeEventListener('resize', this.resizeHandler);
       this.resizeHandler = null;
     }
   }
 
+  // ==================== INICIALIZACIÓN DEL CANVAS ====================
   private initCanvas(): void {
-    const canvas = this.canvasRef.nativeElement;
+    const canvas = this.regataCanvasRef.nativeElement;
     if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    // Obtener el contexto
-    this.ctx = canvas.getContext('2d');
-    if (!this.ctx) return;
-
-    // Establecer tamaño real del canvas (DPI-aware)
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
+    this.canvasWidth = rect.width;
+    this.canvasHeight = rect.height;
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     canvas.style.width = rect.width + 'px';
     canvas.style.height = rect.height + 'px';
-    this.ctx.scale(dpr, dpr);
+    ctx.scale(dpr, dpr);
+    this.ctx = ctx;
 
-    // Guardar referencia del handler para poder eliminarlo después
     this.resizeHandler = () => {
       const newRect = canvas.getBoundingClientRect();
+      this.canvasWidth = newRect.width;
+      this.canvasHeight = newRect.height;
       canvas.width = newRect.width * dpr;
       canvas.height = newRect.height * dpr;
       canvas.style.width = newRect.width + 'px';
       canvas.style.height = newRect.height + 'px';
       this.ctx?.scale(dpr, dpr);
-      this.dibujarFoil();
+      this.dibujarRegata();
     };
-
-    // Escuchar cambios de tamaño
     window.addEventListener('resize', this.resizeHandler);
   }
 
-  calcular(): void {
-    // Fórmulas simplificadas de física de fluidos
-    const vientoMs = this.velocidadViento * 0.514;   // nudos → m/s
-    const superficieM2 = this.superficieAlar / 100;  // dm² → m²
-    const densidadAire = 1.225;                     // kg/m³
-    const cl = 0.4 + (this.anguloAtaque * 0.05);    // coeficiente de sustentación
-    const cd = 0.05 + (this.anguloAtaque * 0.01);   // coeficiente de resistencia
+  // ==================== ACTUALIZACIÓN DE PARÁMETROS ====================
+  actualizarRegata(): void {
+    this.calcularAnguloOptimo();
+    this.generarRecorrido();
+    this.inicializarBarcos();
+    this.dibujarRegata();
+  }
 
-    // Sustentación = 0.5 * ρ * v² * S * CL
-    this.sustentacion = 0.5 * densidadAire * vientoMs * vientoMs * superficieM2 * cl;
+  // ==================== CÁLCULO DE ÁNGULO ====================
+  private calcularAnguloOptimo(): void {
+    const dirMap: { [key: string]: { x: number; y: number } } = {
+      N: { x: 0, y: -1 },
+      S: { x: 0, y: 1 },
+      E: { x: 1, y: 0 },
+      O: { x: -1, y: 0 },
+      NE: { x: 0.707, y: -0.707 },
+      NO: { x: -0.707, y: -0.707 },
+      SE: { x: 0.707, y: 0.707 },
+      SO: { x: -0.707, y: 0.707 },
+    };
+    const viento = dirMap[this.direccionViento] || { x: 0, y: -1 };
+    const anguloViento = Math.atan2(viento.x, viento.y) * (180 / Math.PI);
 
-    // Resistencia = 0.5 * ρ * v² * S * CD
-    this.resistencia = 0.5 * densidadAire * vientoMs * vientoMs * superficieM2 * cd;
-
-    // Relación L/D
-    this.relacionLD = this.resistencia > 0 ? this.sustentacion / this.resistencia : 0;
-
-    // Velocidad de despegue (cuando sustentación = peso)
-    const pesoN = this.pesoNavegante * 9.81;
-    this.velocidadDespegue = Math.sqrt((2 * pesoN) / (densidadAire * superficieM2 * cl)) / 0.514;
-
-    // Ajuste por ola grande (reduce sustentación un 10%)
-    if (this.olaGrande) {
-      this.sustentacion *= 0.9;
-      this.velocidadDespegue *= 1.1;
+    let anguloOptimo = 0;
+    let rumbo = '';
+    switch (this.tipoPista) {
+      case 'curso':
+        anguloOptimo = 45;
+        rumbo = 'Ceñida (contra el viento)';
+        break;
+      case 'slalom':
+        anguloOptimo = 90;
+        rumbo = 'Travesía (viento de través)';
+        break;
+      case 'slalom_ceñida':
+        anguloOptimo = 45;
+        rumbo = 'Ceñida final';
+        break;
+      case 'maraton':
+        anguloOptimo = 30;
+        rumbo = 'Mixto (ceñida/popa)';
+        break;
+      default:
+        anguloOptimo = 45;
+        rumbo = 'Ceñida';
     }
 
-    // Redibujar el foil con los nuevos valores
-    this.dibujarFoil();
+    let anguloReal = anguloViento + anguloOptimo;
+    if (anguloReal > 360) anguloReal -= 360;
+    if (anguloReal < 0) anguloReal += 360;
+
+    this.anguloOptimo = anguloOptimo;
+    this.rumboRecomendado = `${rumbo} (${anguloReal.toFixed(0)}° desde el Norte)`;
+
+    // Velocidad estimada según tipo de pista
+    let factor = 1.0;
+    if (this.tipoPista === 'curso') factor = 0.8;
+    else if (this.tipoPista === 'slalom') factor = 0.9;
+    else if (this.tipoPista === 'slalom_ceñida') factor = 0.7;
+    else if (this.tipoPista === 'maraton') factor = 0.6;
+    this.velocidadEstimada = this.velocidadViento * factor;
   }
 
-  resetear(): void {
-    this.velocidadViento = 15;
-    this.anguloAtaque = 5;
-    this.superficieAlar = 120;
-    this.pesoNavegante = 75;
-    this.olaGrande = false;
-    this.calcular();
-    this.notificacionService.mostrarInfo('Valores restablecidos a configuración por defecto');
+  // ==================== GENERACIÓN DE RECORRIDO ====================
+  private generarRecorrido(): void {
+    const margin = 60;
+    const w = this.canvasWidth || 600;
+    const h = this.canvasHeight || 400;
+    const cx = w / 2;
+    const cy = h / 2;
+    const size = Math.min(w, h) * 0.35;
+
+    this.waypoints = [];
+
+    switch (this.tipoPista) {
+      case 'curso':
+        // Rectángulo: esquinas (inicio en superior izquierda)
+        this.waypoints = [
+          { x: margin, y: margin, tipo: 'ceñida' },
+          { x: w - margin, y: margin, tipo: 'traves' },
+          { x: w - margin, y: h - margin, tipo: 'popa' },
+          { x: margin, y: h - margin, tipo: 'traves' },
+        ];
+        break;
+      case 'slalom':
+        // U invertida: salida abajo izquierda, sube, va a la derecha, baja
+        this.waypoints = [
+          { x: margin, y: h - margin, tipo: 'traves' },
+          { x: margin, y: margin, tipo: 'ceñida' },
+          { x: w - margin, y: margin, tipo: 'popa' },
+          { x: w - margin, y: h - margin, tipo: 'traves' },
+        ];
+        break;
+      case 'slalom_ceñida':
+        // Similar a U pero con ceñida final en diagonal
+        this.waypoints = [
+          { x: margin, y: h - margin, tipo: 'traves' },
+          { x: margin, y: margin, tipo: 'ceñida' },
+          { x: w - margin, y: margin, tipo: 'popa' },
+          { x: w - margin, y: h - margin, tipo: 'ceñida' },
+          { x: cx, y: h - margin, tipo: 'traves' },
+        ];
+        break;
+      case 'maraton':
+        // Recorrido largo con zigzag
+        this.waypoints = [
+          { x: margin, y: h - margin, tipo: 'ceñida' },
+          { x: cx, y: margin, tipo: 'popa' },
+          { x: w - margin, y: h * 0.3, tipo: 'traves' },
+          { x: margin, y: h * 0.6, tipo: 'ceñida' },
+          { x: w - margin, y: h - margin, tipo: 'popa' },
+        ];
+        break;
+      default:
+        this.waypoints = [];
+    }
   }
 
-  private dibujarFoil(): void {
-    const canvas = this.canvasRef?.nativeElement;
-    if (!canvas) return;
+  // ==================== INICIALIZACIÓN DE BARCOS ====================
+  private inicializarBarcos(): void {
+    if (this.waypoints.length < 2) return;
 
+    const colores = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#ff9ff3', '#54a0ff', '#5f27cd', '#f368e0', '#ff9f43', '#00d2d3', '#1dd1a1', '#f8a5c2'];
+    this.barcos = [];
+    for (let i = 0; i < this.numBarcos; i++) {
+      // Distribuir los barcos a lo largo del recorrido (progreso inicial escalonado)
+      const progresoInicial = i / this.numBarcos;
+      const color = colores[i % colores.length];
+      this.barcos.push({
+        nombre: `Barco ${i + 1}`,
+        color,
+        x: 0,
+        y: 0,
+        waypointIndex: 0,
+        progreso: progresoInicial,
+        velocidad: 0.5 + Math.random() * 0.5 // factor de velocidad individual
+      });
+    }
+    // Actualizar posiciones iniciales
+    this.actualizarPosicionesBarcos(0);
+  }
+
+  // ==================== ACTUALIZACIÓN DE POSICIONES ====================
+  private actualizarPosicionesBarcos(deltaTime: number): void {
+    if (this.waypoints.length < 2) return;
+
+    const factorVelocidadBase = 0.02; // ajuste de velocidad de animación
+    const vientoDir = this.obtenerVectorViento();
+
+    for (const barco of this.barcos) {
+      // Velocidad base según el tramo actual
+      const wpActual = this.waypoints[barco.waypointIndex];
+      const wpSiguiente = this.waypoints[(barco.waypointIndex + 1) % this.waypoints.length];
+      let velocidadTramo = 1.0;
+      switch (wpActual.tipo) {
+        case 'ceñida': velocidadTramo = 0.6; break;
+        case 'popa': velocidadTramo = 1.2; break;
+        case 'traves': velocidadTramo = 0.9; break;
+        default: velocidadTramo = 1.0;
+      }
+
+      // Efecto del viento sobre la velocidad en este tramo
+      const dx = wpSiguiente.x - wpActual.x;
+      const dy = wpSiguiente.y - wpActual.y;
+      const anguloTramo = Math.atan2(dy, dx);
+      const vientoAngle = Math.atan2(vientoDir.y, vientoDir.x);
+      const diff = this.normalizarAngulo(anguloTramo - vientoAngle);
+      // Si el viento es de cara (diff ~ PI) reduce velocidad, si es de popa (diff ~ 0) aumenta
+      const factorViento = 1 + 0.3 * Math.cos(diff);
+
+      // Velocidad final
+      const velocidad = factorVelocidadBase * velocidadTramo * factorViento * barco.velocidad * (1 + deltaTime * 0.1);
+
+      // Avanzar progreso
+      barco.progreso += velocidad;
+      if (barco.progreso >= 1) {
+        barco.progreso = 0;
+        barco.waypointIndex = (barco.waypointIndex + 1) % this.waypoints.length;
+      }
+
+      // Interpolar posición
+      const wpA = this.waypoints[barco.waypointIndex];
+      const wpB = this.waypoints[(barco.waypointIndex + 1) % this.waypoints.length];
+      barco.x = wpA.x + (wpB.x - wpA.x) * barco.progreso;
+      barco.y = wpA.y + (wpB.y - wpA.y) * barco.progreso;
+    }
+  }
+
+  private normalizarAngulo(angulo: number): number {
+    while (angulo > Math.PI) angulo -= 2 * Math.PI;
+    while (angulo < -Math.PI) angulo += 2 * Math.PI;
+    return angulo;
+  }
+
+  private obtenerVectorViento(): { x: number; y: number } {
+    const map: { [key: string]: { x: number; y: number } } = {
+      N: { x: 0, y: -1 },
+      S: { x: 0, y: 1 },
+      E: { x: 1, y: 0 },
+      O: { x: -1, y: 0 },
+      NE: { x: 0.707, y: -0.707 },
+      NO: { x: -0.707, y: -0.707 },
+      SE: { x: 0.707, y: 0.707 },
+      SO: { x: -0.707, y: 0.707 },
+    };
+    return map[this.direccionViento] || { x: 0, y: -1 };
+  }
+
+  // ==================== DIBUJADO DEL CANVAS ====================
+  private dibujarRegata(): void {
     const ctx = this.ctx;
     if (!ctx) return;
+    const w = this.canvasWidth || 600;
+    const h = this.canvasHeight || 400;
 
-    // Obtener dimensiones reales del canvas (en píxeles CSS)
-    const rect = canvas.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-
-    // Limpiar
+    // Fondo
     ctx.clearRect(0, 0, w, h);
-
-    // Fondo semitransparente
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillStyle = '#0a1a2b';
     ctx.fillRect(0, 0, w, h);
 
-    // Línea de referencia horizontal
+    // Dibujar recorrido
+    if (this.waypoints.length >= 2) {
+      ctx.beginPath();
+      ctx.moveTo(this.waypoints[0].x, this.waypoints[0].y);
+      for (let i = 1; i < this.waypoints.length; i++) {
+        ctx.lineTo(this.waypoints[i].x, this.waypoints[i].y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(0,230,214,0.5)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 8]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Puntos de control
+      for (const wp of this.waypoints) {
+        ctx.beginPath();
+        ctx.arc(wp.x, wp.y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.fill();
+      }
+    }
+
+    // Dibujar rosa del viento
+    const centerX = 60;
+    const centerY = 60;
+    const radius = 30;
     ctx.beginPath();
-    ctx.moveTo(40, h / 2);
-    ctx.lineTo(w - 40, h / 2);
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
     ctx.strokeStyle = 'rgba(255,255,255,0.2)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Centro del canvas
-    const centerX = w / 2;
-    const baseY = h / 2;
-
-    // Ángulo de ataque en radianes
-    const rad = (this.anguloAtaque * Math.PI) / 180;
-    const offset = Math.min(20, Math.max(-20, this.sustentacion / 500));
-
-    // --- Perfil superior (curva de sustentación) ---
+    const v = this.obtenerVectorViento();
+    const len = radius * 0.8;
     ctx.beginPath();
-    for (let x = centerX - 100; x <= centerX + 100; x += 3) {
-      const t = (x - (centerX - 100)) / 200;
-      const espesor = 12 * (1 - Math.pow(2 * t - 1, 2)) * (1 + offset * 0.2);
-      const y = baseY - espesor - (offset * Math.sin(rad) * 0.3);
-      if (x === centerX - 100) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX + v.x * len, centerY + v.y * len);
     ctx.strokeStyle = '#00e6d6';
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3;
     ctx.stroke();
-
-    // --- Perfil inferior ---
+    const angle = Math.atan2(v.y, v.x);
+    const headLen = 10;
     ctx.beginPath();
-    for (let x = centerX - 100; x <= centerX + 100; x += 3) {
-      const t = (x - (centerX - 100)) / 200;
-      const espesor = 12 * (1 - Math.pow(2 * t - 1, 2)) * (1 + offset * 0.2);
-      const y = baseY + espesor * 0.3 + (offset * Math.sin(rad) * 0.2);
-      if (x === centerX - 100) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+    ctx.moveTo(centerX + v.x * len, centerY + v.y * len);
+    ctx.lineTo(centerX + v.x * len - headLen * Math.cos(angle - 0.5), centerY + v.y * len - headLen * Math.sin(angle - 0.5));
+    ctx.moveTo(centerX + v.x * len, centerY + v.y * len);
+    ctx.lineTo(centerX + v.x * len - headLen * Math.cos(angle + 0.5), centerY + v.y * len - headLen * Math.sin(angle + 0.5));
+    ctx.stroke();
+    ctx.fillStyle = 'white';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Viento ' + this.direccionViento, centerX, centerY - radius - 10);
+
+    // Ángulo óptimo (línea verde)
+    if (this.anguloOptimo !== null) {
+      const anguloRad = this.anguloOptimo * (Math.PI / 180);
+      const vientoAngle = Math.atan2(v.y, v.x);
+      const optAngle = vientoAngle + anguloRad;
+      const lineLen = 60;
+      const lineX = centerX + lineLen * Math.cos(optAngle);
+      const lineY = centerY + lineLen * Math.sin(optAngle);
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(lineX, lineY);
+      ctx.strokeStyle = '#4caf50';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      const headLen2 = 10;
+      ctx.beginPath();
+      ctx.moveTo(lineX, lineY);
+      ctx.lineTo(lineX - headLen2 * Math.cos(optAngle - 0.5), lineY - headLen2 * Math.sin(optAngle - 0.5));
+      ctx.moveTo(lineX, lineY);
+      ctx.lineTo(lineX - headLen2 * Math.cos(optAngle + 0.5), lineY - headLen2 * Math.sin(optAngle + 0.5));
+      ctx.stroke();
+      ctx.fillStyle = '#4caf50';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Ángulo óptimo ${this.anguloOptimo.toFixed(0)}°`, lineX + 20, lineY - 10);
     }
-    ctx.strokeStyle = '#1a2b4c';
-    ctx.lineWidth = 2;
-    ctx.stroke();
 
-    // --- Línea del ángulo de ataque ---
-    ctx.beginPath();
-    ctx.moveTo(centerX, baseY);
-    ctx.lineTo(centerX + 40 * Math.sin(rad), baseY - 40 * Math.cos(rad));
-    ctx.strokeStyle = '#f39c12';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 5]);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    // Dibujar barcos
+    for (const barco of this.barcos) {
+      ctx.beginPath();
+      ctx.arc(barco.x, barco.y, 8, 0, 2 * Math.PI);
+      ctx.fillStyle = barco.color;
+      ctx.fill();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = 'white';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(barco.nombre, barco.x, barco.y - 15);
+    }
 
-    // --- Puntos de referencia visual ---
-    ctx.beginPath();
-    ctx.arc(centerX, baseY, 4, 0, 2 * Math.PI);
-    ctx.fillStyle = '#f39c12';
-    ctx.fill();
-
-    // --- Texto informativo ---
-    ctx.font = '12px "Inter", sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.8)';
-    ctx.textAlign = 'left';
-    ctx.fillText(`Ángulo: ${this.anguloAtaque}°`, centerX + 20, baseY - 30);
-    ctx.fillText(`Sustentación: ${this.sustentacion.toFixed(0)} N`, centerX + 20, baseY - 12);
-
-    // Mostrar estado de vuelo
-    // 18 nudos,8 angulo,160dm ,75kg
-    const vuela = this.sustentacion >= this.pesoNavegante * 9.81;
-    ctx.font = '14px "Inter", sans-serif';
+    // Información en el canvas
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '12px sans-serif';
     ctx.textAlign = 'right';
-    ctx.fillStyle = vuela ? '#4caf50' : '#f44336';
-    ctx.fillText(vuela ? '🟢 VOLANDO' : '🔴 NO VUELA', w - 20, 30);
+    ctx.fillText(`Distancia: ${this.distanciaRegata} mn`, w - 20, 30);
+    ctx.fillText(`Barcos: ${this.numBarcos}`, w - 20, 50);
+  }
+
+  // ==================== CONTROL DE SIMULACIÓN ====================
+  toggleRegata(): void {
+    if (this.simulando) {
+      this.detenerSimulacion();
+    } else {
+      this.iniciarSimulacion();
+    }
+  }
+
+  private iniciarSimulacion(): void {
+    if (this.simulando) return;
+    this.simulando = true;
+    this.tiempoSimulacion = 0;
+    this.lastTimestamp = performance.now();
+    this.notificacionService.mostrarInfo('🏁 ¡Regata iniciada!');
+    this.bucleSimulacion();
+  }
+
+  private detenerSimulacion(): void {
+    this.simulando = false;
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+    this.notificacionService.mostrarInfo('⏹️ Regata detenida');
+  }
+
+  private bucleSimulacion(): void {
+    if (!this.simulando) return;
+
+    const now = performance.now();
+    const delta = (now - this.lastTimestamp) / 1000; // segundos
+    this.lastTimestamp = now;
+    this.tiempoSimulacion += delta;
+
+    // Actualizar posiciones
+    this.actualizarPosicionesBarcos(delta);
+
+    // Redibujar
+    this.dibujarRegata();
+
+    // Continuar
+    this.animationId = requestAnimationFrame(() => this.bucleSimulacion());
   }
 }

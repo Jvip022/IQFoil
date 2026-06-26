@@ -94,7 +94,7 @@ export class SidebarComponent implements OnInit {
       label: 'Simulaciones',
       icon: '🎮',
       children: [
-        { label: 'Simulador de foil', icon: '🛸', route: '/simulaciones/simulador' }
+        { label: 'Simulador de regata', icon: '⛵', route: '/simulaciones/simulador' }
       ]
     },
     {

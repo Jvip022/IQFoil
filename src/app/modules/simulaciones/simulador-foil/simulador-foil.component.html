@@ -2,79 +2,67 @@
   <!-- Encabezado -->
   <header class="simulador-foil__header">
     <div class="badge">
-      <i class="fas fa-sliders-h"></i> SIMULADOR · IQFOIL
+      <i class="fas fa-sailboat"></i> SIMULADOR DE REGATA · IQFOIL
     </div>
-    <h1 class="simulador-foil__title">⚙️ Simulador de <span class="title-accent">foil</span></h1>
-    <p class="simulador-foil__subtitle">Ajusta los parámetros y visualiza el rendimiento</p>
+    <h1 class="simulador-foil__title">⛵ Simulador de <span class="title-accent">regata</span></h1>
+    <p class="simulador-foil__subtitle">Configura la regata y obtén el ángulo óptimo de ceñida</p>
   </header>
 
-  <!-- Estado de conexión -->
   <app-estado-conexion class="simulador-foil__connection"></app-estado-conexion>
 
-  <div class="simulador-foil__layout">
-    <!-- Panel de controles -->
-    <div class="card">
-      <h3>📊 Parámetros de entrada</h3>
-
-      <div class="control-group">
-        <label>🌬️ Velocidad del viento: <strong>{{ velocidadViento }} nudos</strong></label>
-        <input type="range" min="0" max="30" step="0.5" [(ngModel)]="velocidadViento" (input)="calcular()" class="slider" />
+  <!-- SECCIÓN: SIMULACIÓN DE REGATA -->
+  <div class="simulador-foil__regata">
+    <div class="card regata-card">
+      <h3>⚙️ Configuración de la regata</h3>
+      <div class="regata-controls">
+        <div class="control-group">
+          <label>Distancia (millas náuticas): <strong>{{ distanciaRegata }}</strong></label>
+          <input type="range" min="1" max="20" step="0.5" [(ngModel)]="distanciaRegata" (input)="actualizarRegata()" class="slider" />
+        </div>
+        <div class="control-group">
+          <label>Número de barcos: <strong>{{ numBarcos }}</strong></label>
+          <input type="range" min="2" max="12" step="1" [(ngModel)]="numBarcos" (input)="actualizarRegata()" class="slider" />
+        </div>
+        <div class="control-group">
+          <label>Dirección del viento:</label>
+          <select [(ngModel)]="direccionViento" (change)="actualizarRegata()" class="form-control">
+            <option value="N">Norte (N)</option>
+            <option value="S">Sur (S)</option>
+            <option value="E">Este (E)</option>
+            <option value="O">Oeste (O)</option>
+            <option value="NE">Nordeste (NE)</option>
+            <option value="NO">Noroeste (NO)</option>
+            <option value="SE">Sureste (SE)</option>
+            <option value="SO">Suroeste (SO)</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Tipo de pista:</label>
+          <select [(ngModel)]="tipoPista" (change)="actualizarRegata()" class="form-control">
+            <option value="curso">Carrera de curso (rectángulo)</option>
+            <option value="slalom">Slalom Sprint (U)</option>
+            <option value="slalom_ceñida">Slalom con Ceñida</option>
+            <option value="maraton">Maratón</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" (click)="toggleRegata()">
+          {{ simulando ? '⏹️ Detener regata' : '🏁 Iniciar regata' }}
+        </button>
       </div>
 
-      <div class="control-group">
-        <label>📐 Ángulo de ataque: <strong>{{ anguloAtaque }}°</strong></label>
-        <input type="range" min="-5" max="15" step="0.5" [(ngModel)]="anguloAtaque" (input)="calcular()" class="slider" />
+      <div class="canvas-container regata-canvas">
+        <canvas #regataCanvas width="600" height="400"></canvas>
+        <p class="small text-muted text-center mt-2">
+          Vista superior: barcos (colores), viento (flecha), ángulo óptimo de ceñida (línea verde)
+        </p>
       </div>
 
-      <div class="control-group">
-        <label>🛸 Superficie alar: <strong>{{ superficieAlar }} dm²</strong></label>
-        <input type="range" min="50" max="200" step="1" [(ngModel)]="superficieAlar" (input)="calcular()" class="slider" />
-      </div>
-
-      <div class="control-group">
-        <label>⚖️ Peso del navegante: <strong>{{ pesoNavegante }} kg</strong></label>
-        <input type="range" min="50" max="120" step="1" [(ngModel)]="pesoNavegante" (input)="calcular()" class="slider" />
-      </div>
-
-      <div class="control-group checkbox">
-        <label>
-          <input type="checkbox" [(ngModel)]="olaGrande" (change)="calcular()" />
-          🌊 Condiciones de ola grande
-        </label>
-      </div>
-
-      <button class="btn btn-outline btn-block" (click)="resetear()">🔄 Restablecer valores</button>
-    </div>
-
-    <!-- Panel de resultados -->
-    <div class="card">
-      <h3>📈 Resultados</h3>
-
-      <div class="resultado-item">
-        <span class="label">Sustentación (lift):</span>
-        <span class="value">{{ sustentacion.toFixed(1) }} N</span>
-      </div>
-      <div class="resultado-item">
-        <span class="label">Resistencia (drag):</span>
-        <span class="value">{{ resistencia.toFixed(1) }} N</span>
-      </div>
-      <div class="resultado-item">
-        <span class="label">Relación L/D:</span>
-        <span class="value">{{ relacionLD.toFixed(2) }}</span>
-      </div>
-      <div class="resultado-item">
-        <span class="label">Velocidad de despegue:</span>
-        <span class="value">{{ velocidadDespegue.toFixed(1) }} nudos</span>
-      </div>
-      <div class="resultado-item" [class.alerta]="sustentacion < pesoNavegante * 9.81">
-        <span class="label">Estado:</span>
-        <span class="value">{{ sustentacion >= pesoNavegante * 9.81 ? '🟢 Vuelo' : '🔴 No vuela' }}</span>
-      </div>
-
-      <!-- Canvas para representación gráfica -->
-      <div class="canvas-container">
-        <canvas #foilCanvas width="300" height="150"></canvas>
-        <p class="small text-muted text-center mt-2">Perfil esquemático del foil (ángulo y deformación visual)</p>
+      <div class="regata-info" *ngIf="anguloOptimo !== null">
+        <p><strong>Ángulo de ceñida óptimo:</strong> {{ anguloOptimo.toFixed(1) }}° respecto al viento</p>
+        <p><strong>Rumbo recomendado:</strong> {{ rumboRecomendado }}</p>
+        <p *ngIf="velocidadEstimada">Velocidad estimada: {{ velocidadEstimada.toFixed(1) }} nudos</p>
+        <p><strong>Viento aparente:</strong> {{ direccionViento }} ({{ velocidadViento }} nudos)</p>
+        <p *ngIf="simulando">⏳ Simulación en curso... ({{ tiempoSimulacion.toFixed(0) }}s)</p>
       </div>
     </div>
   </div>
