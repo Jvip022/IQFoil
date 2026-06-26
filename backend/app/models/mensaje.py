@@ -1,3 +1,4 @@
+# app/models/mensaje.py
 from app import db
 
 class Mensaje(db.Model):
@@ -8,5 +9,6 @@ class Mensaje(db.Model):
     contenido = db.Column(db.Text, nullable=False)
     fecha = db.Column(db.DateTime, default=db.func.now())
 
-    hilo = db.relationship('Hilo', backref='mensajes')
+    # Añadir cascade en el backref
+    hilo = db.relationship('Hilo', backref=db.backref('mensajes', cascade='all, delete-orphan'))
     autor = db.relationship('Usuario', backref='mensajes')

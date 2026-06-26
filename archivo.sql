@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 5ZawUBmsWv5A6Al6yR2QEwuOH7XCjJhkOPeTmAdMoBJnMgv1JsLMffAgSvQtzsV
+\restrict 3MaE4trN2fauQ7Alnyb8BvSWb1xHVMYIsDUBFBiuJvB9P2wYBtDZ6gOT0fgIETb
 
 -- Dumped from database version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
@@ -997,6 +997,33 @@ COPY public.evaluacion (id, titulo, usuario_id, evaluador_id, rubrica_id, video_
 32	Evaluación de Luis Fernández - Junio	6	2	1	https://example.com/videos/6_junio.mp4	2026-06-05 10:00:00	2026-06-10 12:00:00	evaluado	Buen ritmo	10
 33	Evaluación de Pedro Rodríguez - Junio	5	2	1	https://example.com/videos/5_junio.mp4	2026-06-08 14:00:00	2026-06-12 18:00:00	evaluado	Muy buena técnica	8
 34	Evaluación avanzada de Juan Pérez	3	2	1	https://example.com/videos/3_avanzado.mp4	2026-06-20 00:00:00	2026-06-25 00:00:00	evaluado	Excelente rendimiento	18
+35	Evaluación de Juan Pérez	3	2	1	https://example.com/videos/3_1782495836.mp4	2026-01-29 13:43:56.149384	2026-02-01 13:43:56.149384	evaluado	Comentario de prueba para Juan Pérez	9
+36	Evaluación de Juan Pérez	3	2	1	https://example.com/videos/3_1782495836.mp4	2026-01-15 13:43:56.163481	2026-01-16 13:43:56.163481	pendiente	Comentario de prueba para Juan Pérez	15
+37	Evaluación de María García	4	2	1	https://example.com/videos/4_1782495836.mp4	2026-04-04 13:43:56.170126	2026-04-07 13:43:56.170126	pendiente	Comentario de prueba para María García	13
+38	Evaluación de María García	4	2	1	https://example.com/videos/4_1782495836.mp4	2026-03-03 13:43:56.173843	2026-03-06 13:43:56.173843	pendiente	Comentario de prueba para María García	11
+39	Evaluación de María García	4	2	1	https://example.com/videos/4_1782495836.mp4	2026-02-25 13:43:56.176841	2026-03-02 13:43:56.176841	pendiente	Comentario de prueba para María García	7
+40	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1782495836.mp4	2026-05-29 13:43:56.180905	2026-05-30 13:43:56.180905	pendiente	Comentario de prueba para Luis Fernández	13
+41	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1782495836.mp4	2026-01-23 13:43:56.18455	2026-01-24 13:43:56.18455	evaluado	Comentario de prueba para Luis Fernández	15
+42	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1782495836.mp4	2026-01-10 13:43:56.187107	2026-01-15 13:43:56.187107	pendiente	Comentario de prueba para Luis Fernández	12
+43	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1782495836.mp4	2026-01-28 13:43:56.18933	2026-01-29 13:43:56.18933	pendiente	Comentario de prueba para Luis Fernández	7
+44	Evaluación de Pedro Rodríguez	5	2	1	https://example.com/videos/5_1782495836.mp4	2026-06-07 13:43:56.191314	2026-06-11 13:43:56.191314	evaluado	Comentario de prueba para Pedro Rodríguez	5
+45	Evaluación de Pedro Rodríguez	5	2	1	https://example.com/videos/5_1782495836.mp4	2026-04-07 13:43:56.194187	2026-04-10 13:43:56.194187	pendiente	Comentario de prueba para Pedro Rodríguez	15
+46	Evaluación de Pedro Rodríguez	5	2	1	https://example.com/videos/5_1782495836.mp4	2026-04-27 13:43:56.198535	2026-04-30 13:43:56.198535	pendiente	Comentario de prueba para Pedro Rodríguez	6
+47	Evaluación de Pedro Rodríguez	5	2	1	https://example.com/videos/5_1782495836.mp4	2026-01-25 13:43:56.201506	2026-01-27 13:43:56.201506	pendiente	Comentario de prueba para Pedro Rodríguez	10
+48	Evaluación de Ana Torres	7	2	1	https://example.com/videos/7_1782495836.mp4	2026-04-29 13:43:56.203796	2026-05-02 13:43:56.203796	pendiente	Comentario de prueba para Ana Torres	14
+49	Evaluación de Ana Torres	7	2	1	https://example.com/videos/7_1782495836.mp4	2026-02-15 13:43:56.205919	2026-02-18 13:43:56.205919	evaluado	Comentario de prueba para Ana Torres	14
+50	Evaluación de Ana Torres	7	2	1	https://example.com/videos/7_1782495836.mp4	2026-05-14 13:43:56.208142	2026-05-19 13:43:56.208142	evaluado	Comentario de prueba para Ana Torres	10
+51	Evaluación de Ana Torres	7	2	1	https://example.com/videos/7_1782495836.mp4	2026-01-31 13:43:56.211636	2026-02-03 13:43:56.211636	evaluado	Comentario de prueba para Ana Torres	6
+52	Evaluación de José Ramírez	8	2	1	https://example.com/videos/8_1782495836.mp4	2026-02-04 13:43:56.21412	2026-02-05 13:43:56.21412	evaluado	Comentario de prueba para José Ramírez	5
+53	Evaluación de José Ramírez	8	2	1	https://example.com/videos/8_1782495836.mp4	2026-01-16 13:43:56.216359	2026-01-19 13:43:56.216359	evaluado	Comentario de prueba para José Ramírez	13
+54	Evaluación de José Ramírez	8	2	1	https://example.com/videos/8_1782495836.mp4	2026-04-28 13:43:56.218692	2026-04-30 13:43:56.218692	pendiente	Comentario de prueba para José Ramírez	6
+55	Evaluación de José Ramírez	8	2	1	https://example.com/videos/8_1782495836.mp4	2026-03-20 13:43:56.220871	2026-03-22 13:43:56.220871	evaluado	Comentario de prueba para José Ramírez	11
+56	Evaluación de Marta Díaz	9	2	1	https://example.com/videos/9_1782495836.mp4	2026-03-11 13:43:56.222825	2026-03-15 13:43:56.222825	pendiente	Comentario de prueba para Marta Díaz	11
+57	Evaluación de Marta Díaz	9	2	1	https://example.com/videos/9_1782495836.mp4	2026-06-19 13:43:56.2247	2026-06-22 13:43:56.2247	evaluado	Comentario de prueba para Marta Díaz	7
+58	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1782495836.mp4	2026-04-23 13:43:56.227079	2026-04-28 13:43:56.227079	pendiente	Comentario de prueba para Roberto Mena	9
+59	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1782495836.mp4	2026-03-01 13:43:56.229571	2026-03-03 13:43:56.229571	pendiente	Comentario de prueba para Roberto Mena	15
+60	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1782495836.mp4	2026-02-17 13:43:56.232185	2026-02-22 13:43:56.232185	pendiente	Comentario de prueba para Roberto Mena	13
+61	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1782495836.mp4	2026-05-08 13:43:56.234475	2026-05-13 13:43:56.234475	evaluado	Comentario de prueba para Roberto Mena	9
 \.
 
 
@@ -1182,6 +1209,145 @@ COPY public.log_actividad (id, usuario_id, accion, detalles, ip, fecha) FROM std
 130	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:23:18.233469
 131	6	responder_hilo	{"info": "Acción generada automáticamente"}	192.168.1.196	2026-06-13 10:28:40.992884
 132	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:41:35.47299
+133	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:50:38.561948
+134	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:59:13.318701
+135	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 11:00:01.919784
+136	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 11:20:07.418276
+137	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 11:24:04.976228
+138	4	login	{"email": "atleta2@iqfoil.cu", "nombre": "María García"}	127.0.0.1	2026-06-26 11:41:27.953739
+139	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-26 11:42:38.416357
+140	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 11:47:27.190457
+141	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 11:48:02.662904
+142	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 11:50:42.039937
+143	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 11:58:35.170803
+144	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-26 12:04:31.563118
+177	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 12:35:31.111347
+178	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 12:46:50.710153
+179	2	login	{"email": "entrenador@iqfoil.cu", "nombre": "Carlos Gómez"}	127.0.0.1	2026-06-26 12:51:16.613908
+180	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 13:01:23.49399
+181	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 13:34:52.08979
+182	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-26 13:35:26.295863
+183	2	login	{"email": "entrenador@iqfoil.cu", "nombre": "Carlos Gómez"}	127.0.0.1	2026-06-26 13:36:22.084034
+184	5	subir_documento	{"info": "Acción subir_documento"}	192.168.1.70	2026-04-28 13:43:56.280716
+185	5	subir_documento	{"info": "Acción subir_documento"}	192.168.1.49	2026-05-08 13:43:56.280952
+186	5	login	{"info": "Acción login"}	192.168.1.47	2026-03-23 13:43:56.281016
+187	5	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.171	2026-05-01 13:43:56.281063
+188	5	login	{"info": "Acción login"}	192.168.1.17	2026-04-05 13:43:56.281107
+189	5	ver_video	{"info": "Acción ver_video"}	192.168.1.206	2026-01-17 13:43:56.281149
+190	5	completar_video	{"info": "Acción completar_video"}	192.168.1.75	2026-04-29 13:43:56.281191
+191	5	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.234	2026-03-12 13:43:56.281243
+192	5	login	{"info": "Acción login"}	192.168.1.183	2026-03-20 13:43:56.281286
+193	5	ver_video	{"info": "Acción ver_video"}	192.168.1.31	2026-05-02 13:43:56.281327
+194	5	login	{"info": "Acción login"}	192.168.1.97	2026-04-07 13:43:56.281371
+195	5	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.16	2026-06-12 13:43:56.281412
+196	5	ver_video	{"info": "Acción ver_video"}	192.168.1.37	2026-02-19 13:43:56.281452
+197	5	subir_documento	{"info": "Acción subir_documento"}	192.168.1.22	2026-01-20 13:43:56.281491
+198	5	ver_video	{"info": "Acción ver_video"}	192.168.1.52	2026-02-25 13:43:56.281537
+199	6	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.245	2026-05-24 13:43:56.281588
+200	6	subir_documento	{"info": "Acción subir_documento"}	192.168.1.23	2026-03-13 13:43:56.281629
+201	6	subir_documento	{"info": "Acción subir_documento"}	192.168.1.79	2026-03-23 13:43:56.281668
+202	6	completar_video	{"info": "Acción completar_video"}	192.168.1.70	2026-05-07 13:43:56.281707
+203	6	subir_documento	{"info": "Acción subir_documento"}	192.168.1.45	2026-05-20 13:43:56.281745
+204	6	subir_documento	{"info": "Acción subir_documento"}	192.168.1.197	2026-05-30 13:43:56.281784
+205	6	subir_documento	{"info": "Acción subir_documento"}	192.168.1.51	2026-05-21 13:43:56.28185
+206	6	ver_video	{"info": "Acción ver_video"}	192.168.1.132	2026-02-15 13:43:56.281894
+207	6	subir_documento	{"info": "Acción subir_documento"}	192.168.1.154	2026-03-24 13:43:56.282225
+208	6	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.185	2026-01-01 13:43:56.282283
+209	6	login	{"info": "Acción login"}	192.168.1.155	2026-05-28 13:43:56.282328
+210	6	ver_video	{"info": "Acción ver_video"}	192.168.1.87	2026-06-11 13:43:56.282383
+211	7	ver_video	{"info": "Acción ver_video"}	192.168.1.136	2026-06-22 13:43:56.282456
+212	7	login	{"info": "Acción login"}	192.168.1.187	2026-01-08 13:43:56.282531
+213	7	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.142	2026-05-11 13:43:56.282602
+214	7	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.101	2026-02-20 13:43:56.282676
+215	7	ver_video	{"info": "Acción ver_video"}	192.168.1.174	2026-03-15 13:43:56.282761
+216	7	ver_video	{"info": "Acción ver_video"}	192.168.1.102	2026-05-11 13:43:56.282874
+217	7	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.12	2026-01-23 13:43:56.282955
+218	7	ver_video	{"info": "Acción ver_video"}	192.168.1.247	2026-03-19 13:43:56.283069
+219	7	ver_video	{"info": "Acción ver_video"}	192.168.1.107	2026-06-23 13:43:56.283158
+220	8	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.104	2026-03-12 13:43:56.283262
+221	8	subir_documento	{"info": "Acción subir_documento"}	192.168.1.98	2026-04-16 13:43:56.283352
+222	8	completar_video	{"info": "Acción completar_video"}	192.168.1.116	2026-01-07 13:43:56.283425
+223	8	login	{"info": "Acción login"}	192.168.1.8	2026-05-09 13:43:56.283527
+224	8	login	{"info": "Acción login"}	192.168.1.48	2026-04-30 13:43:56.283617
+225	8	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.114	2026-06-02 13:43:56.283676
+226	8	login	{"info": "Acción login"}	192.168.1.59	2026-01-09 13:43:56.283731
+227	8	subir_documento	{"info": "Acción subir_documento"}	192.168.1.245	2026-01-19 13:43:56.283784
+228	8	login	{"info": "Acción login"}	192.168.1.80	2026-02-12 13:43:56.283925
+229	9	subir_documento	{"info": "Acción subir_documento"}	192.168.1.64	2026-01-16 13:43:56.284029
+230	9	subir_documento	{"info": "Acción subir_documento"}	192.168.1.227	2026-05-26 13:43:56.28413
+231	9	completar_video	{"info": "Acción completar_video"}	192.168.1.173	2026-03-07 13:43:56.284221
+232	9	ver_video	{"info": "Acción ver_video"}	192.168.1.50	2026-02-24 13:43:56.28432
+233	9	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.218	2026-01-18 13:43:56.284393
+234	9	login	{"info": "Acción login"}	192.168.1.175	2026-02-25 13:43:56.284459
+235	9	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.199	2026-02-27 13:43:56.284527
+236	10	completar_video	{"info": "Acción completar_video"}	192.168.1.6	2026-06-20 13:43:56.284603
+237	10	subir_documento	{"info": "Acción subir_documento"}	192.168.1.118	2026-03-12 13:43:56.28467
+238	10	login	{"info": "Acción login"}	192.168.1.237	2026-03-01 13:43:56.284711
+239	10	subir_documento	{"info": "Acción subir_documento"}	192.168.1.61	2026-03-23 13:43:56.284748
+240	10	completar_video	{"info": "Acción completar_video"}	192.168.1.73	2026-01-01 13:43:56.284793
+241	10	login	{"info": "Acción login"}	192.168.1.218	2026-06-14 13:43:56.284859
+242	10	subir_documento	{"info": "Acción subir_documento"}	192.168.1.51	2026-03-24 13:43:56.284899
+243	10	completar_video	{"info": "Acción completar_video"}	192.168.1.85	2026-03-05 13:43:56.284937
+244	10	completar_video	{"info": "Acción completar_video"}	192.168.1.72	2026-03-22 13:43:56.284983
+245	10	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.75	2026-04-02 13:43:56.285021
+246	10	ver_video	{"info": "Acción ver_video"}	192.168.1.114	2026-04-02 13:43:56.285058
+247	10	ver_video	{"info": "Acción ver_video"}	192.168.1.25	2026-05-06 13:43:56.285096
+248	10	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.103	2026-05-02 13:43:56.285135
+249	10	completar_video	{"info": "Acción completar_video"}	192.168.1.132	2026-02-20 13:43:56.285174
+250	10	subir_documento	{"info": "Acción subir_documento"}	192.168.1.22	2026-04-05 13:43:56.285215
+251	2	ver_video	{"info": "Acción ver_video"}	192.168.1.32	2026-01-10 13:43:56.285256
+252	2	login	{"info": "Acción login"}	192.168.1.10	2026-05-12 13:43:56.285308
+253	2	login	{"info": "Acción login"}	192.168.1.110	2026-02-18 13:43:56.285349
+254	2	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.49	2026-05-13 13:43:56.285389
+255	2	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.14	2026-06-22 13:43:56.285428
+256	2	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.88	2026-01-04 13:43:56.285467
+257	4	subir_documento	{"info": "Acción subir_documento"}	192.168.1.162	2026-01-01 13:43:56.285515
+258	4	completar_video	{"info": "Acción completar_video"}	192.168.1.230	2026-01-31 13:43:56.285554
+259	4	subir_documento	{"info": "Acción subir_documento"}	192.168.1.114	2026-03-16 13:43:56.285592
+260	4	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.216	2026-02-12 13:43:56.285637
+261	4	login	{"info": "Acción login"}	192.168.1.36	2026-05-19 13:43:56.285677
+262	4	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.82	2026-04-29 13:43:56.285727
+263	4	login	{"info": "Acción login"}	192.168.1.249	2026-04-14 13:43:56.285769
+264	4	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.76	2026-04-10 13:43:56.285836
+265	4	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.120	2026-05-09 13:43:56.285897
+266	4	subir_documento	{"info": "Acción subir_documento"}	192.168.1.160	2026-06-22 13:43:56.285938
+267	4	login	{"info": "Acción login"}	192.168.1.53	2026-03-06 13:43:56.285977
+268	4	login	{"info": "Acción login"}	192.168.1.7	2026-02-09 13:43:56.286017
+269	4	completar_video	{"info": "Acción completar_video"}	192.168.1.78	2026-01-17 13:43:56.286056
+270	4	subir_documento	{"info": "Acción subir_documento"}	192.168.1.9	2026-06-15 13:43:56.286107
+271	4	completar_video	{"info": "Acción completar_video"}	192.168.1.61	2026-06-26 13:43:56.286162
+272	1	ver_video	{"info": "Acción ver_video"}	192.168.1.176	2026-01-03 13:43:56.286265
+273	1	ver_video	{"info": "Acción ver_video"}	192.168.1.108	2026-02-09 13:43:56.286356
+274	1	subir_documento	{"info": "Acción subir_documento"}	192.168.1.85	2026-06-24 13:43:56.286447
+275	1	ver_video	{"info": "Acción ver_video"}	192.168.1.168	2026-03-28 13:43:56.286526
+276	1	login	{"info": "Acción login"}	192.168.1.8	2026-05-07 13:43:56.286617
+277	1	completar_video	{"info": "Acción completar_video"}	192.168.1.69	2026-05-22 13:43:56.286697
+278	1	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.174	2026-04-25 13:43:56.28678
+279	1	login	{"info": "Acción login"}	192.168.1.64	2026-05-17 13:43:56.286887
+280	1	completar_video	{"info": "Acción completar_video"}	192.168.1.232	2026-05-07 13:43:56.286947
+281	1	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.249	2026-06-20 13:43:56.28699
+282	1	subir_documento	{"info": "Acción subir_documento"}	192.168.1.1	2026-06-16 13:43:56.287031
+283	1	completar_video	{"info": "Acción completar_video"}	192.168.1.210	2026-01-01 13:43:56.287071
+284	1	login	{"info": "Acción login"}	192.168.1.240	2026-06-12 13:43:56.287118
+285	1	ver_video	{"info": "Acción ver_video"}	192.168.1.170	2026-05-09 13:43:56.287259
+286	3	subir_documento	{"info": "Acción subir_documento"}	192.168.1.145	2026-04-21 13:43:56.287306
+287	3	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.186	2026-03-25 13:43:56.287347
+288	3	completar_video	{"info": "Acción completar_video"}	192.168.1.91	2026-04-23 13:43:56.287387
+289	3	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.100	2026-02-14 13:43:56.287427
+290	3	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.140	2026-04-01 13:43:56.287468
+291	3	completar_video	{"info": "Acción completar_video"}	192.168.1.122	2026-03-28 13:43:56.287519
+292	3	ver_video	{"info": "Acción ver_video"}	192.168.1.130	2026-05-23 13:43:56.287564
+293	3	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.224	2026-04-30 13:43:56.287603
+294	3	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.82	2026-05-11 13:43:56.28765
+295	3	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.226	2026-04-09 13:43:56.287691
+296	3	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.199	2026-04-20 13:43:56.287731
+297	3	completar_video	{"info": "Acción completar_video"}	192.168.1.169	2026-04-12 13:43:56.28777
+298	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 13:44:42.233975
+299	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-26 13:45:20.234468
+300	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 13:50:38.528144
+301	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 13:54:09.678865
+302	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 13:57:36.263561
+303	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-26 13:58:14.983483
 \.
 
 
@@ -1289,6 +1455,198 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 10	3	90	f	2026-03-28 12:00:00
 10	10	70	f	2026-05-10 13:00:00
 10	11	50	f	2026-06-05 14:00:00
+3	26	30	f	2026-02-22 13:43:55.595838
+3	27	100	t	2026-02-25 13:43:55.599012
+3	28	50	f	2026-04-24 13:43:55.610944
+3	29	50	f	2026-02-05 13:43:55.615342
+3	30	30	f	2026-05-10 13:43:55.617124
+3	31	0	f	2026-06-10 13:43:55.618742
+3	32	0	f	2026-02-03 13:43:55.620421
+3	33	50	f	2025-12-28 13:43:55.622201
+3	34	100	t	2026-03-26 13:43:55.624285
+3	35	0	f	2026-06-02 13:43:55.627146
+3	36	50	f	2026-05-17 13:43:55.631205
+3	37	50	f	2026-01-13 13:43:55.633959
+3	38	70	f	2026-01-24 13:43:55.636606
+3	39	30	f	2026-06-07 13:43:55.638426
+3	40	0	f	2026-06-24 13:43:55.640446
+3	41	70	f	2026-01-30 13:43:55.644273
+3	42	100	t	2026-06-04 13:43:55.648379
+3	43	70	f	2026-01-22 13:43:55.651198
+3	44	70	f	2026-05-03 13:43:55.653775
+3	45	50	f	2026-05-12 13:43:55.655668
+3	46	30	f	2026-05-24 13:43:55.657717
+3	47	0	f	2026-05-01 13:43:55.660456
+3	48	50	f	2026-02-07 13:43:55.664202
+3	49	0	f	2026-05-18 13:43:55.667205
+4	26	30	f	2026-02-23 13:43:55.68263
+4	27	70	f	2026-01-16 13:43:55.684013
+4	28	0	f	2026-02-17 13:43:55.686258
+4	29	50	f	2026-03-18 13:43:55.688266
+4	30	0	f	2026-06-12 13:43:55.690395
+4	31	50	f	2026-05-18 13:43:55.694696
+4	32	30	f	2026-05-10 13:43:55.698915
+4	33	70	f	2026-06-11 13:43:55.703148
+4	34	0	f	2026-04-28 13:43:55.706217
+4	35	100	t	2026-05-10 13:43:55.708197
+4	36	50	f	2026-01-20 13:43:55.710208
+4	37	50	f	2026-04-18 13:43:55.712382
+4	38	0	f	2026-05-17 13:43:55.715257
+4	39	100	t	2026-06-12 13:43:55.717552
+4	40	70	f	2026-01-14 13:43:55.719134
+4	41	50	f	2026-06-02 13:43:55.720851
+4	42	30	f	2026-02-01 13:43:55.722682
+4	43	30	f	2026-03-02 13:43:55.7247
+4	44	30	f	2026-05-25 13:43:55.726465
+4	45	100	t	2026-01-24 13:43:55.728133
+4	46	100	t	2026-04-10 13:43:55.729841
+4	47	0	f	2026-06-05 13:43:55.731654
+4	48	100	t	2026-06-10 13:43:55.733447
+4	49	70	f	2026-04-19 13:43:55.735235
+6	26	50	f	2026-02-15 13:43:55.74569
+6	27	70	f	2026-03-01 13:43:55.746919
+6	28	50	f	2026-05-11 13:43:55.749205
+6	29	100	t	2026-04-19 13:43:55.751376
+6	30	70	f	2026-01-20 13:43:55.754074
+6	31	50	f	2026-03-05 13:43:55.755979
+6	32	70	f	2026-02-15 13:43:55.758267
+6	33	50	f	2026-04-21 13:43:55.759996
+6	34	50	f	2026-06-18 13:43:55.761964
+6	35	100	t	2026-02-17 13:43:55.764796
+6	36	50	f	2026-04-16 13:43:55.767097
+6	37	100	t	2026-02-20 13:43:55.768926
+6	38	70	f	2026-06-02 13:43:55.770753
+6	39	70	f	2026-05-08 13:43:55.772745
+6	40	50	f	2026-04-27 13:43:55.774755
+6	41	70	f	2026-05-21 13:43:55.776722
+6	42	0	f	2026-01-22 13:43:55.778616
+6	43	0	f	2026-06-16 13:43:55.780493
+6	44	30	f	2026-05-22 13:43:55.782444
+6	45	50	f	2026-03-04 13:43:55.784529
+6	46	50	f	2026-06-06 13:43:55.786524
+6	47	50	f	2026-01-09 13:43:55.788464
+6	48	70	f	2026-02-19 13:43:55.7904
+6	49	30	f	2026-02-06 13:43:55.792402
+5	26	100	t	2026-01-02 13:43:55.805043
+5	27	30	f	2026-03-20 13:43:55.806492
+5	28	70	f	2026-04-25 13:43:55.809022
+5	29	100	t	2026-04-17 13:43:55.811514
+5	30	0	f	2026-02-20 13:43:55.814066
+5	31	70	f	2026-05-28 13:43:55.816816
+5	32	50	f	2026-04-27 13:43:55.819411
+5	33	30	f	2026-03-25 13:43:55.821786
+5	34	50	f	2026-06-04 13:43:55.824235
+5	35	0	f	2026-06-12 13:43:55.826835
+5	36	100	t	2026-05-02 13:43:55.8295
+5	37	0	f	2026-04-09 13:43:55.831617
+5	38	100	t	2026-02-15 13:43:55.833405
+5	39	50	f	2026-01-15 13:43:55.83517
+5	40	50	f	2026-03-07 13:43:55.837101
+5	41	70	f	2026-06-14 13:43:55.838912
+5	42	50	f	2026-01-03 13:43:55.841095
+5	43	100	t	2026-02-11 13:43:55.843194
+5	44	50	f	2026-06-01 13:43:55.846289
+5	45	0	f	2026-01-04 13:43:55.850081
+5	46	50	f	2026-06-11 13:43:55.852902
+5	47	70	f	2026-04-21 13:43:55.855578
+5	48	50	f	2026-06-01 13:43:55.858213
+5	49	30	f	2026-02-27 13:43:55.860715
+7	26	70	f	2025-12-29 13:43:55.873136
+7	27	50	f	2026-06-02 13:43:55.87458
+7	28	0	f	2026-05-19 13:43:55.876987
+7	29	100	t	2026-04-25 13:43:55.879355
+7	30	100	t	2026-03-17 13:43:55.881929
+7	31	70	f	2026-06-07 13:43:55.884267
+7	32	100	t	2026-03-02 13:43:55.886591
+7	33	50	f	2026-04-21 13:43:55.888908
+7	34	70	f	2026-06-16 13:43:55.891221
+7	35	50	f	2026-02-14 13:43:55.893445
+7	36	70	f	2026-04-13 13:43:55.89537
+7	37	100	t	2026-01-02 13:43:55.8973
+7	38	30	f	2026-06-08 13:43:55.899677
+7	39	50	f	2026-06-25 13:43:55.902425
+7	40	0	f	2026-06-14 13:43:55.90528
+7	41	30	f	2026-03-27 13:43:55.908571
+7	42	70	f	2026-03-09 13:43:55.911134
+7	43	50	f	2026-04-03 13:43:55.914033
+7	44	30	f	2026-05-04 13:43:55.917129
+7	45	0	f	2026-01-03 13:43:55.919981
+7	46	50	f	2026-04-21 13:43:55.923165
+7	47	100	t	2026-01-24 13:43:55.926026
+7	48	0	f	2026-06-17 13:43:55.928697
+7	49	70	f	2026-04-15 13:43:55.931493
+8	26	30	f	2026-04-02 13:43:55.946167
+8	27	50	f	2026-01-14 13:43:55.947339
+8	28	30	f	2026-01-12 13:43:55.949975
+8	29	0	f	2026-04-02 13:43:55.952458
+8	30	50	f	2026-01-23 13:43:55.955307
+8	31	0	f	2026-06-05 13:43:55.957777
+8	32	30	f	2026-05-03 13:43:55.960239
+8	33	50	f	2026-04-11 13:43:55.962686
+8	34	70	f	2026-05-15 13:43:55.96564
+8	35	50	f	2026-04-17 13:43:55.967795
+8	36	30	f	2026-03-11 13:43:55.969687
+8	37	70	f	2026-02-08 13:43:55.97147
+8	38	70	f	2026-05-03 13:43:55.9732
+8	39	30	f	2026-01-25 13:43:55.975027
+8	40	100	t	2026-06-15 13:43:55.976668
+8	41	50	f	2026-04-08 13:43:55.978297
+8	42	70	f	2026-03-30 13:43:55.979993
+8	43	0	f	2026-06-04 13:43:55.982439
+8	44	100	t	2026-06-03 13:43:55.984461
+8	45	100	t	2026-02-22 13:43:55.986397
+8	46	30	f	2026-06-26 13:43:55.988147
+8	47	50	f	2026-03-19 13:43:55.989919
+8	48	100	t	2026-02-14 13:43:55.992392
+8	49	30	f	2026-01-28 13:43:55.994269
+9	26	70	f	2026-05-28 13:43:56.010369
+9	27	100	t	2026-03-11 13:43:56.011513
+9	28	0	f	2026-04-19 13:43:56.01375
+9	29	70	f	2026-03-07 13:43:56.016112
+9	30	30	f	2026-06-02 13:43:56.018429
+9	31	30	f	2026-02-28 13:43:56.020589
+9	32	70	f	2026-04-02 13:43:56.022727
+9	33	100	t	2026-04-01 13:43:56.024882
+9	34	100	t	2025-12-28 13:43:56.027235
+9	35	70	f	2026-06-04 13:43:56.029478
+9	36	50	f	2026-04-12 13:43:56.031667
+9	37	70	f	2026-03-09 13:43:56.033817
+9	38	70	f	2026-05-26 13:43:56.035905
+9	39	70	f	2026-06-04 13:43:56.038192
+9	40	0	f	2026-05-23 13:43:56.04026
+9	41	50	f	2026-01-24 13:43:56.04221
+9	42	70	f	2025-12-28 13:43:56.044137
+9	43	70	f	2026-03-26 13:43:56.046075
+9	44	0	f	2026-02-19 13:43:56.048284
+9	45	100	t	2026-05-15 13:43:56.050351
+9	46	0	f	2026-04-26 13:43:56.052273
+9	47	50	f	2026-02-21 13:43:56.054234
+9	48	0	f	2026-05-16 13:43:56.056421
+9	49	0	f	2026-04-20 13:43:56.060062
+10	26	70	f	2026-04-11 13:43:56.075349
+10	27	30	f	2026-01-09 13:43:56.076451
+10	28	100	t	2026-01-17 13:43:56.07877
+10	29	50	f	2026-03-17 13:43:56.081355
+10	30	0	f	2026-03-19 13:43:56.083677
+10	31	50	f	2025-12-30 13:43:56.086005
+10	32	50	f	2026-04-22 13:43:56.088345
+10	33	30	f	2026-02-20 13:43:56.090947
+10	34	100	t	2026-05-07 13:43:56.093354
+10	35	0	f	2026-01-15 13:43:56.095676
+10	36	50	f	2026-01-04 13:43:56.097993
+10	37	100	t	2026-04-04 13:43:56.100403
+10	38	0	f	2026-03-22 13:43:56.103271
+10	39	70	f	2026-01-22 13:43:56.105662
+10	40	70	f	2026-02-07 13:43:56.108078
+10	41	0	f	2026-04-11 13:43:56.110378
+10	42	100	t	2026-02-20 13:43:56.113035
+10	43	100	t	2026-05-12 13:43:56.115424
+10	44	50	f	2026-03-18 13:43:56.117757
+10	45	100	t	2026-03-25 13:43:56.120138
+10	46	0	f	2026-04-08 13:43:56.122702
+10	47	30	f	2026-06-25 13:43:56.125153
+10	48	70	f	2026-05-03 13:43:56.127502
+10	49	70	f	2026-04-08 13:43:56.13042
 \.
 
 
@@ -1396,6 +1754,87 @@ COPY public.puntuacion_evaluacion (evaluacion_id, criterio_id, puntuacion) FROM 
 33	1	3
 33	2	5
 33	3	0
+35	1	3
+35	2	2
+35	3	5
+36	1	4
+36	2	3
+36	3	5
+37	1	2
+37	2	4
+37	3	4
+38	1	0
+38	2	2
+38	3	2
+39	1	2
+39	2	0
+39	3	1
+40	1	3
+40	2	1
+40	3	0
+41	1	2
+41	2	0
+41	3	1
+42	1	2
+42	2	3
+42	3	4
+43	1	5
+43	2	3
+43	3	4
+44	1	2
+44	2	1
+44	3	4
+45	1	1
+45	2	2
+45	3	3
+46	1	5
+46	2	4
+46	3	0
+47	1	2
+47	2	3
+47	3	1
+48	1	1
+48	2	2
+48	3	1
+49	1	5
+49	2	1
+49	3	3
+50	1	3
+50	2	3
+50	3	0
+51	1	1
+51	2	1
+51	3	0
+52	1	4
+52	2	2
+52	3	3
+53	1	3
+53	2	4
+53	3	2
+54	1	0
+54	2	2
+54	3	3
+55	1	1
+55	2	3
+55	3	4
+56	1	2
+56	2	2
+56	3	0
+57	1	0
+57	2	5
+57	3	2
+58	1	3
+58	2	1
+58	3	0
+59	1	2
+59	2	4
+59	3	1
+60	1	3
+60	2	1
+60	3	0
+61	1	3
+61	2	3
+61	3	5
 \.
 
 
@@ -1430,10 +1869,10 @@ COPY public.usuario (id, email, password_hash, nombre, avatar_url, rol_id, activ
 8	atleta6@iqfoil.cu	scrypt:32768:8:1$JPLigriBjuUooHKu$9af4b2bad7378a8e518222d0e9f711285aeb173c8b599df46f5fb36e329a2736d14d5014689750aea4addf84e939cd1afde21dd2175b98b2cba2235c3eb688e7	José Ramírez	\N	3	t	2026-06-21 18:42:16.637331	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Holguín
 9	atleta7@iqfoil.cu	scrypt:32768:8:1$ZY1jPhe4VaUBNgn6$983a03d9303edd19d874687b440184d7b0d9386610d11227040900438b620fadc8ad5a20821ab293c1fba07c63972504f7188a0fec4181cb95ac6de038902fa2	Marta Díaz	\N	3	t	2026-06-23 02:23:45.769195	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara
 10	atleta8@iqfoil.cu	scrypt:32768:8:1$pkDAzkoBNXgCPka0$b8cbf19a7b9b7df16d55ea9f807a034ffcc098b28086e1dae6a95b9aa661d3f287e7c2051ff4140918bcf372c8af93e1e8414386912f48d50d1a56a1ff04959b	Roberto Mena	\N	3	t	2026-06-26 09:58:44.213322	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
-1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-26 10:41:35.616688	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
-3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-06-25 15:35:48.440192	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
-4	atleta2@iqfoil.cu	scrypt:32768:8:1$RH5ISwhSV192lBIf$9a36bc43f038529911c650c94e24fce1caf515c74d955b9452b223316de339f7fe1e2fc818db2a453be7dd1717384a600ec2b6b5d4fb53149e738fa265c7f4b8	María García	\N	3	t	2026-06-19 18:45:07.481679	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba
-2	entrenador@iqfoil.cu	scrypt:32768:8:1$s9LtZkIsgV5esacm$a4eefee377931a07b4ab57275f816f6654eac3f219a8d4d8afe2b5ae080ac21949ba9b661f615c78d63bea8e6993dc8ecdf497e134518755080a36713a43e931	Carlos Gómez	\N	2	t	2026-06-19 18:44:56.106231	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
+2	entrenador@iqfoil.cu	scrypt:32768:8:1$s9LtZkIsgV5esacm$a4eefee377931a07b4ab57275f816f6654eac3f219a8d4d8afe2b5ae080ac21949ba9b661f615c78d63bea8e6993dc8ecdf497e134518755080a36713a43e931	Carlos Gómez	\N	2	t	2026-06-26 13:36:22.258917	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
+1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-26 13:57:36.448864	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "en", "notificacionesEmail": true}	La Habana
+3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-06-26 13:58:15.129065	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
+4	atleta2@iqfoil.cu	scrypt:32768:8:1$RH5ISwhSV192lBIf$9a36bc43f038529911c650c94e24fce1caf515c74d955b9452b223316de339f7fe1e2fc818db2a453be7dd1717384a600ec2b6b5d4fb53149e738fa265c7f4b8	María García	\N	3	t	2026-06-26 11:41:28.094673	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba
 \.
 
 
@@ -1455,6 +1894,17 @@ COPY public.usuario_insignia (usuario_id, insignia_id, fecha_obtenida) FROM stdi
 10	1	2026-06-09 20:00:15.897934
 10	3	2026-01-27 20:00:15.90355
 3	3	2026-03-15 00:00:00
+4	1	2026-06-26 10:56:37.727812
+4	2	2026-06-26 10:56:37.727812
+6	1	2026-06-26 10:56:37.727812
+6	2	2026-06-26 10:56:37.727812
+5	1	2026-06-26 10:56:37.727812
+5	2	2026-06-26 10:56:37.727812
+7	1	2026-06-26 10:56:37.727812
+8	1	2026-06-26 10:56:37.727812
+8	3	2026-06-26 10:56:37.727812
+9	2	2026-06-26 10:56:37.727812
+10	2	2026-06-26 10:56:37.727812
 \.
 
 
@@ -1530,7 +1980,7 @@ SELECT pg_catalog.setval('public.documento_id_seq', 11, true);
 -- Name: evaluacion_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.evaluacion_id_seq', 34, true);
+SELECT pg_catalog.setval('public.evaluacion_id_seq', 61, true);
 
 
 --
@@ -1565,7 +2015,7 @@ SELECT pg_catalog.setval('public.insignia_id_seq', 3, true);
 -- Name: log_actividad_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.log_actividad_id_seq', 132, true);
+SELECT pg_catalog.setval('public.log_actividad_id_seq', 303, true);
 
 
 --
@@ -2192,5 +2642,5 @@ ALTER TABLE ONLY public.usuario
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 5ZawUBmsWv5A6Al6yR2QEwuOH7XCjJhkOPeTmAdMoBJnMgv1JsLMffAgSvQtzsV
+\unrestrict 3MaE4trN2fauQ7Alnyb8BvSWb1xHVMYIsDUBFBiuJvB9P2wYBtDZ6gOT0fgIETb
 

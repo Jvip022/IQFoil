@@ -104,6 +104,12 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Restaurar tema guardado en localStorage
+    const temaGuardado = localStorage.getItem('tema') as 'claro' | 'oscuro' | 'sistema' | null;
+    if (temaGuardado) {
+      this.configApariencia.tema = temaGuardado;
+      this.aplicarTema(temaGuardado);
+    }
     this.cargarConfiguracion();
   }
 
@@ -122,11 +128,15 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
           this.usuarioService.getPreferencias().subscribe({
             next: (pref) => {
               this.configNotificaciones.emailNotificaciones = pref.notificacionesEmail ?? true;
-              this.configNotificaciones.pushNotificaciones = true; // Por defecto
+              this.configNotificaciones.pushNotificaciones = true;
               this.configNotificaciones.recordatoriosEventos = true;
               this.configNotificaciones.nuevosContenidos = false;
               
-              this.configApariencia.tema = pref.tema || 'sistema';
+              // Si el tema no está en localStorage, usar el de preferencias
+              if (!localStorage.getItem('tema')) {
+                this.configApariencia.tema = pref.tema || 'sistema';
+                this.aplicarTema(this.configApariencia.tema);
+              }
               this.configApariencia.tamanoFuente = 'mediano';
               this.configApariencia.contraste = 'normal';
               
@@ -134,14 +144,10 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
               this.configPrivacidad.mostrarEstadisticas = true;
               this.configPrivacidad.visibilidadEmail = 'contactos';
               
-              // Aplicar tema inmediatamente
-              this.aplicarTema(this.configApariencia.tema);
               this.actualizarBackups();
               this.hayCambios = false;
             },
             error: () => {
-              // Si falla, usar valores por defecto y aplicar tema
-              this.aplicarTema(this.configApariencia.tema);
               this.actualizarBackups();
             }
           });
@@ -149,7 +155,6 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.notificacionService.mostrarError('No se pudo cargar la configuración');
-        this.aplicarTema(this.configApariencia.tema);
         this.actualizarBackups();
       }
     });
@@ -203,6 +208,8 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
         
         this.usuarioService.actualizarPreferencias(preferencias).subscribe({
           next: () => {
+            // Guardar tema en localStorage
+            localStorage.setItem('tema', this.configApariencia.tema);
             this.actualizarBackups();
             this.hayCambios = false;
             this.guardando = false;
@@ -232,7 +239,6 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   }
 
   eliminarCuenta(): void {
-    // Por seguridad, pedir confirmación adicional antes de eliminar
     this.notificacionService.mostrarExito('Cuenta eliminada. Redirigiendo...');
     this.modalEliminarVisible = false;
     // En producción, llamar a un endpoint de eliminación
@@ -240,7 +246,6 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     // this.router.navigate(['/login']);
   }
 
-  // Detectar cambios en cualquier configuración
   detectarCambios(): void {
     this.hayCambios =
       JSON.stringify(this.configGeneral) !== JSON.stringify(this.configGeneralBackup) ||
@@ -264,7 +269,6 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     } else {
       html.setAttribute('data-theme', tema);
     }
-    // También se puede guardar en localStorage para persistir entre sesiones
     localStorage.setItem('tema', tema);
   }
 }

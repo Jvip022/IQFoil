@@ -119,3 +119,23 @@ def subir_video():
     except Exception as e:
         print("Error en subir_video:", traceback.format_exc())
         return jsonify({'error': 'Error interno del servidor'}), 500
+
+
+
+@bp.route('/<int:id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_video(id):
+    user_id = get_jwt_identity()
+    usuario = Usuario.query.get(user_id)
+    if not usuario or usuario.rol_id not in [1, 2]:
+        return jsonify({'error': 'No autorizado'}), 403
+
+    video = VideoTutorial.query.get_or_404(id)
+    # Eliminar el archivo físico si existe
+    if video.url_video:
+        full_path = os.path.join(current_app.config.get('UPLOAD_FOLDER', 'uploads'), video.url_video)
+        if os.path.exists(full_path):
+            os.remove(full_path)
+    db.session.delete(video)
+    db.session.commit()
+    return jsonify({'message': 'Video eliminado correctamente'}), 200
