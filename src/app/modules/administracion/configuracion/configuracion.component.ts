@@ -215,4 +215,13 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     this.configPrivacidadBackup = { ...this.configPrivacidad };
     this.hayCambios = false;
   }
+  
+aplicarTema(tema: 'claro' | 'oscuro' | 'sistema'): void {
+  const html = document.documentElement;
+  if (tema === 'sistema') {
+    html.removeAttribute('data-theme');
+  } else {
+    html.setAttribute('data-theme', tema);
+  }
+}
 }

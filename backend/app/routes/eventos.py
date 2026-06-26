@@ -3,6 +3,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models.evento import Evento
 from app.models.usuario import Usuario
+from app.models.participante_evento import ParticipanteEvento
+from datetime import datetime
 
 bp = Blueprint('eventos_crud', __name__, url_prefix='/api/eventos')
 
@@ -23,9 +25,9 @@ def get_eventos():
         'fechaFin': e.fecha_fin.isoformat() if e.fecha_fin else None,
         'lugar': e.lugar,
         'tipo': e.tipo,
-        'organizador': e.organizador_id,  # Se devuelve el ID del organizador
-        'contacto': None,  # No hay campo contacto en el modelo, se puede omitir
-        'activo': e.publico   # Usamos publico como activo
+        'organizador': e.organizador_id,
+        'contacto': None,
+        'activo': e.publico
     } for e in eventos])
 
 @bp.route('/', methods=['POST'])
@@ -41,7 +43,7 @@ def crear_evento():
         fecha_fin=data.get('fechaFin'),
         lugar=data.get('lugar'),
         tipo=data.get('tipo'),
-        organizador_id=data.get('organizador_id'),  # Usamos el ID del usuario
+        organizador_id=data.get('organizador_id'),
         max_participantes=data.get('max_participantes'),
         imagen_url=data.get('imagenUrl'),
         publico=data.get('activo', True)
@@ -79,3 +81,41 @@ def eliminar_evento(id):
     db.session.delete(ev)
     db.session.commit()
     return jsonify({'message': 'Evento eliminado'})
+
+# ==================== NUEVO ENDPOINT PARA EVENTOS PRÓXIMOS ====================
+@bp.route('/proximos/<int:usuario_id>', methods=['GET'])
+@jwt_required()
+def get_upcoming_events(usuario_id):
+    """Obtiene eventos próximos para un usuario"""
+    current_user_id = get_jwt_identity()
+    user = Usuario.query.get(current_user_id)
+    if current_user_id != usuario_id and (not user or user.rol_id not in [1, 2]):
+        return jsonify({'error': 'No autorizado'}), 403
+
+    hoy = datetime.now()
+    eventos = Evento.query.filter(
+        Evento.publico == True,
+        Evento.fecha_inicio >= hoy
+    ).order_by(Evento.fecha_inicio).limit(5).all()
+    
+    inscritos = ParticipanteEvento.query.filter_by(usuario_id=usuario_id).all()
+    ids_inscritos = [p.evento_id for p in inscritos]
+    eventos_inscritos = Evento.query.filter(
+        Evento.id.in_(ids_inscritos),
+        Evento.fecha_inicio >= hoy
+    ).order_by(Evento.fecha_inicio).all()
+    
+    todos = {e.id: e for e in eventos}
+    for e in eventos_inscritos:
+        todos[e.id] = e
+    
+    result = []
+    for e in sorted(todos.values(), key=lambda x: x.fecha_inicio)[:5]:
+        result.append({
+            'id': e.id,
+            'titulo': e.titulo,
+            'fecha': e.fecha_inicio.isoformat(),
+            'lugar': e.lugar or 'Por definir',
+            'tipo': e.tipo or 'evento'
+        })
+    return jsonify(result)

@@ -3,8 +3,14 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models.usuario import Usuario
+from app.models.progreso_video import ProgresoVideo
+from app.models.video import VideoTutorial
+from app.models.usuario_insignia import UsuarioInsignia
+from app.models.evaluacion import Evaluacion
 from app.utils.response import success_response, error_response
 from app.utils.decorators import handle_errors
+from datetime import datetime, timedelta
+from sqlalchemy import func, extract
 
 bp = Blueprint('usuarios', __name__, url_prefix='/api/usuarios')
 
@@ -29,7 +35,6 @@ def get_perfil():
     usuario = Usuario.query.get(user_id)
     if not usuario:
         return error_response("Usuario no encontrado", 404)
-    # Obtener nombre del rol si existe la relación
     rol_nombre = usuario.rol.nombre if usuario.rol else 'usuario'
     return success_response({
         'uid': usuario.id,
@@ -62,7 +67,6 @@ def get_preferencias():
         return '', 200
     user_id = get_jwt_identity()
     usuario = Usuario.query.get(user_id)
-    # Suponiendo que tienes un campo preferencias (JSON)
     preferencias = getattr(usuario, 'preferencias', {'idioma': 'es', 'notificacionesEmail': True, 'tema': 'claro'})
     return success_response(preferencias)
 
@@ -74,8 +78,7 @@ def actualizar_preferencias():
     user_id = get_jwt_identity()
     usuario = Usuario.query.get_or_404(user_id)
     data = request.get_json()
-    # Guardar preferencias (ejemplo: columna JSON)
-    usuario.preferencias = data  # Asegúrate de tener esta columna
+    usuario.preferencias = data
     db.session.commit()
     return success_response(data)
 
@@ -88,7 +91,6 @@ def subir_avatar():
     archivo = request.files.get('avatar')
     if not archivo:
         return error_response("No se envió archivo", 400)
-    # Guardar avatar (lógica simplificada)
     from werkzeug.utils import secure_filename
     import os
     filename = secure_filename(f"avatar_{user_id}.jpg")
@@ -96,7 +98,6 @@ def subir_avatar():
     os.makedirs(upload_dir, exist_ok=True)
     path = os.path.join(upload_dir, filename)
     archivo.save(path)
-    # Actualizar URL en el usuario
     usuario = Usuario.query.get(user_id)
     usuario.avatar = f"/{path}"
     db.session.commit()
@@ -119,3 +120,47 @@ def cambiar_password():
     usuario.password_hash = generate_password_hash(new_pass)
     db.session.commit()
     return success_response({'mensaje': 'Contraseña cambiada'})
+
+# ==================== NUEVO ENDPOINT PARA PROGRESO ====================
+@bp.route('/progreso/<int:usuario_id>', methods=['GET'])
+@jwt_required()
+def get_progreso_usuario(usuario_id):
+    """Obtiene el progreso del usuario: videos vistos, insignias, etc."""
+    current_user_id = get_jwt_identity()
+    user = Usuario.query.get(current_user_id)
+    if current_user_id != usuario_id and (not user or user.rol_id not in [1, 2]):
+        return jsonify({'error': 'No autorizado'}), 403
+
+    # Videos completados
+    progresos = ProgresoVideo.query.filter_by(usuario_id=usuario_id, completado=True).count()
+    total_videos = VideoTutorial.query.count()
+    
+    # Insignias obtenidas
+    insignias = UsuarioInsignia.query.filter_by(usuario_id=usuario_id).count()
+    
+    # Evaluaciones realizadas
+    evaluaciones = Evaluacion.query.filter_by(usuario_id=usuario_id, estado='evaluado').count()
+    
+    # Evolución (últimos 6 meses)
+    evolucion = []
+    for i in range(6):
+        mes = datetime.now() - timedelta(days=30*i)
+        completados_mes = ProgresoVideo.query.filter(
+            ProgresoVideo.usuario_id == usuario_id,
+            ProgresoVideo.completado == True,
+            extract('year', ProgresoVideo.ultima_visualizacion) == mes.year,
+            extract('month', ProgresoVideo.ultima_visualizacion) == mes.month
+        ).count()
+        evolucion.append({
+            'fecha': mes.strftime('%b'),
+            'valor': completados_mes
+        })
+
+    return jsonify({
+        'globalProgress': (progresos / total_videos * 100) if total_videos else 0,
+        'videosVistos': progresos,
+        'videosTotales': total_videos,
+        'evaluacionesCompletadas': evaluaciones,
+        'insignias': insignias,
+        'evolucion': evolucion[::-1]  # orden cronológico
+    })

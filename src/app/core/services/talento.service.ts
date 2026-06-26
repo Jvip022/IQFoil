@@ -11,7 +11,7 @@ export interface Recomendacion { id: string; tipo: string; titulo: string; descr
 export class TalentoService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getInsignias(): Observable<Insignia[]> {
     return this.http.get<Insignia[]>(`${this.apiUrl}/talentos/insignias`);
@@ -27,5 +27,22 @@ export class TalentoService {
 
   getRecomendaciones(usuarioId: string): Observable<Recomendacion[]> {
     return this.http.get<Recomendacion[]>(`${this.apiUrl}/talentos/recomendaciones`);
+  }
+
+
+  getUserBadges(usuarioId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/talentos/insignias/usuario/${usuarioId}`);
+  }
+
+  getMentorFor(usuarioId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/talentos/mentor/${usuarioId}`);
+  }
+
+  getAtletasForCoach(usuarioId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/talentos/atletas/${usuarioId}`);
+  }
+
+  getPendingEvaluationsForCoach(usuarioId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/talentos/evaluaciones-pendientes/${usuarioId}`);
   }
 }

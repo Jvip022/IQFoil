@@ -36,8 +36,8 @@ export class ContenidoService {
     return this.http.post(`${this.apiUrl}/videos/progreso`, { moduloId, videoId, progreso: 100 });
   }
   subirVideo(formData: FormData): Observable<Video> {
-  return this.http.post<Video>(`${this.apiUrl}/videos/`, formData);
-}
+    return this.http.post<Video>(`${this.apiUrl}/videos/`, formData);
+  }
 
   actualizarProgreso(videoId: string, progreso: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/videos/progreso`, { videoId, progreso });
@@ -46,5 +46,18 @@ export class ContenidoService {
   /** Elimina un video por su ID */
   eliminarVideo(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/videos/${id}`);
+  }
+
+
+  getProgresoUsuario(usuarioId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/usuarios/progreso/${usuarioId}`);
+  }
+
+  getUpcomingEventsForUser(usuarioId: string): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/eventos/proximos/${usuarioId}`);
+}
+
+  getAdminStats(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/admin/estadisticas`);
   }
 }

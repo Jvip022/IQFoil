@@ -128,8 +128,10 @@ def reporte_talentos():
             puntuaciones.extend([p.puntuacion for p in punt])
         nota_promedio = sum(puntuaciones) / len(puntuaciones) if puntuaciones else 0
 
+        # Ponderación ajustada: progreso 40%, insignias 30%, nota 30%
         score = (progreso * 0.4) + (insignias * 10) + (nota_promedio * 0.3)
-        if score > 50:
+        # UMBRAL BAJADO A 30 PARA MOSTRAR MÁS TALENTOS
+        if score > 30:
             talentos.append({
                 'usuario_id': u.id,
                 'nombre': u.nombre,

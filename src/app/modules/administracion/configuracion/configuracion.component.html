@@ -45,7 +45,23 @@
                 </div>
             </div>
         </div>
-
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="tema" value="claro" [(ngModel)]="configApariencia.tema"
+                    (ngModelChange)="aplicarTema($event)" />
+                Claro
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="tema" value="oscuro" [(ngModel)]="configApariencia.tema"
+                    (ngModelChange)="aplicarTema($event)" />
+                Oscuro
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="tema" value="sistema" [(ngModel)]="configApariencia.tema"
+                    (ngModelChange)="aplicarTema($event)" />
+                Seguir sistema
+            </label>
+        </div>
         <!-- Pestaña Notificaciones -->
         <div class="tab-panel" *ngIf="tabActivo === 'notificaciones'">
             <div class="config-section">
