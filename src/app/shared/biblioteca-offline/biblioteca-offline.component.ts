@@ -1,19 +1,18 @@
+// src/app/shared/biblioteca-offline/biblioteca-offline.component.ts
 import { Component, OnInit, OnDestroy, Pipe, PipeTransform, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 
-// Servicios
 import { OfflineService, OfflineDocument } from '../../core/services/offline.service';
-import { AuthService } from '../../core/services/auth.service';
 import { NotificacionService } from '../../core/services/notificacion.service';
+import { ModalConfirmacionComponent } from '../modal-confirmacion/modal-confirmacion.component'; // ← IMPORTACIÓN AÑADIDA
 
-// Pipe para formatear tamaño de archivo
 @Pipe({ name: 'fileSize', standalone: true })
 export class FileSizePipe implements PipeTransform {
   transform(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
+    if (!bytes || bytes === 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -21,11 +20,11 @@ export class FileSizePipe implements PipeTransform {
   }
 }
 
-// Pipe para sanitizar URLs
 @Pipe({ name: 'safeUrl', standalone: true })
 export class SafeUrlPipe implements PipeTransform {
   constructor(private sanitizer: DomSanitizer) {}
-  transform(url: string): SafeResourceUrl {
+  transform(url: string | undefined | null): SafeResourceUrl | string {
+    if (!url) return '';
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 }
@@ -37,7 +36,8 @@ export class SafeUrlPipe implements PipeTransform {
     CommonModule,
     FormsModule,
     FileSizePipe,
-    SafeUrlPipe
+    SafeUrlPipe,
+    ModalConfirmacionComponent // ← IMPORTADO
   ],
   templateUrl: './biblioteca-offline.component.html',
   styleUrls: ['./biblioteca-offline.component.scss']
@@ -51,6 +51,12 @@ export class BibliotecaOfflineComponent implements OnInit, OnDestroy, AfterViewI
   filteredDocuments: OfflineDocument[] = [];
   selectedDoc: OfflineDocument | null = null;
 
+  // ========== PROPIEDADES PARA EL MODAL DE ALERTA ==========
+  modalAlertaVisible = false;
+  modalAlertaTitulo = '';
+  modalAlertaMensaje = '';
+  modalAlertaConfirmText = 'Aceptar';
+
   private subscriptions: Subscription[] = [];
   private onNetworkChange = () => {
     this.isOnline = navigator.onLine;
@@ -59,7 +65,6 @@ export class BibliotecaOfflineComponent implements OnInit, OnDestroy, AfterViewI
 
   constructor(
     private offlineService: OfflineService,
-    private authService: AuthService,
     private notificacionService: NotificacionService,
     private sanitizer: DomSanitizer
   ) {}
@@ -104,7 +109,7 @@ export class BibliotecaOfflineComponent implements OnInit, OnDestroy, AfterViewI
       },
       error: (err: any) => {
         console.error('Error cargando documentos offline', err);
-        this.notificacionService.mostrarError('No se pudieron cargar los documentos');
+        this.mostrarAlerta('Error', 'No se pudieron cargar los documentos.');
       }
     });
   }
@@ -131,6 +136,13 @@ export class BibliotecaOfflineComponent implements OnInit, OnDestroy, AfterViewI
   }
 
   openDocument(doc: OfflineDocument): void {
+    if (!doc.url && !doc.content) {
+      this.mostrarAlerta(
+        'Contenido no disponible',
+        'Este documento no tiene contenido almacenado offline. Conéctate para descargarlo.'
+      );
+      return;
+    }
     this.selectedDoc = doc;
   }
 
@@ -140,11 +152,21 @@ export class BibliotecaOfflineComponent implements OnInit, OnDestroy, AfterViewI
 
   downloadDocument(doc: OfflineDocument, event: MouseEvent): void {
     event.stopPropagation();
+
+    if (!doc.url && !doc.content) {
+      this.mostrarAlerta(
+        'No se puede descargar',
+        'Este documento no está disponible para descarga offline.'
+      );
+      return;
+    }
+
     if (doc.url) {
       const link = document.createElement('a');
       link.href = doc.url;
       link.download = doc.title;
       link.click();
+      this.notificacionService.mostrarExito(`Descargando "${doc.title}"...`);
     } else if (doc.content) {
       const blob = new Blob([doc.content], { type: 'text/plain' });
       const url = window.URL.createObjectURL(blob);
@@ -153,15 +175,20 @@ export class BibliotecaOfflineComponent implements OnInit, OnDestroy, AfterViewI
       link.download = doc.title + '.txt';
       link.click();
       window.URL.revokeObjectURL(url);
+      this.notificacionService.mostrarExito(`Descargando "${doc.title}"...`);
     }
   }
 
   syncDocuments(): void {
     if (!this.isOnline) {
-      this.notificacionService.mostrarAdvertencia('No hay conexión a internet');
+      this.mostrarAlerta(
+        'Sin conexión',
+        'No tienes conexión a internet. Conéctate para sincronizar los documentos.'
+      );
       return;
     }
 
+    this.notificacionService.mostrarInfo('Sincronizando documentos...');
     this.offlineService.syncOfflineDocuments().subscribe({
       next: (updatedDocs: OfflineDocument[]) => {
         this.documents = updatedDocs;
@@ -170,8 +197,36 @@ export class BibliotecaOfflineComponent implements OnInit, OnDestroy, AfterViewI
       },
       error: (err: any) => {
         console.error('Error sincronizando', err);
-        this.notificacionService.mostrarError('Error al sincronizar documentos');
+        this.mostrarAlerta('Error de sincronización', 'Ocurrió un error al sincronizar los documentos.');
       }
     });
+  }
+
+  // ========== MÉTODOS DEL MODAL DE ALERTA ==========
+  private mostrarAlerta(titulo: string, mensaje: string): void {
+    this.modalAlertaTitulo = titulo;
+    this.modalAlertaMensaje = mensaje;
+    this.modalAlertaConfirmText = 'Aceptar';
+    this.modalAlertaVisible = true;
+  }
+
+  cerrarAlerta(): void {
+    this.modalAlertaVisible = false;
+  }
+
+  // Método para pruebas
+  addMockDocument(): void {
+    const newDoc: OfflineDocument = {
+      id: Date.now().toString(),
+      title: 'Documento de prueba offline',
+      type: 'text',
+      content: 'Este es un documento de prueba guardado localmente.',
+      size: 100,
+      lastModified: new Date(),
+      synced: false
+    };
+    this.offlineService.addOfflineDocument(newDoc);
+    this.loadDocuments();
+    this.notificacionService.mostrarExito('Documento añadido a la biblioteca offline');
   }
 }

@@ -31,8 +31,7 @@ export const routes: Routes = [
   {
     path: 'administracion',
     loadChildren: () => import('./modules/administracion/administracion.module').then(m => m.AdministracionModule),
-    canActivate: [autenticacionGuard, rolGuard],
-    data: { roles: ['admin'] }
+    canActivate: [autenticacionGuard] // ← solo autenticación, roles gestionados internamente
   },
   {
     path: 'evaluacion',

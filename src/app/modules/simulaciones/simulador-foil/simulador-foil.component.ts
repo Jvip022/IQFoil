@@ -1,7 +1,6 @@
-import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { NotificacionService } from '../../../core/services/notificacion.service';
 
@@ -12,24 +11,24 @@ import { NotificacionService } from '../../../core/services/notificacion.service
   templateUrl: './simulador-foil.component.html',
   styleUrls: ['./simulador-foil.component.scss']
 })
-export class SimuladorFoilComponent implements OnInit, AfterViewInit {
+export class SimuladorFoilComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('foilCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   // Parámetros de simulación
-  velocidadViento = 15;   // nudos
-  anguloAtaque = 5;       // grados
-  superficieAlar = 120;   // dm²
-  pesoNavegante = 75;     // kg
+  velocidadViento = 15;
+  anguloAtaque = 5;
+  superficieAlar = 120;
+  pesoNavegante = 75;
   olaGrande = false;
 
   // Resultados
-  sustentacion = 0;       // Newtons
-  resistencia = 0;        // Newtons
-  relacionLD = 0;         // L/D
-  velocidadDespegue = 0;  // nudos
+  sustentacion = 0;
+  resistencia = 0;
+  relacionLD = 0;
+  velocidadDespegue = 0;
 
   private ctx: CanvasRenderingContext2D | null = null;
-  private animationFrameId?: number;
+  private resizeHandler: (() => void) | null = null;
 
   constructor(private notificacionService: NotificacionService) {}
 
@@ -42,21 +41,48 @@ export class SimuladorFoilComponent implements OnInit, AfterViewInit {
     this.dibujarFoil();
   }
 
+  ngOnDestroy(): void {
+    // Eliminar el listener de resize correctamente
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+      this.resizeHandler = null;
+    }
+  }
+
   private initCanvas(): void {
     const canvas = this.canvasRef.nativeElement;
+    if (!canvas) return;
+
+    // Obtener el contexto
     this.ctx = canvas.getContext('2d');
-    // Ajustar resolución para evitar borrosidad
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    window.addEventListener('resize', () => {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
+    if (!this.ctx) return;
+
+    // Establecer tamaño real del canvas (DPI-aware)
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    this.ctx.scale(dpr, dpr);
+
+    // Guardar referencia del handler para poder eliminarlo después
+    this.resizeHandler = () => {
+      const newRect = canvas.getBoundingClientRect();
+      canvas.width = newRect.width * dpr;
+      canvas.height = newRect.height * dpr;
+      canvas.style.width = newRect.width + 'px';
+      canvas.style.height = newRect.height + 'px';
+      this.ctx?.scale(dpr, dpr);
       this.dibujarFoil();
-    });
+    };
+
+    // Escuchar cambios de tamaño
+    window.addEventListener('resize', this.resizeHandler);
   }
 
   calcular(): void {
-    // Fórmulas simplificadas de física de fluidos (solo para simulación)
+    // Fórmulas simplificadas de física de fluidos
     const vientoMs = this.velocidadViento * 0.514;   // nudos → m/s
     const superficieM2 = this.superficieAlar / 100;  // dm² → m²
     const densidadAire = 1.225;                     // kg/m³
@@ -82,6 +108,7 @@ export class SimuladorFoilComponent implements OnInit, AfterViewInit {
       this.velocidadDespegue *= 1.1;
     }
 
+    // Redibujar el foil con los nuevos valores
     this.dibujarFoil();
   }
 
@@ -96,16 +123,25 @@ export class SimuladorFoilComponent implements OnInit, AfterViewInit {
   }
 
   private dibujarFoil(): void {
-    if (!this.ctx) return;
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return;
 
-    const canvas = this.canvasRef.nativeElement;
     const ctx = this.ctx;
-    const w = canvas.width;
-    const h = canvas.height;
+    if (!ctx) return;
 
+    // Obtener dimensiones reales del canvas (en píxeles CSS)
+    const rect = canvas.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+
+    // Limpiar
     ctx.clearRect(0, 0, w, h);
 
-    // Dibujar línea de referencia horizontal
+    // Fondo semitransparente
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(0, 0, w, h);
+
+    // Línea de referencia horizontal
     ctx.beginPath();
     ctx.moveTo(40, h / 2);
     ctx.lineTo(w - 40, h / 2);
@@ -113,58 +149,69 @@ export class SimuladorFoilComponent implements OnInit, AfterViewInit {
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Calcular posición del perfil (centro del canvas)
+    // Centro del canvas
     const centerX = w / 2;
     const baseY = h / 2;
 
     // Ángulo de ataque en radianes
     const rad = (this.anguloAtaque * Math.PI) / 180;
-    const offset = Math.min(20, this.sustentacion / 500); // desplazamiento visual
+    const offset = Math.min(20, Math.max(-20, this.sustentacion / 500));
 
-    // Dibujar perfil superior (curva)
+    // --- Perfil superior (curva de sustentación) ---
     ctx.beginPath();
-    for (let x = centerX - 100; x <= centerX + 100; x += 5) {
-      const t = (x - (centerX - 100)) / 200; // 0 a 1
-      // Espesor máximo en t=0.3 (simula perfil NACA)
+    for (let x = centerX - 100; x <= centerX + 100; x += 3) {
+      const t = (x - (centerX - 100)) / 200;
       const espesor = 12 * (1 - Math.pow(2 * t - 1, 2)) * (1 + offset * 0.2);
-      const y = baseY - espesor - (offset * Math.sin(rad));
+      const y = baseY - espesor - (offset * Math.sin(rad) * 0.3);
       if (x === centerX - 100) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
     ctx.strokeStyle = '#00e6d6';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.5;
     ctx.stroke();
 
-    // Dibujar perfil inferior
+    // --- Perfil inferior ---
     ctx.beginPath();
-    for (let x = centerX - 100; x <= centerX + 100; x += 5) {
+    for (let x = centerX - 100; x <= centerX + 100; x += 3) {
       const t = (x - (centerX - 100)) / 200;
       const espesor = 12 * (1 - Math.pow(2 * t - 1, 2)) * (1 + offset * 0.2);
-      const y = baseY + espesor * 0.3 + (offset * Math.sin(rad) * 0.5);
+      const y = baseY + espesor * 0.3 + (offset * Math.sin(rad) * 0.2);
       if (x === centerX - 100) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
     ctx.strokeStyle = '#1a2b4c';
+    ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Indicar ángulo de ataque con línea
+    // --- Línea del ángulo de ataque ---
     ctx.beginPath();
     ctx.moveTo(centerX, baseY);
-    ctx.lineTo(centerX + 30 * Math.sin(rad), baseY - 30 * Math.cos(rad));
+    ctx.lineTo(centerX + 40 * Math.sin(rad), baseY - 40 * Math.cos(rad));
     ctx.strokeStyle = '#f39c12';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
     ctx.stroke();
+    ctx.setLineDash([]);
 
-    // Texto informativo
+    // --- Puntos de referencia visual ---
+    ctx.beginPath();
+    ctx.arc(centerX, baseY, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = '#f39c12';
+    ctx.fill();
+
+    // --- Texto informativo ---
     ctx.font = '12px "Inter", sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fillText(`Ángulo: ${this.anguloAtaque}°`, centerX + 20, baseY - 20);
-    ctx.fillText(`Sustentación: ${this.sustentacion.toFixed(0)} N`, centerX + 20, baseY - 5);
-  }
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Ángulo: ${this.anguloAtaque}°`, centerX + 20, baseY - 30);
+    ctx.fillText(`Sustentación: ${this.sustentacion.toFixed(0)} N`, centerX + 20, baseY - 12);
 
-  // Limpiar animación al destruir
-  ngOnDestroy(): void {
-    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-    window.removeEventListener('resize', () => {});
+    // Mostrar estado de vuelo
+    // 18 nudos,8 angulo,160dm ,75kg
+    const vuela = this.sustentacion >= this.pesoNavegante * 9.81;
+    ctx.font = '14px "Inter", sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = vuela ? '#4caf50' : '#f44336';
+    ctx.fillText(vuela ? '🟢 VOLANDO' : '🔴 NO VUELA', w - 20, 30);
   }
 }

@@ -90,3 +90,14 @@
     </svg>
   </div>
 </section>
+
+<app-modal-confirmacion
+  *ngIf="modalAlertaVisible"
+  [isOpen]="true"
+  [title]="modalAlertaTitulo"
+  [message]="modalAlertaMensaje"
+  [confirmText]="modalAlertaConfirmText"
+  [cancelText]="''"
+  (confirm)="cerrarAlerta()"
+  (cancel)="cerrarAlerta()">
+</app-modal-confirmacion>

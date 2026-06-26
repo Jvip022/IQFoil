@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { tap, catchError, map, finalize } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface User {
@@ -99,10 +99,17 @@ export class AuthService {
       }),
       catchError(error => {
         console.warn('⚠️ Error al cargar perfil:', error);
-        // En caso de error, emitir null y mantener el estado de autenticación false
-        this.currentUserSubject.next(null);
-        this.authStatusSubject.next(false);
-        // Si el error es 401, el interceptor ya redirigirá al login
+        // Si es 401, el token no es válido → desactivar autenticación
+        if (error.status === 401) {
+          localStorage.removeItem('token');
+          this.authStatusSubject.next(false);
+          this.currentUserSubject.next(null);
+        } else {
+          // Para otros errores (500, red, etc.), mantener autenticación como true
+          // pero dejar el usuario como null (se mostrará "Usuario" en el sidebar)
+          this.authStatusSubject.next(true);
+          this.currentUserSubject.next(null);
+        }
         return of(null);
       })
     );

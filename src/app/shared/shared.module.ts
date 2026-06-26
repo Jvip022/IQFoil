@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 // Importación de componentes standalone
-import { NavbarComponent } from './navbar/navbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { FooterComponent } from './footer/footer.component';
 import { BibliotecaOfflineComponent } from './biblioteca-offline/biblioteca-offline.component';
@@ -15,7 +14,6 @@ import { ModalConfirmacionComponent } from './modal-confirmacion/modal-confirmac
   imports: [
     CommonModule,           
     RouterModule,          
-    //NavbarComponent,
     SidebarComponent,
     FooterComponent,
     BibliotecaOfflineComponent,
@@ -24,12 +22,11 @@ import { ModalConfirmacionComponent } from './modal-confirmacion/modal-confirmac
     ModalConfirmacionComponent
   ],
   exports: [
-    // Re-exportamos CommonModule y RouterModule para que los módulos que importen SharedModule
-    // tengan acceso a estas directivas sin necesidad de importarlas individualmente.
+    
     CommonModule,
     RouterModule,
     
-    //NavbarComponent,
+  
     SidebarComponent,
     FooterComponent,
     BibliotecaOfflineComponent,

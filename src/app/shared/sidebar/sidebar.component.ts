@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService, User } from '../../core/services/auth.service';
@@ -10,7 +10,6 @@ interface MenuItem {
   exact?: boolean;
   children?: MenuItem[];
   expanded?: boolean;
-  roles?: string[]; // Para control de acceso
 }
 
 @Component({
@@ -18,7 +17,8 @@ interface MenuItem {
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
+  styleUrls: ['./sidebar.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush // ← mejora rendimiento
 })
 export class SidebarComponent implements OnInit {
   @Input() collapsed = false;
@@ -29,8 +29,9 @@ export class SidebarComponent implements OnInit {
   user: User | null = null;
   userInitials = '';
   loadingUser = true;
+  menuItems: MenuItem[] = []; // ← propiedad calculada, no getter
 
-  menuItems: MenuItem[] = [
+  private fullMenuItems: MenuItem[] = [
     {
       label: 'Dashboard',
       icon: '📊',
@@ -44,7 +45,6 @@ export class SidebarComponent implements OnInit {
         { label: 'Videoteca', icon: '🎬', route: '/contenidos/lista-videos' },
         { label: 'Certificados', icon: '📜', route: '/contenidos/certificado' },
         { label: 'Progreso de módulos', icon: '📈', route: '/contenidos/progreso-modulo' },
-        { label: 'Reproductor', icon: '▶️', route: '/contenidos/reproductor-video' }
       ]
     },
     {
@@ -111,23 +111,90 @@ export class SidebarComponent implements OnInit {
     }
   ];
 
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
-     this.authService.currentUser$.subscribe(user => {
+    // Cargar usuario si hay token
+    if (this.authService.isAuthenticated()) {
+      this.authService.getUser().subscribe();
+    }
+
+    // Suscribirse a cambios del usuario
+    this.authService.currentUser$.subscribe(user => {
       this.user = user;
       this.loadingUser = false;
       const displayName = user?.nombre || user?.displayName;
       this.userInitials = this.getInitials(displayName);
+      // Actualizar menú cuando el usuario cambia
+      this.updateMenuItems();
+      this.cdr.detectChanges();
     });
 
+    // Reaccionar a cambios en autenticación
     this.authService.getAuthStatus().subscribe(isAuthenticated => {
       if (!isAuthenticated) {
         this.user = null;
         this.userInitials = '';
         this.loadingUser = false;
+        this.menuItems = []; // Vaciar menú al cerrar sesión
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  private updateMenuItems(): void {
+    const roles = this.user?.roles || [];
+    const isAdmin = roles.includes('admin');
+    const isEntrenador = roles.includes('entrenador');
+    const isAtleta = roles.includes('atleta');
+
+    this.menuItems = this.fullMenuItems
+      .map(item => {
+        if (item.children) {
+          let filteredChildren = item.children;
+
+          // Filtro para Administración
+          if (item.label === 'Administración') {
+            if (isAdmin) {
+              filteredChildren = item.children;
+            } else if (isEntrenador) {
+              filteredChildren = item.children.filter(child =>
+                child.label === 'Configuración' || child.label === 'Ver reportes'
+              );
+            } else if (isAtleta) {
+              filteredChildren = item.children.filter(child =>
+                child.label === 'Configuración'
+              );
+            } else {
+              filteredChildren = [];
+            }
+          }
+
+          // Filtro para Evaluación
+          if (item.label === 'Evaluación') {
+            if (isAdmin || isEntrenador) {
+              filteredChildren = item.children;
+            } else if (isAtleta) {
+              filteredChildren = item.children.filter(child =>
+                child.label === 'Realizar evaluación' || child.label === 'Subir video práctica'
+              );
+            } else {
+              filteredChildren = [];
+            }
+          }
+
+          if (filteredChildren.length === 0) {
+            return null;
+          }
+
+          return { ...item, children: filteredChildren };
+        }
+        return item;
+      })
+      .filter(item => item !== null) as MenuItem[];
   }
 
   toggleCollapse(): void {

@@ -1,8 +1,8 @@
+// src/app/core/services/offline.service.ts
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, fromEvent, merge, of } from 'rxjs';
 import { map, delay } from 'rxjs/operators';
 
-// Interfaz para acciones pendientes (offline queue)
 export interface PendingAction {
   id: string;
   action: string;
@@ -10,7 +10,6 @@ export interface PendingAction {
   timestamp: number;
 }
 
-// Interfaz para documentos almacenados offline
 export interface OfflineDocument {
   id: string;
   title: string;
@@ -20,19 +19,20 @@ export interface OfflineDocument {
   size: number;
   lastModified: Date;
   synced: boolean;
+  base64Data?: string; 
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class OfflineService {
-  // ========== Estado de conexión y cola de acciones ==========
   private onlineStatus$ = new BehaviorSubject<boolean>(navigator.onLine);
   private pendingActions: PendingAction[] = [];
   private storageKey = 'offline_pending';
+  private docsStorageKey = 'offline_documents';
 
-  // ========== Documentos offline (mock) ==========
-  private documentsMock: OfflineDocument[] = [
+  // Inicializar con algunos documentos mock, pero se pueden agregar más
+  private defaultDocuments: OfflineDocument[] = [
     {
       id: '1',
       title: 'Reglamento de Vela 2024',
@@ -46,7 +46,7 @@ export class OfflineService {
       id: '2',
       title: 'Manual de Nudos',
       type: 'text',
-      content: 'Contenido del manual...',
+      content: 'Contenido del manual de nudos...',
       size: 15000,
       lastModified: new Date('2024-02-10'),
       synced: true
@@ -54,6 +54,9 @@ export class OfflineService {
   ];
 
   constructor() {
+    // Cargar documentos desde localStorage o usar los default
+    this.loadDocuments();
+
     // Escuchar cambios de conexión
     merge(
       fromEvent(window, 'online').pipe(map(() => true)),
@@ -65,11 +68,63 @@ export class OfflineService {
       }
     });
 
-    // Cargar acciones pendientes desde localStorage
     this.loadPendingActions();
   }
 
-  // ========== Métodos de conexión ==========
+  // ========== Documentos offline ==========
+  private loadDocuments(): void {
+    const stored = localStorage.getItem(this.docsStorageKey);
+    if (stored) {
+      try {
+        const docs = JSON.parse(stored);
+        // Convertir fechas de string a Date
+        this.documents = docs.map((d: any) => ({
+          ...d,
+          lastModified: new Date(d.lastModified)
+        }));
+        return;
+      } catch { /* ignore */ }
+    }
+    // Si no hay stored o hay error, usar default
+    this.documents = this.defaultDocuments;
+    this.saveDocuments();
+  }
+
+  private documents: OfflineDocument[] = [];
+
+  private saveDocuments(): void {
+    localStorage.setItem(this.docsStorageKey, JSON.stringify(this.documents));
+  }
+
+  getOfflineDocuments(): Observable<OfflineDocument[]> {
+    return of(this.documents).pipe(delay(300));
+  }
+
+  addOfflineDocument(doc: OfflineDocument): void {
+    // Evitar duplicados por id
+    const existing = this.documents.find(d => d.id === doc.id);
+    if (existing) {
+      Object.assign(existing, doc);
+    } else {
+      this.documents.push(doc);
+    }
+    this.saveDocuments();
+  }
+
+  removeOfflineDocument(id: string): void {
+    this.documents = this.documents.filter(d => d.id !== id);
+    this.saveDocuments();
+  }
+
+  syncOfflineDocuments(): Observable<OfflineDocument[]> {
+    // Aquí se podría llamar al backend para obtener documentos actualizados
+    // Por ahora, solo marcamos como sincronizados
+    this.documents = this.documents.map(d => ({ ...d, synced: true }));
+    this.saveDocuments();
+    return of(this.documents).pipe(delay(500));
+  }
+
+  // ========== Estado de conexión ==========
   get connectionStatus$(): Observable<boolean> {
     return this.onlineStatus$.asObservable();
   }
@@ -101,7 +156,7 @@ export class OfflineService {
 
   syncPendingActions(): void {
     console.log('Sincronizando acciones pendientes:', this.pendingActions);
-    // Aquí se implementaría la lógica real de sincronización
+    // Aquí se enviarían al backend
     this.pendingActions = [];
     this.savePendingActions();
   }
@@ -123,16 +178,5 @@ export class OfflineService {
         this.pendingActions = [];
       }
     }
-  }
-
-  // ========== Métodos para documentos offline ==========
-  getOfflineDocuments(): Observable<OfflineDocument[]> {
-    return of(this.documentsMock).pipe(delay(500));
-  }
-
-  syncOfflineDocuments(): Observable<OfflineDocument[]> {
-    // Simula sincronización
-    this.documentsMock = this.documentsMock.map(doc => ({ ...doc, synced: true }));
-    return of(this.documentsMock).pipe(delay(800));
   }
 }
