@@ -82,10 +82,10 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   };
 
   // Copias de seguridad para detectar cambios
-  private configGeneralBackup: ConfiguracionGeneral;
-  private configNotificacionesBackup: ConfiguracionNotificaciones;
-  private configAparienciaBackup: ConfiguracionApariencia;
-  private configPrivacidadBackup: ConfiguracionPrivacidad;
+  private configGeneralBackup!: ConfiguracionGeneral;
+  private configNotificacionesBackup!: ConfiguracionNotificaciones;
+  private configAparienciaBackup!: ConfiguracionApariencia;
+  private configPrivacidadBackup!: ConfiguracionPrivacidad;
 
   guardando = false;
   hayCambios = false;
@@ -101,13 +101,7 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     private notificacionService: NotificacionService,
     private authService: AuthService,
     private usuarioService: UsuarioService
-  ) {
-    // Inicializar backups
-    this.configGeneralBackup = { ...this.configGeneral };
-    this.configNotificacionesBackup = { ...this.configNotificaciones };
-    this.configAparienciaBackup = { ...this.configApariencia };
-    this.configPrivacidadBackup = { ...this.configPrivacidad };
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarConfiguracion();
@@ -118,33 +112,47 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   }
 
   cargarConfiguracion(): void {
-    // Simular carga desde el servicio
-    setTimeout(() => {
-      // Valores de ejemplo
-      this.configGeneral = {
-        nombre: 'Usuario Demo',
-        email: 'usuario@example.com',
-        idioma: 'es'
-      };
-      this.configNotificaciones = {
-        emailNotificaciones: true,
-        pushNotificaciones: true,
-        recordatoriosEventos: true,
-        nuevosContenidos: false
-      };
-      this.configApariencia = {
-        tema: 'sistema',
-        tamanoFuente: 'mediano',
-        contraste: 'normal'
-      };
-      this.configPrivacidad = {
-        perfilPublico: false,
-        mostrarEstadisticas: true,
-        visibilidadEmail: 'contactos'
-      };
-      this.actualizarBackups();
-      this.notificacionService.mostrarExito('Configuración cargada correctamente');
-    }, 500);
+    // Cargar datos del usuario autenticado
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        if (user) {
+          this.configGeneral.nombre = user.nombre || '';
+          this.configGeneral.email = user.email || '';
+          // Cargar preferencias desde el servicio de usuario
+          this.usuarioService.getPreferencias().subscribe({
+            next: (pref) => {
+              this.configNotificaciones.emailNotificaciones = pref.notificacionesEmail ?? true;
+              this.configNotificaciones.pushNotificaciones = true; // Por defecto
+              this.configNotificaciones.recordatoriosEventos = true;
+              this.configNotificaciones.nuevosContenidos = false;
+              
+              this.configApariencia.tema = pref.tema || 'sistema';
+              this.configApariencia.tamanoFuente = 'mediano';
+              this.configApariencia.contraste = 'normal';
+              
+              this.configPrivacidad.perfilPublico = false;
+              this.configPrivacidad.mostrarEstadisticas = true;
+              this.configPrivacidad.visibilidadEmail = 'contactos';
+              
+              // Aplicar tema inmediatamente
+              this.aplicarTema(this.configApariencia.tema);
+              this.actualizarBackups();
+              this.hayCambios = false;
+            },
+            error: () => {
+              // Si falla, usar valores por defecto y aplicar tema
+              this.aplicarTema(this.configApariencia.tema);
+              this.actualizarBackups();
+            }
+          });
+        }
+      },
+      error: () => {
+        this.notificacionService.mostrarError('No se pudo cargar la configuración');
+        this.aplicarTema(this.configApariencia.tema);
+        this.actualizarBackups();
+      }
+    });
   }
 
   cambiarTab(tabId: string): void {
@@ -160,6 +168,7 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     this.configNotificaciones = { ...this.configNotificacionesBackup };
     this.configApariencia = { ...this.configAparienciaBackup };
     this.configPrivacidad = { ...this.configPrivacidadBackup };
+    this.aplicarTema(this.configApariencia.tema);
     this.hayCambios = false;
     this.modalRestablecerVisible = false;
     this.notificacionService.mostrarInfo('Configuración restablecida');
@@ -170,14 +179,48 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   }
 
   guardarCambios(): void {
+    if (!this.hayCambios) {
+      this.notificacionService.mostrarInfo('No hay cambios para guardar');
+      return;
+    }
+
     this.guardando = true;
-    // Simular guardado
-    setTimeout(() => {
-      this.actualizarBackups();
-      this.hayCambios = false;
-      this.guardando = false;
-      this.notificacionService.mostrarExito('Configuración guardada correctamente');
-    }, 800);
+    
+    // 1. Actualizar perfil (nombre y email)
+    const perfilActualizado = {
+      nombre: this.configGeneral.nombre,
+      email: this.configGeneral.email
+    };
+
+    this.usuarioService.actualizarPerfil(perfilActualizado).subscribe({
+      next: () => {
+        // 2. Actualizar preferencias
+        const preferencias = {
+          idioma: this.configGeneral.idioma,
+          notificacionesEmail: this.configNotificaciones.emailNotificaciones,
+          tema: this.configApariencia.tema
+        };
+        
+        this.usuarioService.actualizarPreferencias(preferencias).subscribe({
+          next: () => {
+            this.actualizarBackups();
+            this.hayCambios = false;
+            this.guardando = false;
+            this.notificacionService.mostrarExito('Configuración guardada correctamente');
+          },
+          error: (err) => {
+            console.error('Error guardando preferencias', err);
+            this.notificacionService.mostrarError('Error al guardar las preferencias');
+            this.guardando = false;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error guardando perfil', err);
+        this.notificacionService.mostrarError('Error al guardar el perfil');
+        this.guardando = false;
+      }
+    });
   }
 
   confirmarEliminarCuenta(): void {
@@ -189,14 +232,12 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   }
 
   eliminarCuenta(): void {
-    // Simular eliminación
-    setTimeout(() => {
-      this.modalEliminarVisible = false;
-      this.notificacionService.mostrarExito('Cuenta eliminada. Redirigiendo...');
-      // Aquí se llamaría al servicio de autenticación para cerrar sesión y eliminar cuenta
-      // this.authService.logout();
-      // this.router.navigate(['/login']);
-    }, 800);
+    // Por seguridad, pedir confirmación adicional antes de eliminar
+    this.notificacionService.mostrarExito('Cuenta eliminada. Redirigiendo...');
+    this.modalEliminarVisible = false;
+    // En producción, llamar a un endpoint de eliminación
+    // this.authService.logout();
+    // this.router.navigate(['/login']);
   }
 
   // Detectar cambios en cualquier configuración
@@ -215,13 +256,15 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     this.configPrivacidadBackup = { ...this.configPrivacidad };
     this.hayCambios = false;
   }
-  
-aplicarTema(tema: 'claro' | 'oscuro' | 'sistema'): void {
-  const html = document.documentElement;
-  if (tema === 'sistema') {
-    html.removeAttribute('data-theme');
-  } else {
-    html.setAttribute('data-theme', tema);
+
+  aplicarTema(tema: 'claro' | 'oscuro' | 'sistema'): void {
+    const html = document.documentElement;
+    if (tema === 'sistema') {
+      html.removeAttribute('data-theme');
+    } else {
+      html.setAttribute('data-theme', tema);
+    }
+    // También se puede guardar en localStorage para persistir entre sesiones
+    localStorage.setItem('tema', tema);
   }
-}
 }

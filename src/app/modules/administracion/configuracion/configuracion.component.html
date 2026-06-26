@@ -27,15 +27,15 @@
                 <h3 class="section-title">Información personal</h3>
                 <div class="form-group">
                     <label for="nombre">Nombre completo</label>
-                    <input type="text" id="nombre" [(ngModel)]="configGeneral.nombre" class="form-control" />
+                    <input type="text" id="nombre" [(ngModel)]="configGeneral.nombre" (ngModelChange)="detectarCambios()" class="form-control" />
                 </div>
                 <div class="form-group">
                     <label for="email">Correo electrónico</label>
-                    <input type="email" id="email" [(ngModel)]="configGeneral.email" class="form-control" />
+                    <input type="email" id="email" [(ngModel)]="configGeneral.email" (ngModelChange)="detectarCambios()" class="form-control" />
                 </div>
                 <div class="form-group">
                     <label for="idioma">Idioma preferido</label>
-                    <select id="idioma" [(ngModel)]="configGeneral.idioma" class="form-control">
+                    <select id="idioma" [(ngModel)]="configGeneral.idioma" (ngModelChange)="detectarCambios()" class="form-control">
                         <option value="es">Español</option>
                         <option value="en">Inglés</option>
                         <option value="ca">Catalán</option>
@@ -45,48 +45,32 @@
                 </div>
             </div>
         </div>
-        <div class="radio-group">
-            <label class="radio-label">
-                <input type="radio" name="tema" value="claro" [(ngModel)]="configApariencia.tema"
-                    (ngModelChange)="aplicarTema($event)" />
-                Claro
-            </label>
-            <label class="radio-label">
-                <input type="radio" name="tema" value="oscuro" [(ngModel)]="configApariencia.tema"
-                    (ngModelChange)="aplicarTema($event)" />
-                Oscuro
-            </label>
-            <label class="radio-label">
-                <input type="radio" name="tema" value="sistema" [(ngModel)]="configApariencia.tema"
-                    (ngModelChange)="aplicarTema($event)" />
-                Seguir sistema
-            </label>
-        </div>
+
         <!-- Pestaña Notificaciones -->
         <div class="tab-panel" *ngIf="tabActivo === 'notificaciones'">
             <div class="config-section">
                 <h3 class="section-title">Preferencias de notificaciones</h3>
                 <div class="checkbox-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" [(ngModel)]="configNotificaciones.emailNotificaciones" />
+                        <input type="checkbox" [(ngModel)]="configNotificaciones.emailNotificaciones" (ngModelChange)="detectarCambios()" />
                         Recibir notificaciones por email
                     </label>
                 </div>
                 <div class="checkbox-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" [(ngModel)]="configNotificaciones.pushNotificaciones" />
+                        <input type="checkbox" [(ngModel)]="configNotificaciones.pushNotificaciones" (ngModelChange)="detectarCambios()" />
                         Recibir notificaciones push en el navegador
                     </label>
                 </div>
                 <div class="checkbox-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" [(ngModel)]="configNotificaciones.recordatoriosEventos" />
+                        <input type="checkbox" [(ngModel)]="configNotificaciones.recordatoriosEventos" (ngModelChange)="detectarCambios()" />
                         Recordatorios de eventos y regatas
                     </label>
                 </div>
                 <div class="checkbox-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" [(ngModel)]="configNotificaciones.nuevosContenidos" />
+                        <input type="checkbox" [(ngModel)]="configNotificaciones.nuevosContenidos" (ngModelChange)="detectarCambios()" />
                         Alertas de nuevos contenidos
                     </label>
                 </div>
@@ -101,22 +85,22 @@
                     <label>Tema</label>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="tema" value="claro" [(ngModel)]="configApariencia.tema" />
+                            <input type="radio" name="tema" value="claro" [(ngModel)]="configApariencia.tema" (ngModelChange)="aplicarTema($event); detectarCambios()" />
                             Claro
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="tema" value="oscuro" [(ngModel)]="configApariencia.tema" />
+                            <input type="radio" name="tema" value="oscuro" [(ngModel)]="configApariencia.tema" (ngModelChange)="aplicarTema($event); detectarCambios()" />
                             Oscuro
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="tema" value="sistema" [(ngModel)]="configApariencia.tema" />
+                            <input type="radio" name="tema" value="sistema" [(ngModel)]="configApariencia.tema" (ngModelChange)="aplicarTema($event); detectarCambios()" />
                             Seguir sistema
                         </label>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="tamanoFuente">Tamaño de fuente</label>
-                    <select id="tamanoFuente" [(ngModel)]="configApariencia.tamanoFuente" class="form-control">
+                    <select id="tamanoFuente" [(ngModel)]="configApariencia.tamanoFuente" (ngModelChange)="detectarCambios()" class="form-control">
                         <option value="pequeno">Pequeño</option>
                         <option value="mediano">Mediano</option>
                         <option value="grande">Grande</option>
@@ -124,7 +108,7 @@
                 </div>
                 <div class="form-group">
                     <label for="contraste">Contraste</label>
-                    <select id="contraste" [(ngModel)]="configApariencia.contraste" class="form-control">
+                    <select id="contraste" [(ngModel)]="configApariencia.contraste" (ngModelChange)="detectarCambios()" class="form-control">
                         <option value="normal">Normal</option>
                         <option value="alto">Alto contraste</option>
                     </select>
@@ -138,19 +122,19 @@
                 <h3 class="section-title">Privacidad y seguridad</h3>
                 <div class="checkbox-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" [(ngModel)]="configPrivacidad.perfilPublico" />
+                        <input type="checkbox" [(ngModel)]="configPrivacidad.perfilPublico" (ngModelChange)="detectarCambios()" />
                         Perfil público (visible para otros usuarios)
                     </label>
                 </div>
                 <div class="checkbox-group">
                     <label class="checkbox-label">
-                        <input type="checkbox" [(ngModel)]="configPrivacidad.mostrarEstadisticas" />
+                        <input type="checkbox" [(ngModel)]="configPrivacidad.mostrarEstadisticas" (ngModelChange)="detectarCambios()" />
                         Mostrar estadísticas de progreso
                     </label>
                 </div>
                 <div class="form-group">
                     <label for="visibilidadEmail">Visibilidad del email</label>
-                    <select id="visibilidadEmail" [(ngModel)]="configPrivacidad.visibilidadEmail" class="form-control">
+                    <select id="visibilidadEmail" [(ngModel)]="configPrivacidad.visibilidadEmail" (ngModelChange)="detectarCambios()" class="form-control">
                         <option value="privado">Solo yo</option>
                         <option value="contactos">Mis contactos</option>
                         <option value="publico">Público</option>

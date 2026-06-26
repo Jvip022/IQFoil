@@ -19,12 +19,18 @@ export interface User {
 export class AuthService {
   private apiUrl = environment.apiUrl;
   private authStatusSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private currentUserSubject = new BehaviorSubject<User | null>(this.loadUserFromStorage()); // ← cargar desde localStorage
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    if (this.isAuthenticated()) {
+    // Si hay token y no hay usuario en memoria, intentar cargar perfil
+    if (this.isAuthenticated() && !this.currentUserSubject.value) {
       this.loadUserProfile();
+    }
+    // Si hay usuario en localStorage pero token no, limpiar
+    if (!this.isAuthenticated()) {
+      localStorage.removeItem('user');
+      this.currentUserSubject.next(null);
     }
   }
 
@@ -42,10 +48,12 @@ export class AuthService {
         tap(response => {
           if (response && response.token) {
             localStorage.setItem('token', response.token);
-            this.authStatusSubject.next(true);
             const user = this.normalizeUser(response.user);
+            // Guardar usuario en localStorage para restaurar al recargar
+            localStorage.setItem('user', JSON.stringify(user));
+            this.authStatusSubject.next(true);
             this.currentUserSubject.next(user);
-            console.log('✅ Token guardado correctamente');
+            console.log('✅ Token y usuario guardados correctamente');
           }
         }),
         catchError(error => {
@@ -65,8 +73,9 @@ export class AuthService {
         tap(response => {
           if (response && response.token) {
             localStorage.setItem('token', response.token);
-            this.authStatusSubject.next(true);
             const user = this.normalizeUser(response.user);
+            localStorage.setItem('user', JSON.stringify(user));
+            this.authStatusSubject.next(true);
             this.currentUserSubject.next(user);
           }
         })
@@ -75,6 +84,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     this.authStatusSubject.next(false);
     this.currentUserSubject.next(null);
   }
@@ -88,27 +98,44 @@ export class AuthService {
     if (this.currentUserSubject.value) {
       return of(this.currentUserSubject.value);
     }
-    // Si no, hacer la petición al backend
+    // Si no, intentar cargar desde localStorage (fallback rápido)
+    const cached = this.loadUserFromStorage();
+    if (cached) {
+      this.currentUserSubject.next(cached);
+      this.authStatusSubject.next(true);
+      // Aún así, intentar actualizar desde el backend en segundo plano
+      this.refreshUserProfile();
+      return of(cached);
+    }
+    // Si no hay caché, hacer la petición al backend
     return this.http.get<any>(`${this.apiUrl}/usuarios/perfil`).pipe(
       map(user => this.normalizeUser(user)),
       tap(user => {
-        this.currentUserSubject.next(user);
         if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
+          this.currentUserSubject.next(user);
           this.authStatusSubject.next(true);
         }
       }),
       catchError(error => {
         console.warn('⚠️ Error al cargar perfil:', error);
-        // Si es 401, el token no es válido → desactivar autenticación
+        // Si es 401, token inválido → desactivar autenticación
         if (error.status === 401) {
           localStorage.removeItem('token');
+          localStorage.removeItem('user');
           this.authStatusSubject.next(false);
           this.currentUserSubject.next(null);
         } else {
-          // Para otros errores (500, red, etc.), mantener autenticación como true
-          // pero dejar el usuario como null (se mostrará "Usuario" en el sidebar)
-          this.authStatusSubject.next(true);
-          this.currentUserSubject.next(null);
+          // Para otros errores, mantener autenticación si hay token
+          // y usar usuario en caché si existe
+          const cachedUser = this.loadUserFromStorage();
+          if (cachedUser) {
+            this.currentUserSubject.next(cachedUser);
+            this.authStatusSubject.next(true);
+          } else {
+            this.authStatusSubject.next(true);
+            this.currentUserSubject.next(null);
+          }
         }
         return of(null);
       })
@@ -117,6 +144,31 @@ export class AuthService {
 
   private loadUserProfile(): void {
     this.getUser().subscribe();
+  }
+
+  private refreshUserProfile(): void {
+    // Actualizar perfil en segundo plano sin bloquear
+    this.http.get<any>(`${this.apiUrl}/usuarios/perfil`).pipe(
+      map(user => this.normalizeUser(user)),
+      tap(user => {
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
+          this.currentUserSubject.next(user);
+        }
+      })
+    ).subscribe();
+  }
+
+  private loadUserFromStorage(): User | null {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return null;
+      }
+    }
+    return null;
   }
 
   private normalizeUser(user: any): User | null {
