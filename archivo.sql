@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict h1cePvnenE2KmkBRZaKO4tx22u82RujDCDhJCed0HXHXNQZkWWkX8sNRTbkq5Qf
+\restrict 5ZawUBmsWv5A6Al6yR2QEwuOH7XCjJhkOPeTmAdMoBJnMgv1JsLMffAgSvQtzsV
 
 -- Dumped from database version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
@@ -911,6 +911,7 @@ COPY public.configuracion_usuario (usuario_id, idioma, tema, notificaciones_emai
 2	es	sistema	t	t	f
 3	es	sistema	t	t	f
 4	es	sistema	t	t	f
+5	es	sistema	t	t	f
 \.
 
 
@@ -938,6 +939,8 @@ COPY public.criterio (id, rubrica_id, descripcion, puntuacion_maxima) FROM stdin
 --
 
 COPY public.curso (id, titulo, descripcion, nivel, imagen_url, activo, fecha_creacion) FROM stdin;
+1	Fundamentos de Vela	Curso básico de navegación	principiante	\N	t	2026-06-01 00:00:00
+2	Técnica Avanzada de Foil	Perfeccionamiento de foil	avanzado	\N	t	2026-06-02 00:00:00
 \.
 
 
@@ -948,7 +951,10 @@ COPY public.curso (id, titulo, descripcion, nivel, imagen_url, activo, fecha_cre
 COPY public.documento (id, titulo, descripcion, tipo, url_archivo, tamano_bytes, autor_id, fecha_subida, version, aprobado) FROM stdin;
 1	Reglamento 2025	Versión oficial del reglamento	pdf	/docs/reglamento2025.pdf	2500000	1	2026-06-01 22:20:05.100068	1	t
 2	Plan de entrenamiento básico	Guía para principiantes	pdf	/docs/plan_entrenamiento.pdf	1800000	2	2026-06-01 22:20:05.100068	1	t
-7	prueba		pdf	documentos/Joel_Rdz_CV_Desarrollador_Full-Stack_Webtoon__Comic_Digital_.pdf	384108	1	2026-06-10 21:46:47.731809	1	f
+10	Reglamento 2025	Nuevo reglamento	pdf	documentos/reglamento2025.pdf	2500000	1	2026-06-19 20:00:15.941726	1	t
+11	Plan de entrenamiento avanzado	Plan para atletas de alto rendimiento	pdf	documentos/plan_avanzado.pdf	1800000	2	2026-06-19 20:00:15.941726	1	t
+8	Reglamento 2024	Versión antigua del reglamento (desactualizada)	pdf	documentos/reglamento2024.pdf	2300000	1	2025-01-15 10:00:00	2	t
+9	Plan de entrenamiento 2024	Plan obsoleto de entrenamiento	pdf	documentos/plan2024.pdf	1500000	2	2025-02-20 14:30:00	1	t
 \.
 
 
@@ -957,6 +963,40 @@ COPY public.documento (id, titulo, descripcion, tipo, url_archivo, tamano_bytes,
 --
 
 COPY public.evaluacion (id, titulo, usuario_id, evaluador_id, rubrica_id, video_url, fecha_entrega, fecha_evaluacion, estado, comentarios, puntuacion_total) FROM stdin;
+1	Evaluación de Juan Pérez	3	2	1	https://example.com/videos/3_1781913615.mp4	2026-03-28 20:00:15.76706	2026-04-01 20:00:15.76706	evaluado	Comentario de prueba para Juan Pérez	6
+2	Evaluación de Juan Pérez	3	2	1	https://example.com/videos/3_1781913615.mp4	2026-02-21 20:00:15.777772	2026-02-26 20:00:15.777772	pendiente	Comentario de prueba para Juan Pérez	7
+3	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2026-04-20 20:00:15.783225	2026-04-25 20:00:15.783225	evaluado	Comentario de prueba para María García	10
+4	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2025-12-23 20:00:15.786964	2025-12-24 20:00:15.786964	pendiente	Comentario de prueba para María García	6
+5	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2025-12-22 20:00:15.79248	2025-12-26 20:00:15.79248	pendiente	Comentario de prueba para María García	6
+6	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2026-02-20 20:00:15.796967	2026-02-23 20:00:15.796967	pendiente	Comentario de prueba para María García	5
+7	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1781913615.mp4	2025-12-25 20:00:15.801029	2025-12-26 20:00:15.801029	evaluado	Comentario de prueba para Luis Fernández	14
+8	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1781913615.mp4	2026-02-27 20:00:15.8034	2026-03-04 20:00:15.8034	pendiente	Comentario de prueba para Luis Fernández	10
+11	Evaluación de Pedro Rodríguez	5	2	1	https://example.com/videos/5_1781913615.mp4	2026-04-01 20:00:15.810608	2026-04-05 20:00:15.810608	evaluado	Comentario de prueba para Pedro Rodríguez	11
+12	Evaluación de Pedro Rodríguez	5	2	1	https://example.com/videos/5_1781913615.mp4	2025-12-29 20:00:15.813476	2026-01-01 20:00:15.813476	evaluado	Comentario de prueba para Pedro Rodríguez	11
+13	Evaluación de Pedro Rodríguez	5	2	1	https://example.com/videos/5_1781913615.mp4	2026-04-04 20:00:15.816336	2026-04-06 20:00:15.816336	pendiente	Comentario de prueba para Pedro Rodríguez	5
+15	Evaluación de Ana Torres	7	2	1	https://example.com/videos/7_1781913615.mp4	2026-01-22 20:00:15.821434	2026-01-27 20:00:15.821434	evaluado	Comentario de prueba para Ana Torres	8
+16	Evaluación de Ana Torres	7	2	1	https://example.com/videos/7_1781913615.mp4	2026-02-24 20:00:15.824055	2026-02-26 20:00:15.824055	evaluado	Comentario de prueba para Ana Torres	12
+17	Evaluación de Ana Torres	7	2	1	https://example.com/videos/7_1781913615.mp4	2025-12-23 20:00:15.826416	2025-12-24 20:00:15.826416	evaluado	Comentario de prueba para Ana Torres	12
+18	Evaluación de José Ramírez	8	2	1	https://example.com/videos/8_1781913615.mp4	2026-02-20 20:00:15.828764	2026-02-25 20:00:15.828764	evaluado	Comentario de prueba para José Ramírez	6
+19	Evaluación de José Ramírez	8	2	1	https://example.com/videos/8_1781913615.mp4	2026-02-18 20:00:15.831012	2026-02-22 20:00:15.831012	pendiente	Comentario de prueba para José Ramírez	15
+22	Evaluación de Marta Díaz	9	2	1	https://example.com/videos/9_1781913615.mp4	2025-12-23 20:00:15.838113	2025-12-28 20:00:15.838113	pendiente	Comentario de prueba para Marta Díaz	7
+26	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1781913615.mp4	2026-01-25 20:00:15.846256	2026-01-28 20:00:15.846256	evaluado	Comentario de prueba para Roberto Mena	7
+9	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1781913615.mp4	2026-06-13 20:00:15.806571	2026-06-17 20:00:15.806571	pendiente	Comentario de prueba para Luis Fernández	6
+10	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1781913615.mp4	2026-05-28 20:00:15.8086	2026-05-30 20:00:15.8086	evaluado	Comentario de prueba para Luis Fernández	10
+14	Evaluación de Pedro Rodríguez	5	2	1	https://example.com/videos/5_1781913615.mp4	2026-06-12 20:00:15.818347	2026-06-15 20:00:15.818347	pendiente	Comentario de prueba para Pedro Rodríguez	9
+20	Evaluación de José Ramírez	8	2	1	https://example.com/videos/8_1781913615.mp4	2026-05-22 20:00:15.833305	2026-05-25 20:00:15.833305	evaluado	Comentario de prueba para José Ramírez	5
+21	Evaluación de Marta Díaz	9	2	1	https://example.com/videos/9_1781913615.mp4	2026-05-13 20:00:15.835831	2026-05-14 20:00:15.835831	evaluado	Comentario de prueba para Marta Díaz	7
+23	Evaluación de Marta Díaz	9	2	1	https://example.com/videos/9_1781913615.mp4	2026-05-27 20:00:15.840292	2026-05-28 20:00:15.840292	pendiente	Comentario de prueba para Marta Díaz	9
+24	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1781913615.mp4	2026-06-10 20:00:15.842275	2026-06-14 20:00:15.842275	evaluado	Comentario de prueba para Roberto Mena	9
+25	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1781913615.mp4	2026-06-10 20:00:15.844235	2026-06-11 20:00:15.844235	evaluado	Comentario de prueba para Roberto Mena	4
+27	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1781913615.mp4	2026-05-19 20:00:15.848229	2026-05-21 20:00:15.848229	pendiente	Comentario de prueba para Roberto Mena	10
+28	Evaluación de Juan Pérez - Mayo	3	2	1	https://example.com/videos/3_mayo.mp4	2026-05-15 10:00:00	2026-05-20 14:00:00	evaluado	Buena técnica	7
+29	Evaluación de Juan Pérez - Junio	3	2	1	https://example.com/videos/3_junio.mp4	2026-06-10 09:00:00	2026-06-15 16:00:00	evaluado	Excelente progreso	9
+30	Evaluación de María García - Mayo	4	2	1	https://example.com/videos/4_mayo.mp4	2026-05-20 11:00:00	2026-05-25 15:00:00	evaluado	Buen desempeño	3
+31	Evaluación de María García - Junio	4	2	1	https://example.com/videos/4_junio.mp4	2026-06-12 08:30:00	2026-06-18 17:00:00	evaluado	Mejoró mucho	6
+32	Evaluación de Luis Fernández - Junio	6	2	1	https://example.com/videos/6_junio.mp4	2026-06-05 10:00:00	2026-06-10 12:00:00	evaluado	Buen ritmo	10
+33	Evaluación de Pedro Rodríguez - Junio	5	2	1	https://example.com/videos/5_junio.mp4	2026-06-08 14:00:00	2026-06-12 18:00:00	evaluado	Muy buena técnica	8
+34	Evaluación avanzada de Juan Pérez	3	2	1	https://example.com/videos/3_avanzado.mp4	2026-06-20 00:00:00	2026-06-25 00:00:00	evaluado	Excelente rendimiento	18
 \.
 
 
@@ -968,6 +1008,8 @@ COPY public.evento (id, titulo, descripcion, fecha_inicio, fecha_fin, lugar, tip
 1	Regata de primavera	Competición anual	2025-05-15 10:00:00	\N	Club Náutico	regata	1	50	\N	t
 2	Entrenamiento de foil	Sesión práctica	2025-06-10 16:00:00	\N	Puerto Deportivo	entrenamiento	2	20	\N	t
 3	competencia	sdss	2026-06-18 21:02:00	2026-06-28 09:12:00	mata	entrenamiento	\N	\N	\N	t
+10	Regata de otoño	Regata de otoño	2026-07-19 20:00:15.951699	\N	Club Náutico	regata	1	\N	\N	t
+11	Entrenamiento de foil	Entrenamiento de foil	2026-07-04 20:00:15.951716	\N	Puerto Deportivo	entrenamiento	2	\N	\N	t
 \.
 
 
@@ -976,9 +1018,9 @@ COPY public.evento (id, titulo, descripcion, fecha_inicio, fecha_fin, lugar, tip
 --
 
 COPY public.foro (id, titulo, descripcion, orden) FROM stdin;
-1	Reglamento	Dudas sobre las reglas de competición	0
 2	Técnica	Consejos y preguntas sobre técnica	0
 3	Material	Equipamiento y embarcaciones	0
+1	Reglamento	Dudas sobre las reglas de competición	0
 \.
 
 
@@ -988,7 +1030,6 @@ COPY public.foro (id, titulo, descripcion, orden) FROM stdin;
 
 COPY public.hilo (id, foro_id, titulo, autor_id, fecha_creacion, ultima_respuesta, contenido, respuestas, vistas, activo) FROM stdin;
 1	1	¿Cómo se penaliza un fuera de línea?	3	2026-06-01 22:20:05.094293	\N	En una regata, ¿cuándo se considera fuera de línea?	0	0	t
-2	1	poui	1	2026-06-10 21:51:17.701057	2026-06-10 21:51:17.701057	yuyu	0	0	t
 3	2	prueba	1	2026-06-13 10:23:53.579927	2026-06-13 10:24:01.815271	hola	0	0	t
 \.
 
@@ -1009,6 +1050,138 @@ COPY public.insignia (id, nombre, descripcion, icono, categoria, color, requisit
 --
 
 COPY public.log_actividad (id, usuario_id, accion, detalles, ip, fecha) FROM stdin;
+1	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 16:38:50.746311
+2	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 16:45:33.290777
+3	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 16:46:47.687873
+4	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 17:23:09.959992
+5	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 17:44:21.356869
+6	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 17:55:18.321176
+7	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 18:41:23.021797
+8	2	login	{"email": "entrenador@iqfoil.cu", "nombre": "Carlos Gómez"}	127.0.0.1	2026-06-19 18:41:36.249755
+9	2	login	{"email": "entrenador@iqfoil.cu", "nombre": "Carlos Gómez"}	127.0.0.1	2026-06-19 18:43:23.661507
+10	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-19 18:44:10.837375
+11	2	login	{"email": "entrenador@iqfoil.cu", "nombre": "Carlos Gómez"}	127.0.0.1	2026-06-19 18:44:55.950858
+12	4	login	{"email": "atleta2@iqfoil.cu", "nombre": "María García"}	127.0.0.1	2026-06-19 18:45:07.334491
+13	5	login	{"email": "atleta3@iqfoil.cu", "nombre": "Pedro Rodríguez"}	127.0.0.1	2026-06-19 18:45:40.071186
+14	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 19:03:15.63753
+15	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 19:18:30.401398
+16	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 19:18:48.23286
+17	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-19 19:19:37.890063
+18	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 19:22:31.171257
+19	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 19:48:48.689369
+20	5	ver_video	{"info": "Acción ver_video"}	192.168.1.70	2026-05-20 20:00:15.911842
+21	5	ver_video	{"info": "Acción ver_video"}	192.168.1.219	2026-03-02 20:00:15.911983
+22	5	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.185	2025-12-22 20:00:15.912055
+23	5	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.231	2026-02-06 20:00:15.912115
+24	5	ver_video	{"info": "Acción ver_video"}	192.168.1.109	2026-03-02 20:00:15.912181
+25	3	login	{"info": "Acción login"}	192.168.1.194	2026-04-09 20:00:15.912271
+26	3	subir_documento	{"info": "Acción subir_documento"}	192.168.1.205	2026-04-05 20:00:15.912338
+27	3	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.224	2026-01-15 20:00:15.912383
+28	3	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.30	2026-06-07 20:00:15.912425
+29	3	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.2	2026-06-04 20:00:15.912477
+30	3	login	{"info": "Acción login"}	192.168.1.180	2026-06-12 20:00:15.912517
+31	3	login	{"info": "Acción login"}	192.168.1.230	2026-06-15 20:00:15.912556
+32	3	ver_video	{"info": "Acción ver_video"}	192.168.1.183	2026-01-11 20:00:15.912595
+33	1	subir_documento	{"info": "Acción subir_documento"}	192.168.1.22	2026-02-23 20:00:15.912636
+34	1	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.18	2026-01-07 20:00:15.912674
+35	1	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.179	2026-05-22 20:00:15.912717
+36	1	subir_documento	{"info": "Acción subir_documento"}	192.168.1.129	2026-03-13 20:00:15.912767
+37	1	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.156	2026-06-07 20:00:15.912803
+38	1	login	{"info": "Acción login"}	192.168.1.105	2026-01-14 20:00:15.912844
+39	1	subir_documento	{"info": "Acción subir_documento"}	192.168.1.50	2026-03-07 20:00:15.912883
+40	1	subir_documento	{"info": "Acción subir_documento"}	192.168.1.217	2026-03-26 20:00:15.912919
+41	1	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.117	2026-04-07 20:00:15.912955
+42	1	completar_video	{"info": "Acción completar_video"}	192.168.1.165	2026-03-24 20:00:15.912995
+43	6	completar_video	{"info": "Acción completar_video"}	192.168.1.81	2026-02-17 20:00:15.913037
+44	6	completar_video	{"info": "Acción completar_video"}	192.168.1.88	2026-04-06 20:00:15.913075
+45	6	completar_video	{"info": "Acción completar_video"}	192.168.1.169	2025-12-30 20:00:15.913112
+46	6	login	{"info": "Acción login"}	192.168.1.198	2026-04-07 20:00:15.913148
+47	6	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.120	2026-03-17 20:00:15.913233
+48	6	ver_video	{"info": "Acción ver_video"}	192.168.1.199	2026-05-08 20:00:15.913281
+49	6	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.34	2026-05-07 20:00:15.913317
+50	6	subir_documento	{"info": "Acción subir_documento"}	192.168.1.77	2026-03-05 20:00:15.91336
+51	7	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.250	2026-01-18 20:00:15.913409
+52	7	subir_documento	{"info": "Acción subir_documento"}	192.168.1.3	2026-05-17 20:00:15.913445
+53	7	subir_documento	{"info": "Acción subir_documento"}	192.168.1.234	2026-02-03 20:00:15.913483
+54	7	ver_video	{"info": "Acción ver_video"}	192.168.1.182	2026-04-07 20:00:15.913525
+55	7	login	{"info": "Acción login"}	192.168.1.24	2026-05-14 20:00:15.913562
+56	7	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.250	2026-05-21 20:00:15.913596
+57	7	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.196	2026-05-28 20:00:15.913637
+58	7	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.36	2026-02-12 20:00:15.913673
+59	7	subir_documento	{"info": "Acción subir_documento"}	192.168.1.97	2026-03-10 20:00:15.913715
+60	7	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.228	2026-02-09 20:00:15.913751
+61	7	ver_video	{"info": "Acción ver_video"}	192.168.1.3	2026-05-08 20:00:15.913787
+62	7	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.162	2026-04-06 20:00:15.913839
+63	7	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.173	2026-03-14 20:00:15.913881
+64	8	subir_documento	{"info": "Acción subir_documento"}	192.168.1.195	2026-03-16 20:00:15.913933
+65	8	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.255	2026-03-17 20:00:15.913982
+66	8	ver_video	{"info": "Acción ver_video"}	192.168.1.109	2026-04-10 20:00:15.914031
+67	8	login	{"info": "Acción login"}	192.168.1.189	2026-06-06 20:00:15.914073
+68	8	ver_video	{"info": "Acción ver_video"}	192.168.1.75	2026-05-27 20:00:15.914107
+69	8	subir_documento	{"info": "Acción subir_documento"}	192.168.1.40	2026-06-17 20:00:15.91415
+70	8	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.11	2026-04-26 20:00:15.914235
+71	8	login	{"info": "Acción login"}	192.168.1.96	2026-01-01 20:00:15.91427
+72	8	completar_video	{"info": "Acción completar_video"}	192.168.1.26	2026-05-10 20:00:15.914305
+73	8	ver_video	{"info": "Acción ver_video"}	192.168.1.202	2026-03-13 20:00:15.914341
+74	8	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.15	2026-06-07 20:00:15.914376
+75	8	completar_video	{"info": "Acción completar_video"}	192.168.1.94	2026-03-10 20:00:15.914419
+76	9	ver_video	{"info": "Acción ver_video"}	192.168.1.243	2026-03-03 20:00:15.914458
+77	9	subir_documento	{"info": "Acción subir_documento"}	192.168.1.57	2025-12-21 20:00:15.914714
+78	9	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.145	2026-05-09 20:00:15.914756
+79	9	ver_video	{"info": "Acción ver_video"}	192.168.1.234	2025-12-30 20:00:15.914791
+80	9	subir_documento	{"info": "Acción subir_documento"}	192.168.1.250	2026-05-30 20:00:15.914832
+81	9	login	{"info": "Acción login"}	192.168.1.222	2026-04-18 20:00:15.914867
+82	9	subir_documento	{"info": "Acción subir_documento"}	192.168.1.187	2026-04-27 20:00:15.914901
+83	9	subir_documento	{"info": "Acción subir_documento"}	192.168.1.118	2026-05-19 20:00:15.91495
+84	9	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.77	2026-04-21 20:00:15.915004
+85	9	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.57	2026-01-14 20:00:15.915088
+86	10	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.234	2026-02-09 20:00:15.915157
+87	10	subir_documento	{"info": "Acción subir_documento"}	192.168.1.103	2026-04-07 20:00:15.915253
+88	10	login	{"info": "Acción login"}	192.168.1.208	2026-06-12 20:00:15.915313
+89	10	ver_video	{"info": "Acción ver_video"}	192.168.1.20	2026-06-14 20:00:15.915389
+90	10	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.183	2025-12-30 20:00:15.915462
+91	10	ver_video	{"info": "Acción ver_video"}	192.168.1.97	2026-01-20 20:00:15.915544
+92	10	subir_documento	{"info": "Acción subir_documento"}	192.168.1.207	2026-05-12 20:00:15.915612
+93	10	login	{"info": "Acción login"}	192.168.1.224	2026-03-27 20:00:15.915698
+94	10	login	{"info": "Acción login"}	192.168.1.156	2025-12-31 20:00:15.915792
+95	10	subir_documento	{"info": "Acción subir_documento"}	192.168.1.245	2026-02-16 20:00:15.915873
+96	2	subir_documento	{"info": "Acción subir_documento"}	192.168.1.90	2026-03-16 20:00:15.915958
+97	2	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.136	2026-06-14 20:00:15.916034
+98	2	completar_video	{"info": "Acción completar_video"}	192.168.1.94	2026-03-16 20:00:15.91611
+99	2	subir_documento	{"info": "Acción subir_documento"}	192.168.1.187	2026-01-02 20:00:15.916205
+100	2	completar_video	{"info": "Acción completar_video"}	192.168.1.113	2026-02-21 20:00:15.916286
+101	2	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.210	2026-04-30 20:00:15.916376
+102	2	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.114	2026-01-19 20:00:15.916457
+103	2	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.189	2026-03-19 20:00:15.916527
+104	4	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.73	2026-03-05 20:00:15.916608
+105	4	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.151	2026-02-06 20:00:15.916689
+106	4	subir_documento	{"info": "Acción subir_documento"}	192.168.1.154	2026-05-05 20:00:15.916752
+107	4	login	{"info": "Acción login"}	192.168.1.197	2026-04-16 20:00:15.916788
+108	4	login	{"info": "Acción login"}	192.168.1.148	2026-01-20 20:00:15.916822
+109	4	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.33	2026-05-07 20:00:15.916855
+110	4	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.203	2026-05-25 20:00:15.916889
+111	4	login	{"info": "Acción login"}	192.168.1.77	2026-01-31 20:00:15.916942
+112	4	completar_video	{"info": "Acción completar_video"}	192.168.1.252	2026-02-14 20:00:15.916994
+113	4	subir_documento	{"info": "Acción subir_documento"}	192.168.1.87	2026-06-16 20:00:15.917028
+114	4	subir_documento	{"info": "Acción subir_documento"}	192.168.1.241	2026-05-11 20:00:15.917061
+115	4	crear_hilo	{"info": "Acción crear_hilo"}	192.168.1.216	2026-03-02 20:00:15.917095
+116	4	responder_hilo	{"info": "Acción responder_hilo"}	192.168.1.38	2026-01-16 20:00:15.917129
+117	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 20:00:49.295091
+118	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 20:07:06.224728
+119	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-19 20:12:13.787058
+120	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-20 08:51:56.733363
+121	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-20 08:54:35.510058
+122	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-20 09:13:48.822473
+123	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-20 12:19:12.944757
+124	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-25 15:35:48.272037
+125	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-25 15:36:12.838636
+126	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:07:31.469524
+127	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:08:50.385634
+128	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:12:23.060106
+129	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:17:39.012092
+130	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:23:18.233469
+131	6	responder_hilo	{"info": "Acción generada automáticamente"}	192.168.1.196	2026-06-13 10:28:40.992884
+132	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 10:41:35.47299
 \.
 
 
@@ -1017,8 +1190,8 @@ COPY public.log_actividad (id, usuario_id, accion, detalles, ip, fecha) FROM std
 --
 
 COPY public.mensaje (id, hilo_id, autor_id, contenido, fecha) FROM stdin;
-1	1	2	Depende de la situación, según la regla 42...	2026-06-01 22:20:05.094293
 2	3	1	hola!	2026-06-13 10:24:01.815271
+1	1	2	depende de la bandera	2026-06-01 22:20:05.094293
 \.
 
 
@@ -1052,6 +1225,70 @@ COPY public.participante_evento (evento_id, usuario_id, fecha_inscripcion) FROM 
 
 COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_visualizacion) FROM stdin;
 1	24	100	t	2026-06-10 22:40:28.505325
+3	1	100	t	2026-06-01 11:00:00
+3	24	0	f	2026-01-23 20:00:15.609672
+3	25	70	f	2026-01-12 20:00:15.613637
+3	12	30	f	2026-05-09 20:00:15.622649
+4	24	30	f	2026-04-12 20:00:15.636231
+4	25	50	f	2026-03-16 20:00:15.640996
+4	11	50	f	2026-05-23 20:00:15.647239
+4	12	50	f	2026-02-01 20:00:15.649487
+6	24	0	f	2026-02-04 20:00:15.66057
+6	25	0	f	2026-03-23 20:00:15.662754
+6	12	100	t	2025-12-24 20:00:15.669212
+5	1	0	f	2026-01-22 20:00:15.671032
+5	2	100	t	2026-02-05 20:00:15.6728
+5	3	30	f	2026-02-11 20:00:15.675428
+5	24	0	f	2026-05-10 20:00:15.677781
+5	25	30	f	2026-05-30 20:00:15.679694
+5	10	70	f	2026-04-13 20:00:15.681532
+5	11	100	t	2026-03-05 20:00:15.68335
+5	12	30	f	2026-01-03 20:00:15.685107
+7	24	30	f	2026-04-09 20:00:15.696448
+7	25	70	f	2026-01-12 20:00:15.698837
+8	24	70	f	2026-01-07 20:00:15.715281
+8	25	50	f	2025-12-23 20:00:15.717507
+8	12	70	f	2026-04-24 20:00:15.724421
+9	24	30	f	2026-02-28 20:00:15.732887
+9	25	70	f	2026-05-16 20:00:15.734928
+9	11	100	t	2026-03-30 20:00:15.738715
+9	12	100	t	2026-03-21 20:00:15.740767
+10	24	70	f	2026-03-18 20:00:15.747563
+10	25	50	f	2026-05-15 20:00:15.749228
+10	12	100	t	2026-05-11 20:00:15.754453
+3	2	100	t	2026-01-15 10:00:00
+3	3	70	f	2026-02-20 14:30:00
+3	10	100	t	2026-03-10 09:00:00
+3	11	50	f	2026-04-05 16:00:00
+4	1	100	t	2026-01-22 11:00:00
+4	2	80	f	2026-02-28 15:00:00
+4	3	100	t	2026-03-15 08:30:00
+4	10	60	f	2026-05-01 17:00:00
+6	1	100	t	2026-01-05 10:00:00
+6	2	100	t	2026-02-10 12:00:00
+6	3	90	f	2026-03-20 14:00:00
+6	10	100	t	2026-04-25 18:00:00
+6	11	70	f	2026-06-01 09:00:00
+7	1	100	t	2026-01-10 10:00:00
+7	2	100	t	2026-02-15 11:00:00
+7	3	100	t	2026-03-25 12:00:00
+7	10	80	f	2026-04-30 13:00:00
+7	11	60	f	2026-05-15 14:00:00
+7	12	40	f	2026-06-10 15:00:00
+8	1	100	t	2026-01-12 10:00:00
+8	2	100	t	2026-02-18 11:00:00
+8	3	100	t	2026-03-22 12:00:00
+8	10	70	f	2026-04-28 13:00:00
+8	11	50	f	2026-05-20 14:00:00
+9	1	100	t	2026-01-18 10:00:00
+9	2	100	t	2026-02-25 11:00:00
+9	3	80	f	2026-03-30 12:00:00
+9	10	60	f	2026-05-05 13:00:00
+10	1	100	t	2026-01-20 10:00:00
+10	2	100	t	2026-02-28 11:00:00
+10	3	90	f	2026-03-28 12:00:00
+10	10	70	f	2026-05-10 13:00:00
+10	11	50	f	2026-06-05 14:00:00
 \.
 
 
@@ -1060,6 +1297,105 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 --
 
 COPY public.puntuacion_evaluacion (evaluacion_id, criterio_id, puntuacion) FROM stdin;
+1	1	4
+1	2	4
+1	3	0
+2	1	3
+2	2	0
+2	3	5
+3	1	5
+3	2	4
+3	3	4
+4	1	1
+4	2	5
+4	3	4
+5	1	5
+5	2	0
+5	3	3
+6	1	0
+6	2	5
+6	3	0
+7	1	3
+7	2	5
+7	3	5
+8	1	3
+8	2	2
+8	3	1
+9	1	2
+9	2	2
+9	3	2
+10	1	4
+10	2	1
+10	3	5
+11	1	3
+11	2	1
+11	3	4
+12	1	2
+12	2	5
+12	3	2
+13	1	1
+13	2	5
+13	3	4
+14	1	1
+14	2	4
+14	3	4
+15	1	3
+15	2	1
+15	3	4
+16	1	1
+16	2	4
+16	3	2
+17	1	0
+17	2	1
+17	3	1
+18	1	3
+18	2	3
+18	3	3
+19	1	1
+19	2	4
+19	3	4
+20	1	2
+20	2	1
+20	3	2
+21	1	0
+21	2	2
+21	3	5
+22	1	4
+22	2	2
+22	3	4
+23	1	0
+23	2	5
+23	3	4
+24	1	4
+24	2	5
+24	3	0
+25	1	0
+25	2	4
+25	3	0
+26	1	0
+26	2	3
+26	3	2
+27	1	0
+27	2	5
+27	3	5
+28	1	3
+28	2	3
+28	3	1
+29	1	4
+29	2	1
+29	3	4
+30	1	1
+30	2	2
+30	3	0
+31	1	4
+31	2	1
+31	3	1
+32	1	5
+32	2	2
+32	3	3
+33	1	3
+33	2	5
+33	3	0
 \.
 
 
@@ -1088,10 +1424,16 @@ COPY public.rubrica (id, titulo, descripcion, creador_id, fecha_creacion) FROM s
 --
 
 COPY public.usuario (id, email, password_hash, nombre, avatar_url, rol_id, activo, ultimo_acceso, fecha_registro, avatar, preferencias, provincia) FROM stdin;
-2	entrenador@iqfoil.cu	$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36B7Zx2lY5gZk3v6tGX9ySq	Carlos Gómez	\N	2	t	\N	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	\N
-3	atleta1@iqfoil.cu	$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36B7Zx2lY5gZk3v6tGX9ySq	Juan Pérez	\N	3	t	\N	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	\N
-4	atleta2@iqfoil.cu	$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36B7Zx2lY5gZk3v6tGX9ySq	María García	\N	3	t	\N	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	\N
-1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-19 16:28:58.544603	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	\N
+5	atleta3@iqfoil.cu	scrypt:32768:8:1$F24BJKFz5RJ2SihH$86704f4a09e724463afc5802484d254c9f4abcd92751e02f511156cd21c53fbadc99c5d0a2f98189526c86140e0a6644329460ffbaf9532369629b3046edc326	Pedro Rodríguez	\N	3	t	2026-06-19 18:45:40.218277	2026-06-19 17:41:16.556994	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara
+6	atleta4@iqfoil.cu	scrypt:32768:8:1$XvWsiScpcKzKHDtm$b7fa92667441851702f049edc2546b8b8c6f8c59f1ec9e47914dc455753d4177c393c3c853a219944c36f87921698a8f35c90d934dbdb62e5bc46ae06d7f91b3	Luis Fernández	\N	3	t	2026-06-25 18:19:40.116979	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Camagüey
+7	atleta5@iqfoil.cu	scrypt:32768:8:1$kXSFv4sBXPTEWIbc$86de0148d516c6ccfeb2c0f84a89e8729fb42c2d2d04d7c28eedd5ff29edcee1754cf3f982b73e13e8c95b06f54ccafce5118ae5ba5e0bc6289523eef2e00a3c	Ana Torres	\N	3	t	2026-06-24 23:22:13.17207	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba
+8	atleta6@iqfoil.cu	scrypt:32768:8:1$JPLigriBjuUooHKu$9af4b2bad7378a8e518222d0e9f711285aeb173c8b599df46f5fb36e329a2736d14d5014689750aea4addf84e939cd1afde21dd2175b98b2cba2235c3eb688e7	José Ramírez	\N	3	t	2026-06-21 18:42:16.637331	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Holguín
+9	atleta7@iqfoil.cu	scrypt:32768:8:1$ZY1jPhe4VaUBNgn6$983a03d9303edd19d874687b440184d7b0d9386610d11227040900438b620fadc8ad5a20821ab293c1fba07c63972504f7188a0fec4181cb95ac6de038902fa2	Marta Díaz	\N	3	t	2026-06-23 02:23:45.769195	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara
+10	atleta8@iqfoil.cu	scrypt:32768:8:1$pkDAzkoBNXgCPka0$b8cbf19a7b9b7df16d55ea9f807a034ffcc098b28086e1dae6a95b9aa661d3f287e7c2051ff4140918bcf372c8af93e1e8414386912f48d50d1a56a1ff04959b	Roberto Mena	\N	3	t	2026-06-26 09:58:44.213322	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
+1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-26 10:41:35.616688	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
+3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-06-25 15:35:48.440192	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
+4	atleta2@iqfoil.cu	scrypt:32768:8:1$RH5ISwhSV192lBIf$9a36bc43f038529911c650c94e24fce1caf515c74d955b9452b223316de339f7fe1e2fc818db2a453be7dd1717384a600ec2b6b5d4fb53149e738fa265c7f4b8	María García	\N	3	t	2026-06-19 18:45:07.481679	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba
+2	entrenador@iqfoil.cu	scrypt:32768:8:1$s9LtZkIsgV5esacm$a4eefee377931a07b4ab57275f816f6654eac3f219a8d4d8afe2b5ae080ac21949ba9b661f615c78d63bea8e6993dc8ecdf497e134518755080a36713a43e931	Carlos Gómez	\N	2	t	2026-06-19 18:44:56.106231	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
 \.
 
 
@@ -1101,6 +1443,18 @@ COPY public.usuario (id, email, password_hash, nombre, avatar_url, rol_id, activ
 
 COPY public.usuario_insignia (usuario_id, insignia_id, fecha_obtenida) FROM stdin;
 3	1	2026-06-01 22:20:05.106784
+3	2	2026-01-04 20:00:15.86935
+4	3	2026-02-19 20:00:15.873464
+6	3	2026-03-01 20:00:15.875911
+5	3	2025-12-29 20:00:15.879079
+7	2	2026-06-18 20:00:15.882658
+7	3	2026-06-18 20:00:15.884986
+8	2	2026-05-16 20:00:15.887116
+9	1	2026-04-20 20:00:15.89001
+9	3	2026-03-05 20:00:15.893548
+10	1	2026-06-09 20:00:15.897934
+10	3	2026-01-27 20:00:15.90355
+3	3	2026-03-15 00:00:00
 \.
 
 
@@ -1114,6 +1468,33 @@ COPY public.video_tutorial (id, titulo, descripcion, url_video, duracion_seg, ni
 3	Navegación con viento fuerte	Consejos para condiciones extremas	https://example.com/video3.mp4	600	avanzado	https://example.com/thumb3.jpg	2026-06-01 22:20:05.088735	t
 24	prueba	sds	uploads/videos/lofi-home-garden-moewalls-com.mp4	0	principiante	\N	2026-06-10 22:39:59.140644	t
 25	prueba		uploads/videos/fire-flag-one-piece-moewalls-com.mp4	0	principiante	\N	2026-06-11 14:13:36.722873	t
+11	Virada en ceñida	Virada en ceñida	uploads/videos/virada_ceñida.mp4	450	intermedio	\N	2026-06-19 20:00:15.572858	t
+12	Trasluchada	Trasluchada en popa	uploads/videos/trasluchada.mp4	600	avanzado	\N	2026-06-19 20:00:15.572858	t
+10	Técnica de salida	Salida en regata	uploads/videos/How to care for and finish a foil surface.mp4	300	principiante	\N	2026-06-19 20:00:15.572858	t
+26	How to care for and finish a foil surface	Tutorial sobre cuidado y acabado de superficies de foil.	uploads/videos/How to care for and finish a foil surface.mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
+27	How to foil. Lesson 1	Primera lección de foil: conceptos básicos.	uploads/videos/How to foil. Lesson 1(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+28	I Hate Fairyland - Resumen	Contenido variado (no relacionado con vela, pero disponible).	uploads/videos/I Hate Fairyland_ ¡El Viaje Más Violento al País de las Maravillas_ - Resumen(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+29	IQ Foil Diary - Singapore Foil GP 2022 - Pasir Ris	Diario de competición: Singapore Foil GP 2022.	uploads/videos/IQ Foil Diary_ Singapore Foil GP 2022 - Pasir Ris(360P).mp4	0	avanzado	\N	2026-06-26 10:42:48.341046	t
+30	IQFOIL - Episode 5 - GoPro Fusion 360 Camera on Jibe Mark	Uso de cámara GoPro en la marca de jibe.	uploads/videos/IQFOIL - Episode 5_  GoPro Fusion 360 Camera on Jibe Mark(360P).mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
+31	IQFoil - Race Day - 2022 Singapore Slalom Nationals at Changi Beach	Día de regata en el Nacional de Slalom 2022.	uploads/videos/IQFoil - Race Day - 2022 Singapore Slalom Nationals at Changi Beach(360P).mp4	0	avanzado	\N	2026-06-26 10:42:48.341046	t
+32	iQFoil Mast Rake Adjustment	Ajuste del rake del mástil en iQFoil.	uploads/videos/iQFoil Mast Rake Adjustment(360P).mp4	0	avanzado	\N	2026-06-26 10:42:48.341046	t
+33	IQFOIL Zero to Hero - Episode 0 - First Flight Day	Primer día de vuelo (foil) - episodio 0.	uploads/videos/IQFOIL Zero to Hero - Episode 0_ First Flight Day(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+34	IQFOIL Zero to Hero - Episode 1 - A few gusts and jibe practice	Prácticas con ráfagas y jibe - episodio 1.	uploads/videos/IQFOIL Zero to Hero - Episode 1_ A few gusts and jibe practice(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+35	IQFOIL Zero to Hero - Episode 2 - Close encounter with gybe mark	Encuentro cercano con la marca de gybe - episodio 2.	uploads/videos/IQFOIL Zero to Hero - Episode 2_  Close encounter with gybe mark(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+36	IQFOIL Zero to Hero - Episode 3 - First Foil Gybe and Day of Practice	Primer gybe en foil y día de práctica - episodio 3.	uploads/videos/IQFOIL Zero to Hero - Episode 3_ First Foil Gybe and Day of Practice(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+37	IQFOIL Zero to Hero - Episode 4 - Foiling in a South East Monsoon Tropical Storm	Navegando en tormenta tropical - episodio 4.	uploads/videos/IQFOIL Zero to Hero - Episode 4_ Foiling in a South East Monsoon Tropical Storm(360P).mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
+38	How to care for and finish a foil surface	Tutorial sobre cuidado y acabado de superficies de foil.	uploads/videos/How to care for and finish a foil surface.mp4	0	intermedio	\N	2026-06-26 10:43:05.28153	t
+39	How to foil. Lesson 1	Primera lección de foil: conceptos básicos.	uploads/videos/How to foil. Lesson 1(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
+40	I Hate Fairyland - Resumen	Contenido variado (no relacionado con vela, pero disponible).	uploads/videos/I Hate Fairyland_ ¡El Viaje Más Violento al País de las Maravillas_ - Resumen(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
+41	IQ Foil Diary - Singapore Foil GP 2022 - Pasir Ris	Diario de competición: Singapore Foil GP 2022.	uploads/videos/IQ Foil Diary_ Singapore Foil GP 2022 - Pasir Ris(360P).mp4	0	avanzado	\N	2026-06-26 10:43:05.28153	t
+42	IQFOIL - Episode 5 - GoPro Fusion 360 Camera on Jibe Mark	Uso de cámara GoPro en la marca de jibe.	uploads/videos/IQFOIL - Episode 5_  GoPro Fusion 360 Camera on Jibe Mark(360P).mp4	0	intermedio	\N	2026-06-26 10:43:05.28153	t
+43	IQFoil - Race Day - 2022 Singapore Slalom Nationals at Changi Beach	Día de regata en el Nacional de Slalom 2022.	uploads/videos/IQFoil - Race Day - 2022 Singapore Slalom Nationals at Changi Beach(360P).mp4	0	avanzado	\N	2026-06-26 10:43:05.28153	t
+44	iQFoil Mast Rake Adjustment	Ajuste del rake del mástil en iQFoil.	uploads/videos/iQFoil Mast Rake Adjustment(360P).mp4	0	avanzado	\N	2026-06-26 10:43:05.28153	t
+45	IQFOIL Zero to Hero - Episode 0 - First Flight Day	Primer día de vuelo (foil) - episodio 0.	uploads/videos/IQFOIL Zero to Hero - Episode 0_ First Flight Day(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
+46	IQFOIL Zero to Hero - Episode 1 - A few gusts and jibe practice	Prácticas con ráfagas y jibe - episodio 1.	uploads/videos/IQFOIL Zero to Hero - Episode 1_ A few gusts and jibe practice(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
+47	IQFOIL Zero to Hero - Episode 2 - Close encounter with gybe mark	Encuentro cercano con la marca de gybe - episodio 2.	uploads/videos/IQFOIL Zero to Hero - Episode 2_  Close encounter with gybe mark(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
+48	IQFOIL Zero to Hero - Episode 3 - First Foil Gybe and Day of Practice	Primer gybe en foil y día de práctica - episodio 3.	uploads/videos/IQFOIL Zero to Hero - Episode 3_ First Foil Gybe and Day of Practice(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
+49	IQFOIL Zero to Hero - Episode 4 - Foiling in a South East Monsoon Tropical Storm	Navegando en tormenta tropical - episodio 4.	uploads/videos/IQFOIL Zero to Hero - Episode 4_ Foiling in a South East Monsoon Tropical Storm(360P).mp4	0	intermedio	\N	2026-06-26 10:43:05.28153	t
 \.
 
 
@@ -1135,21 +1516,21 @@ SELECT pg_catalog.setval('public.criterio_id_seq', 3, true);
 -- Name: curso_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.curso_id_seq', 1, false);
+SELECT pg_catalog.setval('public.curso_id_seq', 2, true);
 
 
 --
 -- Name: documento_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.documento_id_seq', 7, true);
+SELECT pg_catalog.setval('public.documento_id_seq', 11, true);
 
 
 --
 -- Name: evaluacion_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.evaluacion_id_seq', 1, false);
+SELECT pg_catalog.setval('public.evaluacion_id_seq', 34, true);
 
 
 --
@@ -1184,7 +1565,7 @@ SELECT pg_catalog.setval('public.insignia_id_seq', 3, true);
 -- Name: log_actividad_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.log_actividad_id_seq', 1, false);
+SELECT pg_catalog.setval('public.log_actividad_id_seq', 132, true);
 
 
 --
@@ -1226,14 +1607,14 @@ SELECT pg_catalog.setval('public.rubrica_id_seq', 1, true);
 -- Name: usuario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.usuario_id_seq', 4, true);
+SELECT pg_catalog.setval('public.usuario_id_seq', 5, true);
 
 
 --
 -- Name: video_tutorial_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.video_tutorial_id_seq', 25, true);
+SELECT pg_catalog.setval('public.video_tutorial_id_seq', 49, true);
 
 
 --
@@ -1811,5 +2192,5 @@ ALTER TABLE ONLY public.usuario
 -- PostgreSQL database dump complete
 --
 
-\unrestrict h1cePvnenE2KmkBRZaKO4tx22u82RujDCDhJCed0HXHXNQZkWWkX8sNRTbkq5Qf
+\unrestrict 5ZawUBmsWv5A6Al6yR2QEwuOH7XCjJhkOPeTmAdMoBJnMgv1JsLMffAgSvQtzsV
 

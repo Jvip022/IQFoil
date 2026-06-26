@@ -7,13 +7,38 @@
   color: var(--text);
 
   &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 25px;
+
     h2 {
       font-size: 1.8rem;
       color: var(--navy);
     }
     p {
       color: var(--muted);
+    }
+    .header-right {
+      .btn {
+        background: var(--cyan);
+        color: #02121e;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 40px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s;
+        &:hover:not(:disabled) {
+          background: #00ffee;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0, 230, 214, 0.3);
+        }
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
     }
   }
 
@@ -55,13 +80,41 @@
     }
   }
 
-  .chart-container {
+  .chart-container,
+  .chart-container-small {
     position: relative;
-    height: 300px;
     max-width: 100%;
     canvas {
       width: 100% !important;
       height: 100% !important;
     }
+  }
+  .chart-container {
+    height: 300px;
+  }
+  .chart-container-small {
+    height: 200px;
+  }
+}
+
+// Estilos para el PDF (impresión)
+@media print {
+  .reportes__tabs,
+  .reportes__header .header-right,
+  app-estado-conexion,
+  .btn,
+  .tab-btn {
+    display: none !important;
+  }
+  .reportes__content {
+    padding: 0 !important;
+  }
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .chart-container,
+  .chart-container-small {
+    height: 180px !important;
   }
 }
