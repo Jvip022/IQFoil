@@ -1,18 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 
-// Servicios
 import { ContenidoService, Video, Modulo } from '../../../core/services/contenido.service';
 import { NotificacionService } from '../../../core/services/notificacion.service';
 
-// Componentes compartidos
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 import { ModalConfirmacionComponent } from '../../../shared/modal-confirmacion/modal-confirmacion.component';
-
-// Pipe de duración (archivo separado)
 import { DuracionPipe } from './duracion.pipe';
 
 @Component({
@@ -58,15 +54,22 @@ export class ListaVideosComponent implements OnInit, OnDestroy {
 
   cargarVideos(): void {
     this.cargando = true;
-    this.contenidoService.getModulos().subscribe({
-      next: (modulos) => {
-        this.modulos = modulos;
-        this.videos = modulos.flatMap(m => m.videos);
+    forkJoin({
+      tutoriales: this.contenidoService.getModulos(),
+      practicas: this.contenidoService.getVideosPractica()
+    }).subscribe({
+      next: ({ tutoriales, practicas }) => {
+        // Extraer videos de los módulos y asignar tipo 'tutorial'
+        const videosTutorial: Video[] = tutoriales.flatMap(m => m.videos).map(v => ({ ...v, tipo: 'tutorial' }));
+        // Los videos de práctica ya vienen con tipo 'practica' desde el backend
+        this.videos = [...videosTutorial, ...practicas];
+        // También guardar los módulos originales para funcionalidades como marcar visto
+        this.modulos = tutoriales;
         this.filtrarVideos();
         this.cargando = false;
       },
       error: (err) => {
-        console.error('Error cargando videos', err);
+        console.error('Error cargando videos:', err);
         this.notificacionService.mostrarError('No se pudieron cargar los videos');
         this.cargando = false;
       }
@@ -127,6 +130,11 @@ export class ListaVideosComponent implements OnInit, OnDestroy {
   marcarComoVisto(video: Video, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();
+    }
+    // Solo los tutoriales se pueden marcar como vistos (las prácticas no tienen progreso asociado)
+    if (video.tipo === 'practica') {
+      this.notificacionService.mostrarAdvertencia('Los videos de práctica no se pueden marcar como vistos');
+      return;
     }
     const modulo = this.modulos.find(m => m.videos.some(v => v.id === video.id));
     if (!modulo) {

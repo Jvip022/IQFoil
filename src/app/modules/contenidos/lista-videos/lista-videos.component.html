@@ -42,10 +42,18 @@
   <!-- Grid de videos -->
   <div class="lista-videos__grid" *ngIf="!cargando">
     <div class="videos-grid" *ngIf="videosFiltrados.length > 0; else sinVideos">
-      <div class="video-card" *ngFor="let video of videosFiltrados" (click)="verVideo(video)">
+      <div class="video-card" 
+           *ngFor="let video of videosFiltrados" 
+           (click)="verVideo(video)"
+           [class.video-card--practica]="video.tipo === 'practica'">
         <div class="video-card__thumbnail" [style.background-image]="'url(' + (video.thumbnail || 'assets/images/video-placeholder.jpg') + ')'">
           <div class="video-card__duration">{{ video.duracion | duracion }}</div>
           <div class="video-card__play-icon">▶</div>
+          <span class="video-card__tipo-badge" 
+                [class.badge-tutorial]="video.tipo === 'tutorial'" 
+                [class.badge-practica]="video.tipo === 'practica'">
+            {{ video.tipo === 'tutorial' ? 'Tutorial' : 'Práctica' }}
+          </span>
         </div>
         <div class="video-card__info">
           <h3 class="video-card__titulo">{{ video.titulo }}</h3>
@@ -58,7 +66,10 @@
           </div>
         </div>
         <div class="video-card__actions">
-          <button class="btn-icon" (click)="marcarComoVisto(video, $event)" title="Marcar como visto">✅</button>
+          <button class="btn-icon" 
+                  (click)="marcarComoVisto(video, $event)" 
+                  title="Marcar como visto" 
+                  [disabled]="video.tipo === 'practica'">✅</button>
         </div>
       </div>
     </div>
@@ -95,7 +106,7 @@
         </p>
       </div>
       <div class="video-actions">
-        <button class="btn btn-primary" (click)="marcarComoVisto(videoSeleccionado)">
+        <button class="btn btn-primary" (click)="marcarComoVisto(videoSeleccionado)" [disabled]="videoSeleccionado.tipo === 'practica'">
           Marcar como visto
         </button>
       </div>
