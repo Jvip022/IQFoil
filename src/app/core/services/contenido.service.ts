@@ -65,4 +65,7 @@ export class ContenidoService {
   getVideosPractica(): Observable<Video[]> {
     return this.http.get<Video[]>(`${this.apiUrl}/videos/practicas`);
   }
+  inscribirseEvento(eventoId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/eventos/${eventoId}/inscribirse`, {});
+  }
 }

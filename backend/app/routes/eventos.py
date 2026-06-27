@@ -119,3 +119,35 @@ def get_upcoming_events(usuario_id):
             'tipo': e.tipo or 'evento'
         })
     return jsonify(result)
+
+# ==================== INSCRIPCIÓN A EVENTOS ====================
+@bp.route('/<int:id>/inscribirse', methods=['POST'])
+@jwt_required()
+def inscribirse_evento(id):
+    """Inscribe al usuario autenticado en un evento"""
+    user_id = get_jwt_identity()
+    usuario = Usuario.query.get(user_id)
+    if not usuario:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+
+    evento = Evento.query.get_or_404(id)
+    if not evento.publico:
+        return jsonify({'error': 'El evento no está disponible para inscripción'}), 400
+
+    # Verificar si ya está inscrito
+    ya_inscrito = ParticipanteEvento.query.filter_by(evento_id=id, usuario_id=user_id).first()
+    if ya_inscrito:
+        return jsonify({'error': 'Ya estás inscrito en este evento'}), 400
+
+    # Verificar límite de participantes
+    if evento.max_participantes:
+        inscritos = ParticipanteEvento.query.filter_by(evento_id=id).count()
+        if inscritos >= evento.max_participantes:
+            return jsonify({'error': 'El evento ya ha alcanzado el número máximo de participantes'}), 400
+
+    # Inscribir
+    inscripcion = ParticipanteEvento(evento_id=id, usuario_id=user_id, fecha_inscripcion=datetime.now())
+    db.session.add(inscripcion)
+    db.session.commit()
+
+    return jsonify({'message': 'Inscripción realizada con éxito'}), 201
