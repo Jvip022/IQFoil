@@ -164,3 +164,29 @@ def get_progreso_usuario(usuario_id):
         'insignias': insignias,
         'evolucion': evolucion[::-1]  # orden cronológico
     })
+
+@bp.route('/teoricas/iniciar', methods=['POST', 'OPTIONS'])
+@jwt_required()
+def iniciar_examen_teorico():
+    if request.method == 'OPTIONS':
+        return '', 200
+    data = request.get_json()
+    examen_id = data.get('examenId')
+    user_id = get_jwt_identity()
+    # Verificar si ya hay un intento en curso
+    existente = RespuestaUsuario.query.filter_by(
+        examen_id=examen_id,
+        usuario_id=user_id,
+        estado='en_curso'
+    ).first()
+    if existente:
+        return jsonify({'id': existente.id}), 200
+    nuevo = RespuestaUsuario(
+        examen_id=examen_id,
+        usuario_id=user_id,
+        respuestas={},
+        estado='en_curso'
+    )
+    db.session.add(nuevo)
+    db.session.commit()
+    return jsonify({'id': nuevo.id}), 201

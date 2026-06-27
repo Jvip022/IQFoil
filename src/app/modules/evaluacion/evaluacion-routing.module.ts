@@ -25,6 +25,11 @@ const routes: Routes = [
         canActivate: [autenticacionGuard]
       },
       {
+        path: 'examen-teorico/:id', 
+        loadComponent: () => import('./examen-teorico/examen-teorico.component').then(m => m.ExamenTeoricoComponent),
+        canActivate: [autenticacionGuard]
+      },
+      {
         path: 'rubricas',
         loadComponent: () => import('./gestion-rubricas/gestion-rubricas.component').then(m => m.GestionRubricasComponent),
         canActivate: [autenticacionGuard]

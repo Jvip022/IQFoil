@@ -7,10 +7,9 @@
     </div>
   </header>
 
-  <!-- Estado de conexión -->
   <app-estado-conexion class="evaluar-con-rubrica__connection"></app-estado-conexion>
 
-  <!-- Loader mientras carga -->
+  <!-- Loader -->
   <app-loading-spinner *ngIf="cargando" [text]="'Cargando datos de evaluación...'"></app-loading-spinner>
 
   <!-- Contenido principal -->
@@ -24,20 +23,20 @@
         </span>
       </div>
       <div class="info-practica__detalles">
-        <p><strong>Usuario:</strong> {{ evaluacion.usuarioNombre }}</p>
+        <p><strong>Usuario:</strong> {{ evaluacion.usuarioNombre || 'No asignado' }}</p>
         <p><strong>Fecha de entrega:</strong> {{ evaluacion.fechaEntrega | date:'dd/MM/yyyy HH:mm' }}</p>
         <p *ngIf="evaluacion.videoUrl">
           <strong>Video:</strong> 
-          <a [href]="evaluacion.videoUrl" target="_blank">Ver práctica</a>
+          <a [href]="evaluacion.videoUrl" target="_blank" rel="noopener">Ver práctica</a>
         </p>
       </div>
     </div>
 
     <!-- Rúbrica de evaluación -->
-    <div class="rubrica card">
-      <h3 class="rubrica__titulo">Rúbrica: {{ rubrica?.titulo }}</h3>
+    <div class="rubrica card" *ngIf="rubrica; else sinRubrica">
+      <h3 class="rubrica__titulo">Rúbrica: {{ rubrica.titulo }}</h3>
       <div class="rubrica__criterios">
-        <div class="criterio" *ngFor="let criterio of rubrica?.criterios; let i = index">
+        <div class="criterio" *ngFor="let criterio of rubrica.criterios; let i = index">
           <div class="criterio__info">
             <span class="criterio__nombre">{{ criterio.descripcion }}</span>
             <span class="criterio__max">Máx: {{ criterio.puntuacionMaxima }}</span>
@@ -59,14 +58,28 @@
               [(ngModel)]="puntuaciones[criterio.id]"
               (input)="calcularTotal()"
               class="number-input" />
+            <div class="criterio__barra">
+              <div class="barra-progreso" [style.width.%]="(puntuaciones[criterio.id] / criterio.puntuacionMaxima) * 100"></div>
+            </div>
           </div>
         </div>
       </div>
       <div class="rubrica__total">
         <span class="total-label">Puntuación total:</span>
         <span class="total-valor">{{ puntuacionTotal }} / {{ puntuacionMaxima }}</span>
+        <span class="total-porcentaje" [style.color]="puntuacionTotal / puntuacionMaxima > 0.7 ? '#4caf50' : '#f44336'">
+          {{ (puntuacionTotal / puntuacionMaxima * 100) | number:'1.0-0' }}%
+        </span>
       </div>
     </div>
+    <ng-template #sinRubrica>
+      <div class="card">
+        <div class="alert alert-warning">
+          <strong>⚠️ No se encontró una rúbrica para esta evaluación.</strong>
+          <p>Es posible que la rúbrica haya sido eliminada o no esté asignada correctamente.</p>
+        </div>
+      </div>
+    </ng-template>
 
     <!-- Comentarios adicionales -->
     <div class="comentarios card">
@@ -83,7 +96,10 @@
       <button class="btn btn-outline" (click)="cancelar()" [disabled]="guardando">
         Cancelar
       </button>
-      <button class="btn btn-primary" (click)="guardarEvaluacion()" [disabled]="guardando || !evaluacion">
+      <button 
+        class="btn btn-primary" 
+        (click)="guardarEvaluacion()" 
+        [disabled]="guardando || !evaluacion || !rubrica || !todasPuntuacionesAsignadas()">
         <span *ngIf="!guardando">Guardar evaluación</span>
         <span *ngIf="guardando">Guardando...</span>
       </button>

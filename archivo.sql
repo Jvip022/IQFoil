@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 3MaE4trN2fauQ7Alnyb8BvSWb1xHVMYIsDUBFBiuJvB9P2wYBtDZ6gOT0fgIETb
+\restrict y5wv6TPqgJaLCPLJVAMwgGavLEnm435y2o3rrkvXjYlWiPwH8uuuyxTF68Vz7ro
 
 -- Dumped from database version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
@@ -299,6 +299,48 @@ ALTER SEQUENCE public.evento_id_seq OWNED BY public.evento.id;
 
 
 --
+-- Name: examen_teorico; Type: TABLE; Schema: public; Owner: joel
+--
+
+CREATE TABLE public.examen_teorico (
+    id integer NOT NULL,
+    titulo character varying(200) NOT NULL,
+    descripcion text,
+    nivel character varying(20) NOT NULL,
+    tiempo_limite_minutos integer DEFAULT 30 NOT NULL,
+    puntaje_aprobacion integer DEFAULT 60 NOT NULL,
+    activo boolean DEFAULT true,
+    fecha_creacion timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    creado_por integer,
+    CONSTRAINT examen_teorico_nivel_check CHECK (((nivel)::text = ANY ((ARRAY['principiante'::character varying, 'intermedio'::character varying, 'avanzado'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.examen_teorico OWNER TO joel;
+
+--
+-- Name: examen_teorico_id_seq; Type: SEQUENCE; Schema: public; Owner: joel
+--
+
+CREATE SEQUENCE public.examen_teorico_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.examen_teorico_id_seq OWNER TO joel;
+
+--
+-- Name: examen_teorico_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: joel
+--
+
+ALTER SEQUENCE public.examen_teorico_id_seq OWNED BY public.examen_teorico.id;
+
+
+--
 -- Name: foro; Type: TABLE; Schema: public; Owner: joel
 --
 
@@ -581,6 +623,51 @@ CREATE TABLE public.participante_evento (
 ALTER TABLE public.participante_evento OWNER TO joel;
 
 --
+-- Name: pregunta; Type: TABLE; Schema: public; Owner: joel
+--
+
+CREATE TABLE public.pregunta (
+    id integer NOT NULL,
+    examen_id integer NOT NULL,
+    texto text NOT NULL,
+    tipo character varying(20) NOT NULL,
+    opciones jsonb,
+    respuesta_correcta jsonb NOT NULL,
+    puntaje integer DEFAULT 1 NOT NULL,
+    explicacion text,
+    nivel character varying(20),
+    categoria character varying(50),
+    orden integer DEFAULT 0,
+    CONSTRAINT pregunta_nivel_check CHECK (((nivel)::text = ANY ((ARRAY['principiante'::character varying, 'intermedio'::character varying, 'avanzado'::character varying])::text[]))),
+    CONSTRAINT pregunta_tipo_check CHECK (((tipo)::text = ANY ((ARRAY['opcion_unica'::character varying, 'verdadero_falso'::character varying, 'opcion_multiple'::character varying, 'texto_corto'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.pregunta OWNER TO joel;
+
+--
+-- Name: pregunta_id_seq; Type: SEQUENCE; Schema: public; Owner: joel
+--
+
+CREATE SEQUENCE public.pregunta_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.pregunta_id_seq OWNER TO joel;
+
+--
+-- Name: pregunta_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: joel
+--
+
+ALTER SEQUENCE public.pregunta_id_seq OWNED BY public.pregunta.id;
+
+
+--
 -- Name: progreso_video; Type: TABLE; Schema: public; Owner: joel
 --
 
@@ -609,6 +696,48 @@ CREATE TABLE public.puntuacion_evaluacion (
 
 
 ALTER TABLE public.puntuacion_evaluacion OWNER TO joel;
+
+--
+-- Name: respuesta_usuario; Type: TABLE; Schema: public; Owner: joel
+--
+
+CREATE TABLE public.respuesta_usuario (
+    id integer NOT NULL,
+    examen_id integer NOT NULL,
+    usuario_id integer NOT NULL,
+    respuestas jsonb NOT NULL,
+    fecha_inicio timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    fecha_envio timestamp without time zone,
+    puntaje_obtenido integer,
+    porcentaje double precision,
+    aprobado boolean,
+    estado character varying(20) DEFAULT 'en_curso'::character varying
+);
+
+
+ALTER TABLE public.respuesta_usuario OWNER TO joel;
+
+--
+-- Name: respuesta_usuario_id_seq; Type: SEQUENCE; Schema: public; Owner: joel
+--
+
+CREATE SEQUENCE public.respuesta_usuario_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.respuesta_usuario_id_seq OWNER TO joel;
+
+--
+-- Name: respuesta_usuario_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: joel
+--
+
+ALTER SEQUENCE public.respuesta_usuario_id_seq OWNED BY public.respuesta_usuario.id;
+
 
 --
 -- Name: rol; Type: TABLE; Schema: public; Owner: joel
@@ -826,6 +955,13 @@ ALTER TABLE ONLY public.evento ALTER COLUMN id SET DEFAULT nextval('public.event
 
 
 --
+-- Name: examen_teorico id; Type: DEFAULT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.examen_teorico ALTER COLUMN id SET DEFAULT nextval('public.examen_teorico_id_seq'::regclass);
+
+
+--
 -- Name: foro id; Type: DEFAULT; Schema: public; Owner: joel
 --
 
@@ -872,6 +1008,20 @@ ALTER TABLE ONLY public.mensaje_privado ALTER COLUMN id SET DEFAULT nextval('pub
 --
 
 ALTER TABLE ONLY public.mentoria ALTER COLUMN id SET DEFAULT nextval('public.mentoria_id_seq'::regclass);
+
+
+--
+-- Name: pregunta id; Type: DEFAULT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.pregunta ALTER COLUMN id SET DEFAULT nextval('public.pregunta_id_seq'::regclass);
+
+
+--
+-- Name: respuesta_usuario id; Type: DEFAULT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.respuesta_usuario ALTER COLUMN id SET DEFAULT nextval('public.respuesta_usuario_id_seq'::regclass);
 
 
 --
@@ -1041,6 +1191,17 @@ COPY public.evento (id, titulo, descripcion, fecha_inicio, fecha_fin, lugar, tip
 
 
 --
+-- Data for Name: examen_teorico; Type: TABLE DATA; Schema: public; Owner: joel
+--
+
+COPY public.examen_teorico (id, titulo, descripcion, nivel, tiempo_limite_minutos, puntaje_aprobacion, activo, fecha_creacion, creado_por) FROM stdin;
+1	Reglamento de vela básico	Cuestionario sobre las normas básicas de navegación y regatas.	principiante	20	70	t	2026-06-26 15:31:54.610721	1
+2	Meteorología y viento	Preguntas sobre interpretación del viento, nubes y fenómenos atmosféricos.	intermedio	25	65	t	2026-06-26 15:31:54.612301	1
+3	Técnica avanzada de foil	Cuestionario sobre ajustes, maniobras y optimización del foil.	avanzado	30	75	t	2026-06-26 15:31:54.614163	1
+\.
+
+
+--
 -- Data for Name: foro; Type: TABLE DATA; Schema: public; Owner: joel
 --
 
@@ -1057,7 +1218,6 @@ COPY public.foro (id, titulo, descripcion, orden) FROM stdin;
 
 COPY public.hilo (id, foro_id, titulo, autor_id, fecha_creacion, ultima_respuesta, contenido, respuestas, vistas, activo) FROM stdin;
 1	1	¿Cómo se penaliza un fuera de línea?	3	2026-06-01 22:20:05.094293	\N	En una regata, ¿cuándo se considera fuera de línea?	0	0	t
-3	2	prueba	1	2026-06-13 10:23:53.579927	2026-06-13 10:24:01.815271	hola	0	0	t
 \.
 
 
@@ -1348,6 +1508,7 @@ COPY public.log_actividad (id, usuario_id, accion, detalles, ip, fecha) FROM std
 301	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 13:54:09.678865
 302	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 13:57:36.263561
 303	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-26 13:58:14.983483
+304	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 14:15:18.320484
 \.
 
 
@@ -1356,7 +1517,6 @@ COPY public.log_actividad (id, usuario_id, accion, detalles, ip, fecha) FROM std
 --
 
 COPY public.mensaje (id, hilo_id, autor_id, contenido, fecha) FROM stdin;
-2	3	1	hola!	2026-06-13 10:24:01.815271
 1	1	2	depende de la bandera	2026-06-01 22:20:05.094293
 \.
 
@@ -1386,41 +1546,42 @@ COPY public.participante_evento (evento_id, usuario_id, fecha_inscripcion) FROM 
 
 
 --
+-- Data for Name: pregunta; Type: TABLE DATA; Schema: public; Owner: joel
+--
+
+COPY public.pregunta (id, examen_id, texto, tipo, opciones, respuesta_correcta, puntaje, explicacion, nivel, categoria, orden) FROM stdin;
+1	1	¿Cuál es la prioridad entre dos barcos que se aproximan por babor?	opcion_unica	["El barco que viene por estribor tiene prioridad", "El barco que viene por babor tiene prioridad", "El barco más grande tiene prioridad", "El que va más rápido tiene prioridad"]	"El barco que viene por estribor tiene prioridad"	2	Según la regla 10 del RIPA, cuando dos barcos se aproximan por babor, el que viene por estribor es el que tiene prioridad.	principiante	reglamento	1
+2	1	En una regata, un barco que está virando debe mantener su rumbo hasta completar la virada.	verdadero_falso	\N	true	1	Es correcto: durante la virada, el barco debe completarla sin cambiar de rumbo hasta que esté en la nueva dirección.	principiante	reglamento	2
+3	1	¿Qué bandera se utiliza para indicar la salida de una regata?	opcion_unica	["Bandera azul", "Bandera roja", "Bandera amarilla", "Bandera verde"]	"Bandera roja"	1	La bandera roja es la que se iza para dar la señal de salida en la mayoría de las regatas.	principiante	reglamento	3
+4	2	¿Qué tipo de nube indica generalmente la llegada de un frente frío?	opcion_unica	["Cúmulos", "Estratos", "Cumulonimbos", "Cirros"]	"Cumulonimbos"	2	Los cumulonimbos son nubes de tormenta que suelen asociarse con frentes fríos y pueden traer viento fuerte y lluvia.	intermedio	meteorología	1
+5	2	El viento de tierra siempre es más fuerte que el viento de mar.	verdadero_falso	\N	false	1	Falso: el viento de mar suele ser más constante y fuerte, mientras que el de tierra puede ser más variable.	intermedio	meteorología	2
+6	2	¿Qué significa la presión atmosférica en un barómetro cuando desciende rápidamente?	opcion_unica	["Buen tiempo", "Tormenta", "Niebla", "Viento calmo"]	"Tormenta"	2	Un descenso rápido de la presión indica la aproximación de una borrasca y mal tiempo.	intermedio	meteorología	3
+7	3	¿Cuál es el ángulo de ataque óptimo para mantener el vuelo en foil en condiciones de viento medio?	opcion_unica	["2° a 3°", "5° a 7°", "10° a 12°", "15° a 18°"]	"5° a 7°"	2	Para mantener el foil en vuelo con viento medio, se recomienda un ángulo de ataque entre 5° y 7° para optimizar la sustentación sin aumentar excesivamente la resistencia.	avanzado	técnica	1
+8	3	En condiciones de ola grande, es recomendable aumentar el rake del mástil para mejorar la estabilidad.	verdadero_falso	\N	true	1	Correcto: aumentar el rake del mástil (inclinarlo hacia atrás) ayuda a mantener el foil más estable en olas grandes.	avanzado	técnica	2
+9	3	¿Qué ajuste se debe realizar en el foil para reducir la resistencia al avance en aguas planas?	opcion_unica	["Aumentar el ángulo de ataque", "Reducir el ángulo de ataque", "Aumentar la superficie alar", "Reducir la superficie alar"]	"Reducir el ángulo de ataque"	2	En aguas planas, un ángulo de ataque más bajo reduce la resistencia y permite mayor velocidad.	avanzado	técnica	3
+10	3	El foil de popa siempre debe tener un mayor ángulo de ataque que el de proa.	verdadero_falso	\N	false	1	Falso: el ángulo de ataque de los foils se ajusta según el equilibrio y las condiciones; no hay una regla fija.	avanzado	técnica	4
+\.
+
+
+--
 -- Data for Name: progreso_video; Type: TABLE DATA; Schema: public; Owner: joel
 --
 
 COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_visualizacion) FROM stdin;
-1	24	100	t	2026-06-10 22:40:28.505325
 3	1	100	t	2026-06-01 11:00:00
-3	24	0	f	2026-01-23 20:00:15.609672
-3	25	70	f	2026-01-12 20:00:15.613637
 3	12	30	f	2026-05-09 20:00:15.622649
-4	24	30	f	2026-04-12 20:00:15.636231
-4	25	50	f	2026-03-16 20:00:15.640996
 4	11	50	f	2026-05-23 20:00:15.647239
 4	12	50	f	2026-02-01 20:00:15.649487
-6	24	0	f	2026-02-04 20:00:15.66057
-6	25	0	f	2026-03-23 20:00:15.662754
 6	12	100	t	2025-12-24 20:00:15.669212
 5	1	0	f	2026-01-22 20:00:15.671032
 5	2	100	t	2026-02-05 20:00:15.6728
 5	3	30	f	2026-02-11 20:00:15.675428
-5	24	0	f	2026-05-10 20:00:15.677781
-5	25	30	f	2026-05-30 20:00:15.679694
 5	10	70	f	2026-04-13 20:00:15.681532
 5	11	100	t	2026-03-05 20:00:15.68335
 5	12	30	f	2026-01-03 20:00:15.685107
-7	24	30	f	2026-04-09 20:00:15.696448
-7	25	70	f	2026-01-12 20:00:15.698837
-8	24	70	f	2026-01-07 20:00:15.715281
-8	25	50	f	2025-12-23 20:00:15.717507
 8	12	70	f	2026-04-24 20:00:15.724421
-9	24	30	f	2026-02-28 20:00:15.732887
-9	25	70	f	2026-05-16 20:00:15.734928
 9	11	100	t	2026-03-30 20:00:15.738715
 9	12	100	t	2026-03-21 20:00:15.740767
-10	24	70	f	2026-03-18 20:00:15.747563
-10	25	50	f	2026-05-15 20:00:15.749228
 10	12	100	t	2026-05-11 20:00:15.754453
 3	2	100	t	2026-01-15 10:00:00
 3	3	70	f	2026-02-20 14:30:00
@@ -1467,18 +1628,6 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 3	35	0	f	2026-06-02 13:43:55.627146
 3	36	50	f	2026-05-17 13:43:55.631205
 3	37	50	f	2026-01-13 13:43:55.633959
-3	38	70	f	2026-01-24 13:43:55.636606
-3	39	30	f	2026-06-07 13:43:55.638426
-3	40	0	f	2026-06-24 13:43:55.640446
-3	41	70	f	2026-01-30 13:43:55.644273
-3	42	100	t	2026-06-04 13:43:55.648379
-3	43	70	f	2026-01-22 13:43:55.651198
-3	44	70	f	2026-05-03 13:43:55.653775
-3	45	50	f	2026-05-12 13:43:55.655668
-3	46	30	f	2026-05-24 13:43:55.657717
-3	47	0	f	2026-05-01 13:43:55.660456
-3	48	50	f	2026-02-07 13:43:55.664202
-3	49	0	f	2026-05-18 13:43:55.667205
 4	26	30	f	2026-02-23 13:43:55.68263
 4	27	70	f	2026-01-16 13:43:55.684013
 4	28	0	f	2026-02-17 13:43:55.686258
@@ -1491,18 +1640,6 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 4	35	100	t	2026-05-10 13:43:55.708197
 4	36	50	f	2026-01-20 13:43:55.710208
 4	37	50	f	2026-04-18 13:43:55.712382
-4	38	0	f	2026-05-17 13:43:55.715257
-4	39	100	t	2026-06-12 13:43:55.717552
-4	40	70	f	2026-01-14 13:43:55.719134
-4	41	50	f	2026-06-02 13:43:55.720851
-4	42	30	f	2026-02-01 13:43:55.722682
-4	43	30	f	2026-03-02 13:43:55.7247
-4	44	30	f	2026-05-25 13:43:55.726465
-4	45	100	t	2026-01-24 13:43:55.728133
-4	46	100	t	2026-04-10 13:43:55.729841
-4	47	0	f	2026-06-05 13:43:55.731654
-4	48	100	t	2026-06-10 13:43:55.733447
-4	49	70	f	2026-04-19 13:43:55.735235
 6	26	50	f	2026-02-15 13:43:55.74569
 6	27	70	f	2026-03-01 13:43:55.746919
 6	28	50	f	2026-05-11 13:43:55.749205
@@ -1515,18 +1652,6 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 6	35	100	t	2026-02-17 13:43:55.764796
 6	36	50	f	2026-04-16 13:43:55.767097
 6	37	100	t	2026-02-20 13:43:55.768926
-6	38	70	f	2026-06-02 13:43:55.770753
-6	39	70	f	2026-05-08 13:43:55.772745
-6	40	50	f	2026-04-27 13:43:55.774755
-6	41	70	f	2026-05-21 13:43:55.776722
-6	42	0	f	2026-01-22 13:43:55.778616
-6	43	0	f	2026-06-16 13:43:55.780493
-6	44	30	f	2026-05-22 13:43:55.782444
-6	45	50	f	2026-03-04 13:43:55.784529
-6	46	50	f	2026-06-06 13:43:55.786524
-6	47	50	f	2026-01-09 13:43:55.788464
-6	48	70	f	2026-02-19 13:43:55.7904
-6	49	30	f	2026-02-06 13:43:55.792402
 5	26	100	t	2026-01-02 13:43:55.805043
 5	27	30	f	2026-03-20 13:43:55.806492
 5	28	70	f	2026-04-25 13:43:55.809022
@@ -1539,18 +1664,6 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 5	35	0	f	2026-06-12 13:43:55.826835
 5	36	100	t	2026-05-02 13:43:55.8295
 5	37	0	f	2026-04-09 13:43:55.831617
-5	38	100	t	2026-02-15 13:43:55.833405
-5	39	50	f	2026-01-15 13:43:55.83517
-5	40	50	f	2026-03-07 13:43:55.837101
-5	41	70	f	2026-06-14 13:43:55.838912
-5	42	50	f	2026-01-03 13:43:55.841095
-5	43	100	t	2026-02-11 13:43:55.843194
-5	44	50	f	2026-06-01 13:43:55.846289
-5	45	0	f	2026-01-04 13:43:55.850081
-5	46	50	f	2026-06-11 13:43:55.852902
-5	47	70	f	2026-04-21 13:43:55.855578
-5	48	50	f	2026-06-01 13:43:55.858213
-5	49	30	f	2026-02-27 13:43:55.860715
 7	26	70	f	2025-12-29 13:43:55.873136
 7	27	50	f	2026-06-02 13:43:55.87458
 7	28	0	f	2026-05-19 13:43:55.876987
@@ -1563,18 +1676,6 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 7	35	50	f	2026-02-14 13:43:55.893445
 7	36	70	f	2026-04-13 13:43:55.89537
 7	37	100	t	2026-01-02 13:43:55.8973
-7	38	30	f	2026-06-08 13:43:55.899677
-7	39	50	f	2026-06-25 13:43:55.902425
-7	40	0	f	2026-06-14 13:43:55.90528
-7	41	30	f	2026-03-27 13:43:55.908571
-7	42	70	f	2026-03-09 13:43:55.911134
-7	43	50	f	2026-04-03 13:43:55.914033
-7	44	30	f	2026-05-04 13:43:55.917129
-7	45	0	f	2026-01-03 13:43:55.919981
-7	46	50	f	2026-04-21 13:43:55.923165
-7	47	100	t	2026-01-24 13:43:55.926026
-7	48	0	f	2026-06-17 13:43:55.928697
-7	49	70	f	2026-04-15 13:43:55.931493
 8	26	30	f	2026-04-02 13:43:55.946167
 8	27	50	f	2026-01-14 13:43:55.947339
 8	28	30	f	2026-01-12 13:43:55.949975
@@ -1587,18 +1688,6 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 8	35	50	f	2026-04-17 13:43:55.967795
 8	36	30	f	2026-03-11 13:43:55.969687
 8	37	70	f	2026-02-08 13:43:55.97147
-8	38	70	f	2026-05-03 13:43:55.9732
-8	39	30	f	2026-01-25 13:43:55.975027
-8	40	100	t	2026-06-15 13:43:55.976668
-8	41	50	f	2026-04-08 13:43:55.978297
-8	42	70	f	2026-03-30 13:43:55.979993
-8	43	0	f	2026-06-04 13:43:55.982439
-8	44	100	t	2026-06-03 13:43:55.984461
-8	45	100	t	2026-02-22 13:43:55.986397
-8	46	30	f	2026-06-26 13:43:55.988147
-8	47	50	f	2026-03-19 13:43:55.989919
-8	48	100	t	2026-02-14 13:43:55.992392
-8	49	30	f	2026-01-28 13:43:55.994269
 9	26	70	f	2026-05-28 13:43:56.010369
 9	27	100	t	2026-03-11 13:43:56.011513
 9	28	0	f	2026-04-19 13:43:56.01375
@@ -1611,18 +1700,6 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 9	35	70	f	2026-06-04 13:43:56.029478
 9	36	50	f	2026-04-12 13:43:56.031667
 9	37	70	f	2026-03-09 13:43:56.033817
-9	38	70	f	2026-05-26 13:43:56.035905
-9	39	70	f	2026-06-04 13:43:56.038192
-9	40	0	f	2026-05-23 13:43:56.04026
-9	41	50	f	2026-01-24 13:43:56.04221
-9	42	70	f	2025-12-28 13:43:56.044137
-9	43	70	f	2026-03-26 13:43:56.046075
-9	44	0	f	2026-02-19 13:43:56.048284
-9	45	100	t	2026-05-15 13:43:56.050351
-9	46	0	f	2026-04-26 13:43:56.052273
-9	47	50	f	2026-02-21 13:43:56.054234
-9	48	0	f	2026-05-16 13:43:56.056421
-9	49	0	f	2026-04-20 13:43:56.060062
 10	26	70	f	2026-04-11 13:43:56.075349
 10	27	30	f	2026-01-09 13:43:56.076451
 10	28	100	t	2026-01-17 13:43:56.07877
@@ -1635,18 +1712,6 @@ COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_v
 10	35	0	f	2026-01-15 13:43:56.095676
 10	36	50	f	2026-01-04 13:43:56.097993
 10	37	100	t	2026-04-04 13:43:56.100403
-10	38	0	f	2026-03-22 13:43:56.103271
-10	39	70	f	2026-01-22 13:43:56.105662
-10	40	70	f	2026-02-07 13:43:56.108078
-10	41	0	f	2026-04-11 13:43:56.110378
-10	42	100	t	2026-02-20 13:43:56.113035
-10	43	100	t	2026-05-12 13:43:56.115424
-10	44	50	f	2026-03-18 13:43:56.117757
-10	45	100	t	2026-03-25 13:43:56.120138
-10	46	0	f	2026-04-08 13:43:56.122702
-10	47	30	f	2026-06-25 13:43:56.125153
-10	48	70	f	2026-05-03 13:43:56.127502
-10	49	70	f	2026-04-08 13:43:56.13042
 \.
 
 
@@ -1839,6 +1904,14 @@ COPY public.puntuacion_evaluacion (evaluacion_id, criterio_id, puntuacion) FROM 
 
 
 --
+-- Data for Name: respuesta_usuario; Type: TABLE DATA; Schema: public; Owner: joel
+--
+
+COPY public.respuesta_usuario (id, examen_id, usuario_id, respuestas, fecha_inicio, fecha_envio, puntaje_obtenido, porcentaje, aprobado, estado) FROM stdin;
+\.
+
+
+--
 -- Data for Name: rol; Type: TABLE DATA; Schema: public; Owner: joel
 --
 
@@ -1870,8 +1943,8 @@ COPY public.usuario (id, email, password_hash, nombre, avatar_url, rol_id, activ
 9	atleta7@iqfoil.cu	scrypt:32768:8:1$ZY1jPhe4VaUBNgn6$983a03d9303edd19d874687b440184d7b0d9386610d11227040900438b620fadc8ad5a20821ab293c1fba07c63972504f7188a0fec4181cb95ac6de038902fa2	Marta Díaz	\N	3	t	2026-06-23 02:23:45.769195	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara
 10	atleta8@iqfoil.cu	scrypt:32768:8:1$pkDAzkoBNXgCPka0$b8cbf19a7b9b7df16d55ea9f807a034ffcc098b28086e1dae6a95b9aa661d3f287e7c2051ff4140918bcf372c8af93e1e8414386912f48d50d1a56a1ff04959b	Roberto Mena	\N	3	t	2026-06-26 09:58:44.213322	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
 2	entrenador@iqfoil.cu	scrypt:32768:8:1$s9LtZkIsgV5esacm$a4eefee377931a07b4ab57275f816f6654eac3f219a8d4d8afe2b5ae080ac21949ba9b661f615c78d63bea8e6993dc8ecdf497e134518755080a36713a43e931	Carlos Gómez	\N	2	t	2026-06-26 13:36:22.258917	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
-1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-26 13:57:36.448864	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "en", "notificacionesEmail": true}	La Habana
-3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-06-26 13:58:15.129065	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
+3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-06-26 13:58:15.129065	2026-06-01 22:20:05.081416	\N	{"tema": "sistema", "idioma": "es", "notificacionesEmail": true}	La Habana
+1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-26 14:15:18.458413	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "en", "notificacionesEmail": true}	La Habana
 4	atleta2@iqfoil.cu	scrypt:32768:8:1$RH5ISwhSV192lBIf$9a36bc43f038529911c650c94e24fce1caf515c74d955b9452b223316de339f7fe1e2fc818db2a453be7dd1717384a600ec2b6b5d4fb53149e738fa265c7f4b8	María García	\N	3	t	2026-06-26 11:41:28.094673	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba
 \.
 
@@ -1916,35 +1989,21 @@ COPY public.video_tutorial (id, titulo, descripcion, url_video, duracion_seg, ni
 1	Introducción al foil	Conceptos básicos del foil	https://example.com/video1.mp4	360	principiante	https://example.com/thumb1.jpg	2026-06-01 22:20:05.088735	t
 2	Técnica de virada	Aprende a virar correctamente	https://example.com/video2.mp4	480	intermedio	https://example.com/thumb2.jpg	2026-06-01 22:20:05.088735	t
 3	Navegación con viento fuerte	Consejos para condiciones extremas	https://example.com/video3.mp4	600	avanzado	https://example.com/thumb3.jpg	2026-06-01 22:20:05.088735	t
-24	prueba	sds	uploads/videos/lofi-home-garden-moewalls-com.mp4	0	principiante	\N	2026-06-10 22:39:59.140644	t
-25	prueba		uploads/videos/fire-flag-one-piece-moewalls-com.mp4	0	principiante	\N	2026-06-11 14:13:36.722873	t
 11	Virada en ceñida	Virada en ceñida	uploads/videos/virada_ceñida.mp4	450	intermedio	\N	2026-06-19 20:00:15.572858	t
 12	Trasluchada	Trasluchada en popa	uploads/videos/trasluchada.mp4	600	avanzado	\N	2026-06-19 20:00:15.572858	t
 10	Técnica de salida	Salida en regata	uploads/videos/How to care for and finish a foil surface.mp4	300	principiante	\N	2026-06-19 20:00:15.572858	t
-26	How to care for and finish a foil surface	Tutorial sobre cuidado y acabado de superficies de foil.	uploads/videos/How to care for and finish a foil surface.mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
-27	How to foil. Lesson 1	Primera lección de foil: conceptos básicos.	uploads/videos/How to foil. Lesson 1(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
 28	I Hate Fairyland - Resumen	Contenido variado (no relacionado con vela, pero disponible).	uploads/videos/I Hate Fairyland_ ¡El Viaje Más Violento al País de las Maravillas_ - Resumen(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
-29	IQ Foil Diary - Singapore Foil GP 2022 - Pasir Ris	Diario de competición: Singapore Foil GP 2022.	uploads/videos/IQ Foil Diary_ Singapore Foil GP 2022 - Pasir Ris(360P).mp4	0	avanzado	\N	2026-06-26 10:42:48.341046	t
-30	IQFOIL - Episode 5 - GoPro Fusion 360 Camera on Jibe Mark	Uso de cámara GoPro en la marca de jibe.	uploads/videos/IQFOIL - Episode 5_  GoPro Fusion 360 Camera on Jibe Mark(360P).mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
-31	IQFoil - Race Day - 2022 Singapore Slalom Nationals at Changi Beach	Día de regata en el Nacional de Slalom 2022.	uploads/videos/IQFoil - Race Day - 2022 Singapore Slalom Nationals at Changi Beach(360P).mp4	0	avanzado	\N	2026-06-26 10:42:48.341046	t
-32	iQFoil Mast Rake Adjustment	Ajuste del rake del mástil en iQFoil.	uploads/videos/iQFoil Mast Rake Adjustment(360P).mp4	0	avanzado	\N	2026-06-26 10:42:48.341046	t
-33	IQFOIL Zero to Hero - Episode 0 - First Flight Day	Primer día de vuelo (foil) - episodio 0.	uploads/videos/IQFOIL Zero to Hero - Episode 0_ First Flight Day(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
-34	IQFOIL Zero to Hero - Episode 1 - A few gusts and jibe practice	Prácticas con ráfagas y jibe - episodio 1.	uploads/videos/IQFOIL Zero to Hero - Episode 1_ A few gusts and jibe practice(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
-35	IQFOIL Zero to Hero - Episode 2 - Close encounter with gybe mark	Encuentro cercano con la marca de gybe - episodio 2.	uploads/videos/IQFOIL Zero to Hero - Episode 2_  Close encounter with gybe mark(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
-36	IQFOIL Zero to Hero - Episode 3 - First Foil Gybe and Day of Practice	Primer gybe en foil y día de práctica - episodio 3.	uploads/videos/IQFOIL Zero to Hero - Episode 3_ First Foil Gybe and Day of Practice(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
-37	IQFOIL Zero to Hero - Episode 4 - Foiling in a South East Monsoon Tropical Storm	Navegando en tormenta tropical - episodio 4.	uploads/videos/IQFOIL Zero to Hero - Episode 4_ Foiling in a South East Monsoon Tropical Storm(360P).mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
-38	How to care for and finish a foil surface	Tutorial sobre cuidado y acabado de superficies de foil.	uploads/videos/How to care for and finish a foil surface.mp4	0	intermedio	\N	2026-06-26 10:43:05.28153	t
-39	How to foil. Lesson 1	Primera lección de foil: conceptos básicos.	uploads/videos/How to foil. Lesson 1(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
-40	I Hate Fairyland - Resumen	Contenido variado (no relacionado con vela, pero disponible).	uploads/videos/I Hate Fairyland_ ¡El Viaje Más Violento al País de las Maravillas_ - Resumen(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
-41	IQ Foil Diary - Singapore Foil GP 2022 - Pasir Ris	Diario de competición: Singapore Foil GP 2022.	uploads/videos/IQ Foil Diary_ Singapore Foil GP 2022 - Pasir Ris(360P).mp4	0	avanzado	\N	2026-06-26 10:43:05.28153	t
-42	IQFOIL - Episode 5 - GoPro Fusion 360 Camera on Jibe Mark	Uso de cámara GoPro en la marca de jibe.	uploads/videos/IQFOIL - Episode 5_  GoPro Fusion 360 Camera on Jibe Mark(360P).mp4	0	intermedio	\N	2026-06-26 10:43:05.28153	t
-43	IQFoil - Race Day - 2022 Singapore Slalom Nationals at Changi Beach	Día de regata en el Nacional de Slalom 2022.	uploads/videos/IQFoil - Race Day - 2022 Singapore Slalom Nationals at Changi Beach(360P).mp4	0	avanzado	\N	2026-06-26 10:43:05.28153	t
-44	iQFoil Mast Rake Adjustment	Ajuste del rake del mástil en iQFoil.	uploads/videos/iQFoil Mast Rake Adjustment(360P).mp4	0	avanzado	\N	2026-06-26 10:43:05.28153	t
-45	IQFOIL Zero to Hero - Episode 0 - First Flight Day	Primer día de vuelo (foil) - episodio 0.	uploads/videos/IQFOIL Zero to Hero - Episode 0_ First Flight Day(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
-46	IQFOIL Zero to Hero - Episode 1 - A few gusts and jibe practice	Prácticas con ráfagas y jibe - episodio 1.	uploads/videos/IQFOIL Zero to Hero - Episode 1_ A few gusts and jibe practice(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
-47	IQFOIL Zero to Hero - Episode 2 - Close encounter with gybe mark	Encuentro cercano con la marca de gybe - episodio 2.	uploads/videos/IQFOIL Zero to Hero - Episode 2_  Close encounter with gybe mark(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
-48	IQFOIL Zero to Hero - Episode 3 - First Foil Gybe and Day of Practice	Primer gybe en foil y día de práctica - episodio 3.	uploads/videos/IQFOIL Zero to Hero - Episode 3_ First Foil Gybe and Day of Practice(360P).mp4	0	principiante	\N	2026-06-26 10:43:05.28153	t
-49	IQFOIL Zero to Hero - Episode 4 - Foiling in a South East Monsoon Tropical Storm	Navegando en tormenta tropical - episodio 4.	uploads/videos/IQFOIL Zero to Hero - Episode 4_ Foiling in a South East Monsoon Tropical Storm(360P).mp4	0	intermedio	\N	2026-06-26 10:43:05.28153	t
+26	Cómo cuidar y terminar una superficie de foil	Tutorial sobre cuidado y acabado de superficies de foil.	uploads/videos/How to care for and finish a foil surface.mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
+27	Cómo hacer foil. Lección 1	Primera lección de foil: conceptos básicos.	uploads/videos/How to foil. Lesson 1(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+29	Diario de IQ Foil - Singapore Foil GP 2022 - Pasir Ris	Diario de competición: Singapore Foil GP 2022.	uploads/videos/IQ Foil Diary_ Singapore Foil GP 2022 - Pasir Ris(360P).mp4	0	avanzado	\N	2026-06-26 10:42:48.341046	t
+30	IQFOIL - Episodio 5 - Cámara GoPro Fusion 360 en la marca de Jibe	Uso de cámara GoPro en la marca de jibe.	uploads/videos/IQFOIL - Episode 5_  GoPro Fusion 360 Camera on Jibe Mark(360P).mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
+31	IQFoil - Día de regata - Nacional de Slalom 2022 en Changi Beach	Día de regata en el Nacional de Slalom 2022.	uploads/videos/IQFoil - Race Day - 2022 Singapore Slalom Nationals at Changi Beach(360P).mp4	0	avanzado	\N	2026-06-26 10:42:48.341046	t
+32	Ajuste del rake del mástil iQFoil	Ajuste del rake del mástil en iQFoil.	uploads/videos/iQFoil Mast Rake Adjustment(360P).mp4	0	avanzado	\N	2026-06-26 10:42:48.341046	t
+33	IQFOIL Zero to Hero - Episodio 0 - Primer día de vuelo	Primer día de vuelo (foil) - episodio 0.	uploads/videos/IQFOIL Zero to Hero - Episode 0_ First Flight Day(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+34	IQFOIL Zero to Hero - Episodio 1 - Algunas ráfagas y práctica de jibe	Prácticas con ráfagas y jibe - episodio 1.	uploads/videos/IQFOIL Zero to Hero - Episode 1_ A few gusts and jibe practice(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+35	IQFOIL Zero to Hero - Episodio 2 - Encuentro cercano con la marca de gybe	Encuentro cercano con la marca de gybe - episodio 2.	uploads/videos/IQFOIL Zero to Hero - Episode 2_  Close encounter with gybe mark(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+36	IQFOIL Zero to Hero - Episodio 3 - Primer gybe en foil y día de práctica	Primer gybe en foil y día de práctica - episodio 3.	uploads/videos/IQFOIL Zero to Hero - Episode 3_ First Foil Gybe and Day of Practice(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
+37	IQFOIL Zero to Hero - Episodio 4 - Navegando en una tormenta tropical del monzón del sureste	Navegando en tormenta tropical - episodio 4.	uploads/videos/IQFOIL Zero to Hero - Episode 4_ Foiling in a South East Monsoon Tropical Storm(360P).mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
 \.
 
 
@@ -1966,7 +2025,7 @@ SELECT pg_catalog.setval('public.criterio_id_seq', 3, true);
 -- Name: curso_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.curso_id_seq', 2, true);
+SELECT pg_catalog.setval('public.curso_id_seq', 3, true);
 
 
 --
@@ -1987,7 +2046,14 @@ SELECT pg_catalog.setval('public.evaluacion_id_seq', 61, true);
 -- Name: evento_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.evento_id_seq', 3, true);
+SELECT pg_catalog.setval('public.evento_id_seq', 4, true);
+
+
+--
+-- Name: examen_teorico_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
+--
+
+SELECT pg_catalog.setval('public.examen_teorico_id_seq', 3, true);
 
 
 --
@@ -2008,14 +2074,14 @@ SELECT pg_catalog.setval('public.hilo_id_seq', 3, true);
 -- Name: insignia_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.insignia_id_seq', 3, true);
+SELECT pg_catalog.setval('public.insignia_id_seq', 4, true);
 
 
 --
 -- Name: log_actividad_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.log_actividad_id_seq', 303, true);
+SELECT pg_catalog.setval('public.log_actividad_id_seq', 304, true);
 
 
 --
@@ -2037,6 +2103,20 @@ SELECT pg_catalog.setval('public.mensaje_privado_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.mentoria_id_seq', 1, false);
+
+
+--
+-- Name: pregunta_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
+--
+
+SELECT pg_catalog.setval('public.pregunta_id_seq', 10, true);
+
+
+--
+-- Name: respuesta_usuario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
+--
+
+SELECT pg_catalog.setval('public.respuesta_usuario_id_seq', 1, false);
 
 
 --
@@ -2124,6 +2204,14 @@ ALTER TABLE ONLY public.evento
 
 
 --
+-- Name: examen_teorico examen_teorico_pkey; Type: CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.examen_teorico
+    ADD CONSTRAINT examen_teorico_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: foro foro_pkey; Type: CONSTRAINT; Schema: public; Owner: joel
 --
 
@@ -2196,6 +2284,14 @@ ALTER TABLE ONLY public.participante_evento
 
 
 --
+-- Name: pregunta pregunta_pkey; Type: CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.pregunta
+    ADD CONSTRAINT pregunta_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: progreso_video progreso_video_pkey; Type: CONSTRAINT; Schema: public; Owner: joel
 --
 
@@ -2209,6 +2305,14 @@ ALTER TABLE ONLY public.progreso_video
 
 ALTER TABLE ONLY public.puntuacion_evaluacion
     ADD CONSTRAINT puntuacion_evaluacion_pkey PRIMARY KEY (evaluacion_id, criterio_id);
+
+
+--
+-- Name: respuesta_usuario respuesta_usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.respuesta_usuario
+    ADD CONSTRAINT respuesta_usuario_pkey PRIMARY KEY (id);
 
 
 --
@@ -2324,6 +2428,20 @@ CREATE INDEX idx_evento_fecha ON public.evento USING btree (fecha_inicio);
 
 
 --
+-- Name: idx_examen_activo; Type: INDEX; Schema: public; Owner: joel
+--
+
+CREATE INDEX idx_examen_activo ON public.examen_teorico USING btree (activo);
+
+
+--
+-- Name: idx_examen_nivel; Type: INDEX; Schema: public; Owner: joel
+--
+
+CREATE INDEX idx_examen_nivel ON public.examen_teorico USING btree (nivel);
+
+
+--
 -- Name: idx_hilo_fecha; Type: INDEX; Schema: public; Owner: joel
 --
 
@@ -2370,6 +2488,13 @@ CREATE INDEX idx_mp_conversacion ON public.mensaje_privado USING btree (conversa
 --
 
 CREATE INDEX idx_mp_fecha ON public.mensaje_privado USING btree (fecha);
+
+
+--
+-- Name: idx_pregunta_examen; Type: INDEX; Schema: public; Owner: joel
+--
+
+CREATE INDEX idx_pregunta_examen ON public.pregunta USING btree (examen_id);
 
 
 --
@@ -2487,6 +2612,14 @@ ALTER TABLE ONLY public.evento
 
 
 --
+-- Name: examen_teorico examen_teorico_creado_por_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.examen_teorico
+    ADD CONSTRAINT examen_teorico_creado_por_fkey FOREIGN KEY (creado_por) REFERENCES public.usuario(id) ON DELETE SET NULL;
+
+
+--
 -- Name: hilo hilo_autor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
 --
 
@@ -2575,6 +2708,14 @@ ALTER TABLE ONLY public.participante_evento
 
 
 --
+-- Name: pregunta pregunta_examen_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.pregunta
+    ADD CONSTRAINT pregunta_examen_id_fkey FOREIGN KEY (examen_id) REFERENCES public.examen_teorico(id) ON DELETE CASCADE;
+
+
+--
 -- Name: progreso_video progreso_video_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
 --
 
@@ -2604,6 +2745,22 @@ ALTER TABLE ONLY public.puntuacion_evaluacion
 
 ALTER TABLE ONLY public.puntuacion_evaluacion
     ADD CONSTRAINT puntuacion_evaluacion_evaluacion_id_fkey FOREIGN KEY (evaluacion_id) REFERENCES public.evaluacion(id) ON DELETE CASCADE;
+
+
+--
+-- Name: respuesta_usuario respuesta_usuario_examen_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.respuesta_usuario
+    ADD CONSTRAINT respuesta_usuario_examen_id_fkey FOREIGN KEY (examen_id) REFERENCES public.examen_teorico(id) ON DELETE CASCADE;
+
+
+--
+-- Name: respuesta_usuario respuesta_usuario_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.respuesta_usuario
+    ADD CONSTRAINT respuesta_usuario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuario(id) ON DELETE CASCADE;
 
 
 --
@@ -2642,5 +2799,5 @@ ALTER TABLE ONLY public.usuario
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 3MaE4trN2fauQ7Alnyb8BvSWb1xHVMYIsDUBFBiuJvB9P2wYBtDZ6gOT0fgIETb
+\unrestrict y5wv6TPqgJaLCPLJVAMwgGavLEnm435y2o3rrkvXjYlWiPwH8uuuyxTF68Vz7ro
 

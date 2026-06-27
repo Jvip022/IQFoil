@@ -1,0 +1,127 @@
+<div class="examen-teorico">
+  <!-- Cabecera -->
+  <header class="examen-teorico__header">
+    <div class="header-left">
+      <h2 class="examen-teorico__title">📚 Examen teórico</h2>
+      <p class="examen-teorico__subtitle" *ngIf="examen">{{ examen.titulo }}</p>
+    </div>
+    <div class="header-right" *ngIf="!cargando && !enviado">
+      <div class="timer" [class.warning]="tiempoRestante < 60">
+        <i class="fas fa-clock"></i> {{ tiempoFormateado }}
+      </div>
+      <div class="progreso">
+        <span>{{ progreso }}% completado</span>
+        <div class="barra-progreso">
+          <div class="barra" [style.width.%]="progreso"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <app-estado-conexion class="examen-teorico__connection"></app-estado-conexion>
+
+  <!-- Cargando -->
+  <app-loading-spinner *ngIf="cargando" [text]="'Cargando examen...'"></app-loading-spinner>
+
+  <!-- Examen -->
+  <div *ngIf="!cargando && examen && !enviado" class="examen-teorico__content">
+    <!-- Descripción -->
+    <div class="examen-info">
+      <p><strong>Nivel:</strong> {{ examen.nivel }}</p>
+      <p><strong>Tiempo límite:</strong> {{ examen.tiempoLimiteMinutos }} minutos</p>
+      <p><strong>Nota de aprobación:</strong> {{ examen.puntajeAprobacion }}%</p>
+      <p><strong>Preguntas:</strong> {{ totalPreguntas }}</p>
+    </div>
+
+    <!-- Indicador de pregunta actual -->
+    <div class="pregunta-indicador">
+      Pregunta {{ preguntaActual + 1 }} de {{ totalPreguntas }}
+    </div>
+
+    <!-- Pregunta actual -->
+    <div class="pregunta-card" *ngIf="preguntas.length > 0">
+      <div class="pregunta-texto">
+        <strong>{{ preguntaActual + 1 }}.</strong> {{ preguntas[preguntaActual].texto }}
+      </div>
+
+      <!-- Opciones según tipo -->
+      <div class="opciones">
+        <!-- Opción única (radio) -->
+        <div *ngIf="preguntas[preguntaActual].tipo === 'opcion_unica'">
+          <div class="opcion" *ngFor="let opcion of preguntas[preguntaActual].opciones">
+            <label>
+              <input type="radio"
+                     name="pregunta_{{ preguntas[preguntaActual].id }}"
+                     [value]="opcion"
+                     [(ngModel)]="respuestas[preguntas[preguntaActual].id]" />
+              {{ opcion }}
+            </label>
+          </div>
+        </div>
+
+        <!-- Verdadero / Falso -->
+        <div *ngIf="preguntas[preguntaActual].tipo === 'verdadero_falso'">
+          <div class="opcion">
+            <label>
+              <input type="radio"
+                     name="pregunta_{{ preguntas[preguntaActual].id }}"
+                     [value]="true"
+                     [(ngModel)]="respuestas[preguntas[preguntaActual].id]" />
+              Verdadero
+            </label>
+          </div>
+          <div class="opcion">
+            <label>
+              <input type="radio"
+                     name="pregunta_{{ preguntas[preguntaActual].id }}"
+                     [value]="false"
+                     [(ngModel)]="respuestas[preguntas[preguntaActual].id]" />
+              Falso
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navegación entre preguntas -->
+    <div class="navegacion">
+      <button class="btn btn-outline" (click)="anteriorPregunta()" [disabled]="preguntaActual === 0">
+        ⬅ Anterior
+      </button>
+      <span class="paginador">{{ preguntaActual + 1 }} / {{ totalPreguntas }}</span>
+      <button class="btn btn-outline" (click)="siguientePregunta()" [disabled]="preguntaActual === totalPreguntas - 1">
+        Siguiente ➡
+      </button>
+    </div>
+
+    <!-- Miniatura de preguntas -->
+    <div class="miniaturas">
+      <div class="miniatura"
+           *ngFor="let p of preguntas; let i = index"
+           [class.respondida]="respuestas[p.id] !== null && respuestas[p.id] !== undefined && respuestas[p.id] !== ''"
+           [class.actual]="i === preguntaActual"
+           (click)="irAPregunta(i)">
+        {{ i + 1 }}
+      </div>
+    </div>
+
+    <!-- Botón enviar -->
+    <div class="accion">
+      <button class="btn btn-primary btn-enviar" (click)="enviarExamen()" [disabled]="enviado">
+        📤 Enviar examen
+      </button>
+    </div>
+  </div>
+
+  <!-- Resultados (después de enviar) -->
+  <div *ngIf="enviado" class="examen-teorico__resultado">
+    <div class="resultado-card" [class.aprobado]="aprobado" [class.reprobado]="!aprobado">
+      <h3>{{ aprobado ? '🎉 ¡Aprobado!' : '😞 No aprobado' }}</h3>
+      <p><strong>Puntaje obtenido:</strong> {{ puntajeObtenido }}%</p>
+      <p><strong>Nota de aprobación:</strong> {{ examen?.puntajeAprobacion }}%</p>
+      <button class="btn btn-primary" (click)="volver()">
+        📋 Volver a evaluaciones
+      </button>
+    </div>
+  </div>
+</div>

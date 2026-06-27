@@ -97,8 +97,9 @@
   }
 }
 
-// Estilos para el PDF (impresión)
+// Estilos para el PDF (impresión) - SIN ESTILOS DE TABLAS NI GRÁFICOS
 @media print {
+  // Ocultar elementos de navegación
   .reportes__tabs,
   .reportes__header .header-right,
   app-estado-conexion,
@@ -106,15 +107,75 @@
   .tab-btn {
     display: none !important;
   }
+
   .reportes__content {
     padding: 0 !important;
   }
+
+  // Eliminar estilos de tarjetas
   .card {
     border: none !important;
     box-shadow: none !important;
+    page-break-inside: avoid;
+    background: transparent !important;
   }
+
+  // Eliminar fondo y bordes de tablas
+  .table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    font-size: 10px !important;
+    background: transparent !important;
+  }
+  .table th,
+  .table td {
+    border: 1px solid #ccc !important;
+    padding: 4px 6px !important;
+    background: transparent !important;
+  }
+  .table-striped tbody tr:nth-of-type(odd) {
+    background: transparent !important;
+  }
+  .table-sm th,
+  .table-sm td {
+    padding: 2px 4px !important;
+  }
+
+  // Mantener encabezados de tarjetas con estilo mínimo
+  .card-header {
+    background: #f0f4f8 !important;
+    color: #1a2b4c !important;
+    font-weight: bold;
+    padding: 6px 10px !important;
+    border-bottom: 1px solid #ccc !important;
+  }
+
+  .card-body {
+    padding: 10px !important;
+  }
+
+  // Gráficos: solo tamaño, sin estilos adicionales
   .chart-container,
   .chart-container-small {
     height: 180px !important;
+    canvas {
+      max-height: 160px !important;
+      background: transparent !important;
+    }
+  }
+
+  // Asegurar que las filas de las tablas no tengan color de fondo
+  .table tbody tr {
+    background: transparent !important;
+  }
+
+  // Mejorar el espaciado en columnas
+  .row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+  }
+  .col-md-6, .col-md-7, .col-md-5 {
+    flex: 1 1 50% !important;
+    max-width: 50% !important;
   }
 }

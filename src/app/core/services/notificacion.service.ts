@@ -4,9 +4,6 @@ import { delay } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
-
-
-
 // ========== Interfaz para notificaciones persistentes (listas) ==========
 export interface NotificacionPersistente {
   id: string;
@@ -26,14 +23,15 @@ export interface NotificacionToast {
 }
 
 @Injectable({ providedIn: 'root' })
-
-  export class NotificacionService {
+export class NotificacionService {
   private apiUrl = environment.apiUrl;
 
+  constructor(private http: HttpClient) { }
+
+  // ========== Notificaciones persistentes (API) ==========
   getNotificaciones(): Observable<NotificacionPersistente[]> {
     return this.http.get<NotificacionPersistente[]>(`${this.apiUrl}/notificaciones`);
   }
-
 
   // ========== Notificaciones persistentes (mock) ==========
   private notificacionesMock: NotificacionPersistente[] = [
@@ -54,14 +52,6 @@ export interface NotificacionToast {
       fecha: new Date(Date.now() - 86400000)
     }
   ];
-
-  // ========== Sistema de notificaciones toast ==========
-  private toastSubject = new Subject<NotificacionToast>();
-  toast$ = this.toastSubject.asObservable();
-
-  constructor(private http: HttpClient) { }
-
-  // ========== Métodos para notificaciones persistentes ==========
 
   getUnreadCount(): Observable<number> {
     const count = this.notificacionesMock.filter(n => !n.leida).length;
@@ -90,7 +80,10 @@ export interface NotificacionToast {
     return of(this.notificacionesMock.slice(0, limit)).pipe(delay(300));
   }
 
-  // ========== Métodos para notificaciones toast ==========
+  // ========== Sistema de notificaciones toast ==========
+  private toastSubject = new Subject<NotificacionToast>();
+  toast$ = this.toastSubject.asObservable();
+
   mostrarExito(mensaje: string, duracion: number = 3000): void {
     this.toastSubject.next({ tipo: 'exito', mensaje, duracion });
   }
@@ -106,7 +99,4 @@ export interface NotificacionToast {
   mostrarInfo(mensaje: string, duracion: number = 3000): void {
     this.toastSubject.next({ tipo: 'info', mensaje, duracion });
   }
-
 }
-
-

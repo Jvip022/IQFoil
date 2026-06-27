@@ -59,10 +59,8 @@ export class RealizarEvaluacionComponent implements OnInit, OnDestroy {
 
   cargarExamenesTeoricos(): void {
     this.cargandoTeoricos = true;
-    // Se obtienen todos los exámenes activos (podrías filtrar por usuario no realizados)
     this.evaluacionService.getExamenesTeoricos().subscribe({
       next: (examenes: ExamenTeorico[]) => {
-        // Filtrar solo activos (si el backend no lo hace)
         this.examenesTeoricos = examenes.filter(e => e.activo === true);
         this.cargandoTeoricos = false;
       },
@@ -75,11 +73,30 @@ export class RealizarEvaluacionComponent implements OnInit, OnDestroy {
   }
 
   evaluarPractica(item: VideoPractica): void {
-    this.router.navigate(['/evaluacion/evaluar', item.id]);
+    console.log('Navegando a evaluación de práctica:', item.id);
+    this.router.navigate(['/evaluacion/evaluar', item.id])
+      .then(success => {
+        if (!success) {
+          this.notificacionService.mostrarError('No se pudo acceder a la evaluación (ruta no encontrada)');
+        }
+      })
+      .catch(err => {
+        console.error('Error en navegación:', err);
+        this.notificacionService.mostrarError('Error al navegar a la evaluación');
+      });
   }
 
   tomarExamen(examen: ExamenTeorico): void {
-    // Redirige a un componente que maneje la realización del examen teórico
-    this.router.navigate(['/evaluacion/examen-teorico', examen.id]);
+    console.log('Navegando a examen teórico:', examen.id);
+    this.router.navigate(['/evaluacion/examen-teorico', examen.id])
+      .then(success => {
+        if (!success) {
+          this.notificacionService.mostrarError('No se pudo acceder al examen (ruta no encontrada)');
+        }
+      })
+      .catch(err => {
+        console.error('Error en navegación:', err);
+        this.notificacionService.mostrarError('Error al navegar al examen');
+      });
   }
 }

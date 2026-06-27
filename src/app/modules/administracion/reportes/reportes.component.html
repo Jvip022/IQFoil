@@ -1,5 +1,5 @@
 <div class="reportes">
-  <!-- Header con botón de exportar -->
+  <!-- Header con botones de exportar -->
   <header class="reportes__header">
     <div class="header-left">
       <h2>📊 Reportes y estadísticas</h2>
@@ -8,6 +8,9 @@
     <div class="header-right">
       <button class="btn btn-primary" (click)="exportarPDF()" [disabled]="exportando">
         {{ exportando ? 'Generando...' : '📄 Descargar PDF' }}
+      </button>
+      <button class="btn btn-success" (click)="exportarExcel()" [disabled]="exportando">
+        {{ exportando ? 'Generando...' : '📊 Descargar Excel' }}
       </button>
     </div>
   </header>
@@ -27,7 +30,7 @@
   <div #reporteContent>
     <div class="reportes__content" *ngIf="!cargando">
       <!-- ========== PROGRESO INDIVIDUAL ========== -->
-      <div *ngIf="tabActivo === 'progreso' && progresoIndividual">
+      <div id="seccion-progreso" *ngIf="tabActivo === 'progreso' && progresoIndividual">
         <div class="card mb-3">
           <div class="card-header">📈 Progreso de {{ progresoIndividual.nombre }}</div>
           <div class="card-body">
@@ -53,15 +56,29 @@
       </div>
 
       <!-- ========== COMPARATIVO PROVINCIAL ========== -->
-      <div *ngIf="tabActivo === 'comparativo' && comparativo.length">
+      <div id="seccion-comparativo" *ngIf="tabActivo === 'comparativo' && comparativo.length">
         <div class="card">
           <div class="card-header">🏙️ Comparativo por provincia</div>
           <div class="card-body">
             <div class="row">
               <div class="col-md-7">
                 <table class="table table-striped table-sm">
-                  <thead><tr><th>Usuario</th><th>Provincia</th><th>Progreso</th><th>Evaluaciones</th></tr></thead>
-                  <tbody><tr *ngFor="let item of comparativo"><td>{{ item.nombre }}</td><td>{{ item.provincia }}</td><td>{{ item.progreso_global }}%</td><td>{{ item.evaluaciones }}</td></tr></tbody>
+                  <thead>
+                    <tr>
+                      <th>Usuario</th>
+                      <th>Provincia</th>
+                      <th>Progreso</th>
+                      <th>Evaluaciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of comparativo">
+                      <td>{{ item.nombre }}</td>
+                      <td>{{ item.provincia }}</td>
+                      <td>{{ item.progreso_global }}%</td>
+                      <td>{{ item.evaluaciones }}</td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
               <div class="col-md-5">
@@ -75,15 +92,31 @@
       </div>
 
       <!-- ========== TALENTOS ========== -->
-      <div *ngIf="tabActivo === 'talentos'">
+      <div id="seccion-talentos" *ngIf="tabActivo === 'talentos'">
         <div class="card" *ngIf="talentos.length > 0; else sinTalentos">
           <div class="card-header">🌟 Talentos detectados</div>
           <div class="card-body">
             <div class="row">
               <div class="col-md-7">
                 <table class="table table-sm">
-                  <thead><tr><th>Nombre</th><th>Progreso</th><th>Insignias</th><th>Nota</th><th>Score</th></tr></thead>
-                  <tbody><tr *ngFor="let t of talentos"><td>{{ t.nombre }}</td><td>{{ t.progreso }}%</td><td>{{ t.insignias }}</td><td>{{ t.nota_promedio }}</td><td>{{ t.score }}</td></tr></tbody>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Progreso</th>
+                      <th>Insignias</th>
+                      <th>Nota</th>
+                      <th>Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let t of talentos">
+                      <td>{{ t.nombre }}</td>
+                      <td>{{ t.progreso }}%</td>
+                      <td>{{ t.insignias }}</td>
+                      <td>{{ t.nota_promedio }}</td>
+                      <td>{{ t.score }}</td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
               <div class="col-md-5">
@@ -100,8 +133,8 @@
             <div class="card-body">
               <div class="alert alert-info">
                 <strong>ℹ️ No se detectaron talentos con el umbral actual.</strong>
-                <p class="mb-0">Esto puede deberse a que los atletas aún no han alcanzado el nivel necesario. 
-                Sigue motivándolos a completar videos, obtener insignias y mejorar sus evaluaciones.</p>
+                <p class="mb-0">Esto puede deberse a que los atletas aún no han alcanzado el nivel necesario.
+                  Sigue motivándolos a completar videos, obtener insignias y mejorar sus evaluaciones.</p>
               </div>
             </div>
           </div>
@@ -109,7 +142,7 @@
       </div>
 
       <!-- ========== USO PLATAFORMA ========== -->
-      <div *ngIf="tabActivo === 'uso' && usoPlataforma">
+      <div id="seccion-uso" *ngIf="tabActivo === 'uso' && usoPlataforma">
         <div class="card">
           <div class="card-header">📊 Uso de la plataforma</div>
           <div class="card-body">
@@ -120,20 +153,39 @@
             <p>Documentos subidos: {{ usoPlataforma.documentos_subidos }}</p>
             <p>Evaluaciones realizadas: {{ usoPlataforma.evaluaciones_realizadas }}</p>
             <h5>Actividad mensual</h5>
-            <table class="table"><tr *ngFor="let m of usoPlataforma.uso_mensual"><td>{{ m.mes }}</td><td>{{ m.actividades }} actividades</td></tr></table>
+            <table class="table">
+              <tr *ngFor="let m of usoPlataforma.uso_mensual">
+                <td>{{ m.mes }}</td>
+                <td>{{ m.actividades }} actividades</td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
 
       <!-- ========== DOCUMENTOS DESACTUALIZADOS ========== -->
-      <div *ngIf="tabActivo === 'documentos'">
+      <div id="seccion-documentos" *ngIf="tabActivo === 'documentos'">
         <div class="card">
           <div class="card-header">📄 Documentos desactualizados (>180 días)</div>
           <div class="card-body">
             <div *ngIf="documentosDesactualizados.length > 0; else sinDocumentos">
               <table class="table">
-                <thead><tr><th>Título</th><th>Tipo</th><th>Autor</th><th>Días antiguo</th></tr></thead>
-                <tbody><tr *ngFor="let doc of documentosDesactualizados"><td>{{ doc.titulo }}</td><td>{{ doc.tipo }}</td><td>{{ doc.autor }}</td><td>{{ doc.dias_antiguo }}</td></tr></tbody>
+                <thead>
+                  <tr>
+                    <th>Título</th>
+                    <th>Tipo</th>
+                    <th>Autor</th>
+                    <th>Días antiguo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let doc of documentosDesactualizados">
+                    <td>{{ doc.titulo }}</td>
+                    <td>{{ doc.tipo }}</td>
+                    <td>{{ doc.autor }}</td>
+                    <td>{{ doc.dias_antiguo }}</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
             <ng-template #sinDocumentos>
@@ -146,7 +198,7 @@
       </div>
 
       <!-- ========== GRÁFICAS RENDIMIENTO ========== -->
-      <div [hidden]="tabActivo !== 'graficas'">
+      <div id="seccion-graficas" [hidden]="tabActivo !== 'graficas'">
         <div class="card mb-4">
           <div class="card-header">
             <h4>📊 Panel de rendimiento y peso</h4>

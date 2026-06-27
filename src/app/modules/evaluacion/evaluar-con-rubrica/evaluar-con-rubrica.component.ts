@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { EvaluacionService, Rubrica, Evaluacion } from '../../../core/services/evaluacion.service';
@@ -10,6 +10,7 @@ import { NotificacionService } from '../../../core/services/notificacion.service
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 
+// Interfaz extendida para incluir campos adicionales que vienen del backend
 interface EvaluacionDetalle extends Evaluacion {
   usuarioNombre?: string;
   fechaEntrega: Date;
@@ -24,7 +25,7 @@ interface EvaluacionDetalle extends Evaluacion {
   styleUrls: ['./evaluar-con-rubrica.component.scss']
 })
 export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
-  @Input() evaluacionId!: string;
+  evaluacionId!: string;
 
   cargando = false;
   guardando = false;
@@ -40,18 +41,20 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor(
+    private route: ActivatedRoute,
+    private router: Router,
     private evaluacionService: EvaluacionService,
-    private notificacionService: NotificacionService,
-    private router: Router
+    private notificacionService: NotificacionService
   ) {}
 
   ngOnInit(): void {
-    if (this.evaluacionId) {
-      this.cargarDatos(this.evaluacionId);
-    } else {
-      this.notificacionService.mostrarError('No se especificó la evaluación a cargar');
-      this.router.navigate(['/evaluacion/lista-evaluaciones']);
+    this.evaluacionId = this.route.snapshot.paramMap.get('id') || '';
+    if (!this.evaluacionId) {
+      this.notificacionService.mostrarError('ID de evaluación no válido');
+      this.router.navigate(['/evaluacion/lista']);
+      return;
     }
+    this.cargarDatos(this.evaluacionId);
   }
 
   ngOnDestroy(): void {
@@ -65,13 +68,21 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
         if (!evaluacion) {
           this.notificacionService.mostrarError('Evaluación no encontrada');
           this.cargando = false;
+          this.router.navigate(['/evaluacion/lista']);
           return;
         }
+
+        // Obtener videoUrl desde cualquier propiedad que pueda tener el objeto
+        const videoUrl = (evaluacion as any).video_url || (evaluacion as any).videoUrl || '';
+
         this.evaluacion = {
           ...evaluacion,
           usuarioNombre: 'Usuario ' + evaluacion.usuarioId,
-          fechaEntrega: evaluacion.fecha
+          fechaEntrega: evaluacion.fecha || new Date(),
+          videoUrl: videoUrl
         };
+        this.comentarios = evaluacion.comentarios || '';
+
         this.evaluacionService.getRubrica(evaluacion.rubricaId).subscribe({
           next: (rubrica: Rubrica | undefined) => {
             if (!rubrica) {
@@ -82,7 +93,8 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
             this.rubrica = rubrica;
             this.puntuacionMaxima = rubrica.criterios.reduce((sum, c) => sum + c.puntuacionMaxima, 0);
 
-            if (evaluacion.puntuaciones) {
+            // Inicializar puntuaciones desde datos guardados o a cero
+            if (evaluacion.puntuaciones && evaluacion.puntuaciones.length > 0) {
               evaluacion.puntuaciones.forEach(p => {
                 this.puntuaciones[p.criterioId] = p.puntuacion;
               });
@@ -92,7 +104,6 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
               });
             }
             this.calcularTotal();
-            this.comentarios = evaluacion.comentarios || '';
             this.cargando = false;
           },
           error: (err: any) => {
@@ -111,16 +122,28 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
   }
 
   calcularTotal(): void {
-    this.puntuacionTotal = Object.values(this.puntuaciones).reduce((sum, val) => sum + val, 0);
+    this.puntuacionTotal = Object.values(this.puntuaciones).reduce((sum, val) => sum + (val || 0), 0);
   }
 
   guardarEvaluacion(): void {
-    if (!this.evaluacion || !this.rubrica) return;
+    if (!this.evaluacion || !this.rubrica) {
+      this.notificacionService.mostrarError('Faltan datos de evaluación');
+      return;
+    }
+
+    // Validar que todas las puntuaciones estén asignadas
+    const todosCriterios = this.rubrica.criterios.every(c => 
+      this.puntuaciones[c.id] !== undefined && this.puntuaciones[c.id] !== null
+    );
+    if (!todosCriterios) {
+      this.notificacionService.mostrarAdvertencia('Por favor, asigna una puntuación a todos los criterios');
+      return;
+    }
 
     this.guardando = true;
     const puntuacionesArray = Object.entries(this.puntuaciones).map(([criterioId, puntuacion]) => ({
       criterioId,
-      puntuacion
+      puntuacion: Number(puntuacion)
     }));
 
     this.evaluacionService.guardarEvaluacion(this.evaluacionId, {
@@ -131,7 +154,7 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
       next: () => {
         this.notificacionService.mostrarExito('Evaluación guardada correctamente');
         this.guardando = false;
-        this.router.navigate(['/evaluacion/lista-evaluaciones']);
+        this.router.navigate(['/evaluacion/lista']);
       },
       error: (err: any) => {
         console.error('Error guardando evaluación', err);
@@ -142,6 +165,19 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
   }
 
   cancelar(): void {
-    this.router.navigate(['/evaluacion/lista-evaluaciones']);
+    this.router.navigate(['/evaluacion/lista']);
+  }
+
+  // Método para verificar si todas las puntuaciones han sido asignadas
+  todasPuntuacionesAsignadas(): boolean {
+    if (!this.rubrica) return false;
+    return this.rubrica.criterios.every(c => 
+      this.puntuaciones[c.id] !== undefined && this.puntuaciones[c.id] !== null
+    );
+  }
+
+  // Método opcional para trackBy (mejora rendimiento en listas largas)
+  trackByCriterio(index: number, criterio: any): string {
+    return criterio.id;
   }
 }
