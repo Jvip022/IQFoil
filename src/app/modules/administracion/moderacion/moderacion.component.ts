@@ -1,30 +1,35 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 // Servicios
 import { NotificacionService } from '../../../core/services/notificacion.service';
+import { DocumentoService, Documento } from '../../../core/services/documento.service';
+import { ComunidadService, Hilo, Mensaje } from '../../../core/services/comunidad.service';
+import { EvaluacionService, VideoPractica } from '../../../core/services/evaluacion.service';
 import { AdminService } from '../../../core/services/admin.service';
 
 // Componentes compartidos
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 import { ModalConfirmacionComponent } from '../../../shared/modal-confirmacion/modal-confirmacion.component';
-import { SafeUrlPipe } from '../../../shared/biblioteca-offline/biblioteca-offline.component'; // Reutilizamos el pipe
+import { SafeUrlPipe } from '../../../shared/biblioteca-offline/biblioteca-offline.component';
 
 export interface ItemPendiente {
   id: string;
-  tipo: string;          // 'comentario', 'hilo', 'respuesta', 'documento'
+  tipo: string;
   autor: string;
   fecha: Date;
   texto?: string;
   titulo?: string;
   contexto?: string;
-  nombre?: string;        // para documentos
-  descripcion?: string;   // para documentos
-  tipoArchivo?: string;   // pdf, image, etc.
+  nombre?: string;
+  descripcion?: string;
+  tipoArchivo?: string;
   url?: string;
+  itemOriginal?: any; // guardar referencia al objeto original
 }
 
 @Component({
@@ -43,7 +48,7 @@ export interface ItemPendiente {
 })
 export class ModeracionComponent implements OnInit {
   tabs = [
-    { id: 'comentarios', nombre: 'Comentarios', icono: '💬', pendientes: 0 },
+    { id: 'comentarios', nombre: 'Prácticas pendientes', icono: '🎥', pendientes: 0 },
     { id: 'foros', nombre: 'Foros', icono: '📋', pendientes: 0 },
     { id: 'documentos', nombre: 'Documentos', icono: '📄', pendientes: 0 }
   ];
@@ -70,6 +75,9 @@ export class ModeracionComponent implements OnInit {
 
   constructor(
     private notificacionService: NotificacionService,
+    private documentoService: DocumentoService,
+    private comunidadService: ComunidadService,
+    private evaluacionService: EvaluacionService,
     private adminService: AdminService
   ) {}
 
@@ -83,72 +91,60 @@ export class ModeracionComponent implements OnInit {
 
   cargarPendientes(): void {
     this.cargando = true;
-    // Simular carga desde servicio
-    setTimeout(() => {
-      this.comentariosPendientes = [
-        {
-          id: 'c1',
-          tipo: 'comentario',
-          autor: 'Juan Pérez',
-          fecha: new Date(Date.now() - 2 * 3600000),
-          texto: 'Excelente artículo, muy útil para principiantes.',
-          contexto: 'Artículo: "Introducción a los foils"'
-        },
-        {
-          id: 'c2',
-          tipo: 'comentario',
-          autor: 'María García',
-          fecha: new Date(Date.now() - 5 * 3600000),
-          texto: 'No estoy de acuerdo con la regla 42, debería revisarse.',
-          contexto: 'Foro: Reglamento'
-        }
-      ];
 
-      this.forosPendientes = [
-        {
-          id: 'f1',
+    forkJoin({
+      documentos: this.documentoService.getDocumentos().pipe(take(1)),
+      hilos: this.comunidadService.getHilos().pipe(take(1)),
+      evaluaciones: this.evaluacionService.getVideosPendientes().pipe(take(1))
+    }).subscribe({
+      next: ({ documentos, hilos, evaluaciones }) => {
+        // Procesar documentos pendientes (no aprobados)
+        this.documentosPendientes = documentos
+          .filter((doc: any) => doc.aprobado === false || doc.aprobado === undefined)
+          .map((doc: any) => ({
+            id: doc.id,
+            tipo: 'documento',
+            autor: doc.autor || 'Anónimo',
+            fecha: new Date(doc.fechaSubida || Date.now()),
+            nombre: doc.titulo,
+            descripcion: doc.descripcion || '',
+            tipoArchivo: doc.tipo || 'pdf',
+            url: doc.archivoUrl || '',
+            itemOriginal: doc
+          }));
+
+        // Procesar hilos y respuestas (foros)
+        this.forosPendientes = hilos.map((hilo: any) => ({
+          id: hilo.id,
           tipo: 'hilo',
-          autor: 'Carlos López',
-          fecha: new Date(Date.now() - 1 * 24 * 3600000),
-          titulo: 'Duda sobre viradas',
-          texto: '¿Cuál es la mejor técnica para virar en condiciones de viento fuerte?'
-        },
-        {
-          id: 'f2',
-          tipo: 'respuesta',
-          autor: 'Ana Martínez',
-          fecha: new Date(Date.now() - 3 * 3600000),
-          texto: 'Yo recomiendo practicar con olas pequeñas primero.',
-          contexto: 'Hilo: "Duda sobre viradas"'
-        }
-      ];
+          autor: hilo.autor || 'Anónimo',
+          fecha: new Date(hilo.fechaCreacion || Date.now()),
+          titulo: hilo.titulo,
+          texto: hilo.contenido || '',
+          contexto: `Foro: ${hilo.foroId || 'General'}`,
+          itemOriginal: hilo
+        }));
 
-      this.documentosPendientes = [
-        {
-          id: 'd1',
-          tipo: 'documento',
-          autor: 'Pedro Sánchez',
-          fecha: new Date(Date.now() - 12 * 3600000),
-          nombre: 'Reglamento 2025 - borrador.pdf',
-          descripcion: 'Propuesta de actualización del reglamento',
-          tipoArchivo: 'pdf',
-          url: '/assets/docs/borrador.pdf'
-        },
-        {
-          id: 'd2',
-          tipo: 'documento',
-          autor: 'Laura Fernández',
-          fecha: new Date(Date.now() - 2 * 24 * 3600000),
-          nombre: 'Esquema de maniobras.jpg',
-          descripcion: 'Diagrama explicativo',
-          tipoArchivo: 'image',
-          url: '/assets/images/esquema.jpg'
-        }
-      ];
+        // Procesar evaluaciones pendientes como "comentarios" (prácticas por evaluar)
+        this.comentariosPendientes = evaluaciones.map((ev: any) => ({
+          id: ev.id,
+          tipo: 'evaluacion',
+          autor: `Usuario ${ev.usuarioId}`,
+          fecha: new Date(ev.fechaSubida || Date.now()),
+          texto: ev.titulo || 'Práctica pendiente de evaluar',
+          contexto: `Práctica subida el ${new Date(ev.fechaSubida).toLocaleDateString()}`,
+          itemOriginal: ev
+        }));
 
-      this.actualizarContadores();
-      this.cargando = false;
-    }, 600);
+        this.actualizarContadores();
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error cargando datos de moderación:', err);
+        this.notificacionService.mostrarError('No se pudieron cargar los elementos pendientes');
+        this.cargando = false;
+      }
+    });
   }
 
   actualizarContadores(): void {
@@ -172,13 +168,17 @@ export class ModeracionComponent implements OnInit {
 
   // Acciones individuales
   aprobarItem(item: ItemPendiente, tab: string): void {
+    // Simular aprobación (en backend se actualizaría el estado)
     this.eliminarItem(item, tab);
     this.notificacionService.mostrarExito('Elemento aprobado');
+    // Aquí se llamaría al servicio correspondiente para aprobar en backend
   }
 
   rechazarItem(item: ItemPendiente, tab: string): void {
+    // Simular rechazo (en backend se eliminaría o marcaría como rechazado)
     this.eliminarItem(item, tab);
     this.notificacionService.mostrarExito('Elemento rechazado');
+    // Aquí se llamaría al servicio correspondiente para rechazar en backend
   }
 
   confirmarEliminar(item: ItemPendiente, tab: string): void {
@@ -220,12 +220,16 @@ export class ModeracionComponent implements OnInit {
     if (accion === 'eliminar' && item) {
       this.eliminarItem(item, tipo);
       this.notificacionService.mostrarExito('Elemento eliminado');
+      // Llamar a servicio de eliminación real
+      this.eliminarEnBackend(item, tipo);
     } else if (accion === 'aprobarTodos') {
       this.vaciarLista(tipo);
       this.notificacionService.mostrarExito(`Todos los elementos de "${this.getNombreTab(tipo)}" han sido aprobados`);
+      // Aquí se llamaría al servicio para aprobar todos
     } else if (accion === 'rechazarTodos') {
       this.vaciarLista(tipo);
       this.notificacionService.mostrarExito(`Todos los elementos de "${this.getNombreTab(tipo)}" han sido rechazados`);
+      // Aquí se llamaría al servicio para rechazar todos
     }
 
     this.modalVisible = false;
@@ -265,6 +269,33 @@ export class ModeracionComponent implements OnInit {
         break;
     }
     this.actualizarContadores();
+  }
+
+  private eliminarEnBackend(item: ItemPendiente, tab: string): void {
+    // Llamar al servicio correspondiente para eliminar en backend
+    switch (tab) {
+      case 'documentos':
+        if (item.id) {
+          this.documentoService.eliminarDocumento(item.id).subscribe({
+            next: () => console.log('Documento eliminado del backend'),
+            error: (err) => console.error('Error eliminando documento:', err)
+          });
+        }
+        break;
+      case 'foros':
+        if (item.id) {
+          this.comunidadService.eliminarHilo(item.id).subscribe({
+            next: () => console.log('Hilo eliminado del backend'),
+            error: (err) => console.error('Error eliminando hilo:', err)
+          });
+        }
+        break;
+      case 'comentarios':
+        // No hay endpoint de eliminación para evaluaciones pendientes, pero podríamos
+        // llamar a un endpoint si existiera
+        console.log('Eliminación de evaluación pendiente no implementada');
+        break;
+    }
   }
 
   // Vista previa de documento

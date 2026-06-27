@@ -14,6 +14,7 @@ export interface Documento {
   tamano: number;
   autor: string;
   version?: number;
+  aprobado?: boolean; 
 }
 
 @Injectable({ providedIn: 'root' })
