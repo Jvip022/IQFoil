@@ -1,4 +1,4 @@
-<div class="reporte-progreso">
+<div class="reporte-progreso" #reporteContent>
   <!-- Encabezado -->
   <header class="reporte-progreso__header">
     <div class="header-left">
@@ -13,15 +13,12 @@
     </div>
   </header>
 
-  <!-- Estado de conexión -->
   <app-estado-conexion class="reporte-progreso__connection"></app-estado-conexion>
 
-  <!-- Loader mientras carga -->
   <app-loading-spinner *ngIf="cargando" [text]="'Generando reporte...'"></app-loading-spinner>
 
-  <!-- Contenido principal -->
   <div class="reporte-progreso__content" *ngIf="!cargando">
-    <!-- Tarjetas de KPIs -->
+    <!-- KPIs -->
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-card__icon">📚</div>
@@ -53,7 +50,7 @@
       </div>
     </div>
 
-    <!-- Gráficos (simulados con barras) -->
+    <!-- Gráficos -->
     <div class="charts-grid">
       <div class="chart-card">
         <h3 class="chart-card__title">Progreso por módulo</h3>
@@ -79,7 +76,7 @@
       </div>
     </div>
 
-    <!-- Historial de actividad reciente -->
+    <!-- Actividad reciente -->
     <div class="actividad-card">
       <h3 class="actividad-card__title">Actividad reciente</h3>
       <div class="actividad-list" *ngIf="progreso.actividadReciente.length > 0; else sinActividad">
@@ -90,7 +87,7 @@
             <span class="actividad-fecha">{{ act.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
         </div>
-      </div> 
+      </div>
       <ng-template #sinActividad>
         <p class="sin-actividad">No hay actividad reciente.</p>
       </ng-template>

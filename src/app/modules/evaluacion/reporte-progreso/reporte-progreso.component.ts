@@ -1,16 +1,23 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 // Servicios
 import { NotificacionService } from '../../../core/services/notificacion.service';
-import { ContenidoService } from '../../../core/services/contenido.service';
+import { ContenidoService, Modulo } from '../../../core/services/contenido.service';
 import { EvaluacionService } from '../../../core/services/evaluacion.service';
+import { ReportesService, ProgresoIndividual } from '../../../core/services/reportes.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 // Componentes compartidos
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
+
+// Librerías para exportar
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 export interface ProgresoData {
   modulosCompletados: number;
@@ -37,6 +44,8 @@ export interface ProgresoData {
   styleUrls: ['./reporte-progreso.component.scss']
 })
 export class ReporteProgresoComponent implements OnInit, OnDestroy {
+  @ViewChild('reporteContent') reporteContent!: ElementRef;
+
   cargando = false;
   exportando = false;
 
@@ -59,7 +68,9 @@ export class ReporteProgresoComponent implements OnInit, OnDestroy {
   constructor(
     private notificacionService: NotificacionService,
     private contenidoService: ContenidoService,
-    private evaluacionService: EvaluacionService
+    private evaluacionService: EvaluacionService,
+    private reportesService: ReportesService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -72,47 +83,159 @@ export class ReporteProgresoComponent implements OnInit, OnDestroy {
 
   cargarDatos(): void {
     this.cargando = true;
-    // Simular carga desde servicios
-    setTimeout(() => {
-      this.progreso = {
-        modulosCompletados: 3,
-        totalModulos: 5,
-        videosVistos: 12,
-        totalVideos: 18,
-        evaluacionesRealizadas: 7,
-        puntuacionMedia: 82,
-        modulos: [
-          { nombre: 'Introducción', progreso: 100, color: '#4aa3c2' },
-          { nombre: 'Técnica básica', progreso: 80, color: '#1a2b4c' },
-          { nombre: 'Maniobras', progreso: 60, color: '#f39c12' },
-          { nombre: 'Reglamento', progreso: 40, color: '#61708b' },
-          { nombre: 'Avanzado', progreso: 20, color: '#d94e4e' }
-        ],
-        evolucion: [
-          { mes: 'Ene', puntuacion: 65 },
-          { mes: 'Feb', puntuacion: 70 },
-          { mes: 'Mar', puntuacion: 78 },
-          { mes: 'Abr', puntuacion: 82 },
-          { mes: 'May', puntuacion: 80 },
-          { mes: 'Jun', puntuacion: 85 }
-        ],
-        actividadReciente: [
-          { icono: '📝', descripcion: 'Evaluación de "Técnica básica" completada', fecha: new Date(Date.now() - 2 * 24 * 3600000) },
-          { icono: '🎥', descripcion: 'Video "Virada" visto', fecha: new Date(Date.now() - 3 * 24 * 3600000) },
-          { icono: '🏆', descripcion: 'Insignia "Principiante" obtenida', fecha: new Date(Date.now() - 5 * 24 * 3600000) },
-          { icono: '📚', descripcion: 'Módulo "Introducción" completado', fecha: new Date(Date.now() - 7 * 24 * 3600000) }
-        ]
-      };
-      this.cargando = false;
-    }, 800);
-  } 
+    this.authService.currentUser$.pipe(take(1)).subscribe({
+      next: (user) => {
+        if (!user || !user.uid) {
+          this.notificacionService.mostrarError('Usuario no autenticado');
+          this.cargando = false;
+          return;
+        }
+        this.obtenerDatos(parseInt(user.uid));
+      },
+      error: () => {
+        this.notificacionService.mostrarError('Error al obtener usuario');
+        this.cargando = false;
+      }
+    });
+  }
 
+  private obtenerDatos(usuarioId: number): void {
+    forkJoin({
+      progresoIndividual: this.reportesService.getProgresoIndividual(usuarioId).pipe(take(1)),
+      modulos: this.contenidoService.getModulos().pipe(take(1))
+    }).subscribe({
+      next: ({ progresoIndividual, modulos }) => {
+        this.procesarDatos(progresoIndividual, modulos);
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error cargando datos:', err);
+        this.notificacionService.mostrarError('No se pudieron cargar los datos');
+        this.cargando = false;
+      }
+    });
+  }
+
+  private procesarDatos(pi: ProgresoIndividual, modulos: Modulo[]): void {
+    // KPI principales
+    this.progreso.videosVistos = pi.videos_vistos;
+    this.progreso.totalVideos = pi.total_videos;
+    this.progreso.evaluacionesRealizadas = pi.evaluaciones_realizadas;
+    this.progreso.puntuacionMedia = pi.nota_promedio;
+    this.progreso.totalModulos = modulos.length;
+    this.progreso.modulosCompletados = modulos.filter(m => m.completado).length;
+
+    // Módulos con progreso
+    this.progreso.modulos = modulos.map((m, index) => {
+      const progresoModulo = m.progreso ?? 0;
+      const colores = ['#4aa3c2', '#1a2b4c', '#f39c12', '#61708b', '#d94e4e', '#7cb342', '#e67e22', '#8e44ad'];
+      return {
+        nombre: m.titulo,
+        progreso: progresoModulo,
+        color: colores[index % colores.length]
+      };
+    });
+
+    // Evolución de puntuaciones
+    if (pi.evolucion && pi.evolucion.length > 0) {
+      this.progreso.evolucion = pi.evolucion.map(e => ({
+        mes: e.mes,
+        puntuacion: e.puntuacion_promedio || 0
+      }));
+    } else {
+      this.progreso.evolucion = [
+        { mes: 'Ene', puntuacion: 0 },
+        { mes: 'Feb', puntuacion: 0 },
+        { mes: 'Mar', puntuacion: 0 },
+        { mes: 'Abr', puntuacion: 0 },
+        { mes: 'May', puntuacion: 0 },
+        { mes: 'Jun', puntuacion: 0 }
+      ];
+    }
+
+    // Actividad reciente (mock, pero mejorable)
+    this.progreso.actividadReciente = [
+      { icono: '📝', descripcion: 'Evaluación completada', fecha: new Date() },
+      { icono: '🎥', descripcion: `Video visto: ${pi.videos_vistos} de ${pi.total_videos}`, fecha: new Date() },
+      { icono: '🏆', descripcion: `Progreso global: ${pi.progreso_global}%`, fecha: new Date() }
+    ];
+  }
+
+  // ========== EXPORTAR PDF ==========
   exportarReporte(): void {
+    if (this.exportando) return;
     this.exportando = true;
-    // Simular exportación a PDF o CSV
-    setTimeout(() => {
-      this.notificacionService.mostrarExito('Reporte exportado correctamente');
+    this.notificacionService.mostrarInfo('Generando PDF...');
+
+    const content = this.reporteContent.nativeElement;
+    if (!content) {
+      this.notificacionService.mostrarError('No hay contenido para exportar');
       this.exportando = false;
-    }, 1000);
+      return;
+    }
+
+    const fecha = new Date().toLocaleDateString('es-ES', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
+    });
+
+    // Clonar y forzar fondo blanco
+    const clon = content.cloneNode(true) as HTMLElement;
+    clon.style.backgroundColor = '#ffffff';
+    clon.style.color = '#000000';
+    clon.style.padding = '20px';
+    const cards = clon.querySelectorAll('.kpi-card, .chart-card, .actividad-card');
+    cards.forEach(c => {
+      (c as HTMLElement).style.backgroundColor = '#ffffff';
+      (c as HTMLElement).style.border = '1px solid #cccccc';
+    });
+    const barras = clon.querySelectorAll('.barra-bg');
+    barras.forEach(b => {
+      (b as HTMLElement).style.backgroundColor = '#e9ecef';
+    });
+
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '-9999px';
+    wrapper.style.top = '0';
+    wrapper.style.backgroundColor = '#ffffff';
+    wrapper.appendChild(clon);
+    document.body.appendChild(wrapper);
+
+    html2canvas(wrapper, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: 1200
+    }).then((canvas) => {
+      document.body.removeChild(wrapper);
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 60, 120);
+      pdf.text('Reporte de Progreso', pdfWidth / 2, 20, { align: 'center' });
+      pdf.setFontSize(12);
+      pdf.setTextColor(40);
+      pdf.text('Federación Cubana de Vela', pdfWidth / 2, 30, { align: 'center' });
+      pdf.setFontSize(10);
+      pdf.setTextColor(100);
+      pdf.text(`Fecha: ${fecha}`, pdfWidth - 20, 40, { align: 'right' });
+      pdf.setDrawColor(0, 60, 120);
+      pdf.line(20, 45, pdfWidth - 20, 45);
+
+      pdf.addImage(imgData, 'PNG', 0, 50, pdfWidth, pdfHeight - 50);
+      pdf.save('reporte_progreso.pdf');
+      this.exportando = false;
+      this.notificacionService.mostrarExito('PDF descargado correctamente');
+    }).catch((error) => {
+      document.body.removeChild(wrapper);
+      console.error('Error al generar PDF:', error);
+      this.notificacionService.mostrarError('Error al generar el PDF');
+      this.exportando = false;
+    });
   }
 }
