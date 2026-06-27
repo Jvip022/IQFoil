@@ -7,6 +7,8 @@ from app import db
 from app.models.video import VideoTutorial
 from app.models.progreso_video import ProgresoVideo
 from app.models.usuario import Usuario
+from app.models.evaluacion import Evaluacion
+from sqlalchemy import not_
 
 bp = Blueprint('videos', __name__, url_prefix='/api/videos')
 
@@ -139,3 +141,34 @@ def eliminar_video(id):
     db.session.delete(video)
     db.session.commit()
     return jsonify({'message': 'Video eliminado correctamente'}), 200
+
+    
+
+@bp.route('/practicas', methods=['GET'])
+@jwt_required()
+def get_videos_practica():
+    """Devuelve los videos subidos como práctica (evaluaciones pendientes con video_url)"""
+    from app.models.evaluacion import Evaluacion
+    practicas = Evaluacion.query.filter(
+        Evaluacion.video_url.isnot(None),
+        Evaluacion.estado == 'pendiente'
+    ).order_by(Evaluacion.fecha_entrega.desc()).all()
+    
+    base_url = request.host_url.rstrip('/')
+    result = []
+    for p in practicas:
+        # Construir URL pública
+        url = f"{base_url}/{p.video_url}" if p.video_url else None
+        result.append({
+            'id': str(p.id),
+            'titulo': p.titulo or 'Práctica sin título',
+            'descripcion': p.comentarios or '',
+            'url': url,
+            'duracion': 0,
+            'nivel': 'practica',  # valor fijo para identificar
+            'completado': False,
+            'progreso': 0,
+            'thumbnail': None,
+            'tipo': 'practica'  # para distinguir en el frontend
+        })
+    return jsonify(result)

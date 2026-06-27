@@ -1,4 +1,4 @@
-@use 'variable' as *;
+@use "variable" as *;
 
 .gestion-contenido {
   padding: 20px;
@@ -34,7 +34,8 @@
       cursor: pointer;
       color: var(--muted);
       transition: all 0.2s;
-      &:hover, &.active {
+      &:hover,
+      &.active {
         color: var(--cyan);
         border-bottom: 2px solid var(--cyan);
       }
@@ -62,7 +63,7 @@
         padding: 8px 12px;
         background: var(--bg);
         border: 1px solid var(--border-cyan-alpha);
-        border-radius: calc(var(--radius)/2);
+        border-radius: calc(var(--radius) / 2);
         color: var(--text);
       }
     }
@@ -102,13 +103,26 @@
         strong {
           font-weight: 600;
         }
-        .badge {
-          font-size: 0.75rem;
-          background: rgba(0,230,214,0.2);
-          padding: 2px 6px;
-          border-radius: 20px;
-          width: fit-content;
+        .badges {
+          display: flex;
+          gap: 6px;
           margin-top: 5px;
+          flex-wrap: wrap;
+        }
+        .badge {
+          font-size: 0.7rem;
+          padding: 2px 8px;
+          border-radius: 12px;
+          background: rgba(0, 230, 214, 0.15);
+          color: var(--cyan);
+        }
+        .badge-tutorial {
+          background: rgba(74, 163, 194, 0.2);
+          color: #4aa3c2;
+        }
+        .badge-practica {
+          background: rgba(243, 156, 18, 0.2);
+          color: #f39c12;
         }
       }
       .btn-icon.delete {

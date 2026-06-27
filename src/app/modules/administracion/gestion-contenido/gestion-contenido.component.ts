@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, forkJoin } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
@@ -9,6 +9,8 @@ import { ContenidoService, Video, Modulo } from '../../../core/services/contenid
 import { DocumentoService, Documento } from '../../../core/services/documento.service';
 import { ComunidadService, Hilo } from '../../../core/services/comunidad.service';
 import { NotificacionService } from '../../../core/services/notificacion.service';
+import { EvaluacionService } from '../../../core/services/evaluacion.service';
+
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 import { ModalConfirmacionComponent } from '../../../shared/modal-confirmacion/modal-confirmacion.component';
@@ -121,7 +123,8 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
     private contenidoService: ContenidoService,
     private documentoService: DocumentoService,
     private comunidadService: ComunidadService,
-    private notificacionService: NotificacionService
+    private notificacionService: NotificacionService,
+    private evaluacionService: EvaluacionService
   ) { }
 
   ngOnInit(): void {
@@ -140,18 +143,24 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
   // ==================== VIDEOS ====================
   cargarVideos(): void {
     this.cargandoVideos = true;
-    this.contenidoService.getModulos().subscribe({
-      next: (modulos: Modulo[]) => {
-        this.videos = modulos.flatMap(m => m.videos);
+    forkJoin({
+      tutoriales: this.contenidoService.getModulos(),
+      practicas: this.contenidoService.getVideosPractica()
+    }).subscribe({
+      next: ({ tutoriales, practicas }) => {
+        // Extraer videos de los módulos y asignar tipo 'tutorial'
+        const videosTutorial: Video[] = tutoriales.flatMap(m => m.videos).map(v => ({ ...v, tipo: 'tutorial' }));
+        // Los videos de práctica ya vienen con tipo 'practica' desde el backend
+        this.videos = [...videosTutorial, ...practicas];
         this.cargandoVideos = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error al cargar videos:', err);
         this.notificacionService.mostrarError('Error al cargar videos');
         this.cargandoVideos = false;
       }
     });
   }
-
   onVideoFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -383,7 +392,7 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
   }
 
   // ==================== ELIMINACIÓN GENÉRICA ====================
-    confirmarEliminar(tipo: string, id: string | number | undefined, nombre: string): void {
+  confirmarEliminar(tipo: string, id: string | number | undefined, nombre: string): void {
     if (!id) return;
     this.elementoAEliminar = { tipo, id: id.toString(), nombre };
     this.mensajeEliminar = `¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`;
@@ -391,58 +400,59 @@ export class GestionContenidoComponent implements OnInit, OnDestroy {
   }
 
   eliminarElemento(): void {
-  if (!this.elementoAEliminar) return;
-  const { tipo, id, nombre } = this.elementoAEliminar;
-  let request: Observable<any> | null = null;
+    if (!this.elementoAEliminar) return;
+    const { tipo, id, nombre } = this.elementoAEliminar;
+    let request: Observable<any> | null = null;
 
-  switch (tipo) {
-    case 'curso': request = this.http.delete(`${this.apiUrl}/cursos/${id}`); break;
-    case 'insignia': request = this.http.delete(`${this.apiUrl}/insignias/${id}`); break;
-    case 'evento': request = this.http.delete(`${this.apiUrl}/eventos/${id}`); break;
-    case 'video': request = this.contenidoService.eliminarVideo(id); break;
-    case 'documento': request = this.documentoService.eliminarDocumento(id); break;
-    case 'hilo': request = this.comunidadService.eliminarHilo(id); break;
-    default: request = null;
-  }
+    switch (tipo) {
+      case 'curso': request = this.http.delete(`${this.apiUrl}/cursos/${id}`); break;
+      case 'insignia': request = this.http.delete(`${this.apiUrl}/insignias/${id}`); break;
+      case 'evento': request = this.http.delete(`${this.apiUrl}/eventos/${id}`); break;
+      case 'video_tutorial': request = this.contenidoService.eliminarVideo(id); break;
+      case 'video_practica': request = this.evaluacionService.eliminarVideoPractica(id); break;
+      case 'documento': request = this.documentoService.eliminarDocumento(id); break;
+      case 'hilo': request = this.comunidadService.eliminarHilo(id); break;
+      default: request = null;
+    }
 
-  if (!request) {
-    this.notificacionService.mostrarError(`No se puede eliminar ${tipo}: método no implementado`);
+    if (!request) {
+      this.notificacionService.mostrarError(`No se puede eliminar ${tipo}: método no implementado`);
+      this.modalEliminarVisible = false;
+      this.elementoAEliminar = null;
+      return;
+    }
+
+    request.subscribe({
+      next: () => {
+        this.notificacionService.mostrarExito(`${tipo} eliminado correctamente`);
+        this.recargarLista(tipo);
+      },
+      error: (err) => {
+        console.error(`Error al eliminar ${tipo}:`, err);
+        if (err.status === 403) {
+          this.notificacionService.mostrarError('No tienes permisos para eliminar este elemento');
+        } else if (err.status === 404) {
+          this.notificacionService.mostrarError('El elemento no existe');
+        } else {
+          this.notificacionService.mostrarError(`Error al eliminar ${tipo}`);
+        }
+      }
+    });
+
     this.modalEliminarVisible = false;
     this.elementoAEliminar = null;
-    return;
   }
 
-  request.subscribe({
-    next: () => {
-      this.notificacionService.mostrarExito(`${tipo} eliminado correctamente`);
-      this.recargarLista(tipo);
-    },
-    error: (err) => {
-      console.error(`Error al eliminar ${tipo}:`, err);
-      if (err.status === 403) {
-        this.notificacionService.mostrarError('No tienes permisos para eliminar este elemento');
-      } else if (err.status === 404) {
-        this.notificacionService.mostrarError('El elemento no existe');
-      } else {
-        this.notificacionService.mostrarError(`Error al eliminar ${tipo}`);
-      }
+  private recargarLista(tipo: string): void {
+    switch (tipo) {
+      case 'curso': this.cargarCursos(); break;
+      case 'insignia': this.cargarInsignias(); break;
+      case 'evento': this.cargarEventos(); break;
+      case 'video': this.cargarVideos(); break;
+      case 'documento': this.cargarDocumentos(); break;
+      case 'hilo': this.cargarHilos(); break;
     }
-  });
-
-  this.modalEliminarVisible = false;
-  this.elementoAEliminar = null;
-}
-
-private recargarLista(tipo: string): void {
-  switch (tipo) {
-    case 'curso': this.cargarCursos(); break;
-    case 'insignia': this.cargarInsignias(); break;
-    case 'evento': this.cargarEventos(); break;
-    case 'video': this.cargarVideos(); break;
-    case 'documento': this.cargarDocumentos(); break;
-    case 'hilo': this.cargarHilos(); break;
   }
-}
 
   cancelarEliminar(): void {
     this.modalEliminarVisible = false;

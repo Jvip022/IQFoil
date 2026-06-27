@@ -261,3 +261,26 @@ def subir_video_practica():
         'titulo': evaluacion.titulo,
         'message': 'Video subido correctamente'
     }), 201
+
+@bp.route('/videos-practica/<int:id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_video_practica(id):
+    """Elimina una evaluación pendiente y su archivo de video"""
+    user_id = get_jwt_identity()
+    user = Usuario.query.get(user_id)
+    if not user or user.rol_id not in [1, 2]:
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    evaluacion = Evaluacion.query.get_or_404(id)
+    if evaluacion.estado != 'pendiente':
+        return jsonify({'error': 'Solo se pueden eliminar prácticas pendientes'}), 400
+    
+    # Eliminar archivo físico si existe
+    if evaluacion.video_url:
+        full_path = os.path.join(current_app.config.get('UPLOAD_FOLDER', 'uploads'), evaluacion.video_url)
+        if os.path.exists(full_path):
+            os.remove(full_path)
+    
+    db.session.delete(evaluacion)
+    db.session.commit()
+    return jsonify({'message': 'Práctica eliminada correctamente'}), 200

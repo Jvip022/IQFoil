@@ -11,8 +11,7 @@
 
   <!-- Pestañas -->
   <div class="gestion-contenido__tabs">
-    <button class="tab-btn" *ngFor="let tab of tabs" [class.active]="tabActivo === tab.id"
-            (click)="tabActivo = tab.id">
+    <button class="tab-btn" *ngFor="let tab of tabs" [class.active]="tabActivo === tab.id" (click)="tabActivo = tab.id">
       <span class="tab-icon">{{ tab.icono }}</span>
       <span class="tab-label">{{ tab.nombre }}</span>
     </button>
@@ -50,18 +49,35 @@
       <div class="list-section">
         <h3>Videos existentes</h3>
         <app-loading-spinner *ngIf="cargandoVideos" [text]="'Cargando...'"></app-loading-spinner>
-        <div class="items-grid" *ngIf="!cargandoVideos">
-          <div class="item-card" *ngFor="let video of videos">
-            <div class="item-info">
-              <strong>{{ video.titulo }}</strong>
-              <span class="badge">{{ video.nivel }}</span>
+        <div *ngIf="!cargandoVideos">
+          <div *ngIf="videos.length > 0; else sinVideos" class="items-grid">
+            <div class="item-card" *ngFor="let video of videos">
+              <div class="item-info">
+                <strong>{{ video.titulo }}</strong>
+                <div class="badges">
+                  <span class="badge" [class.badge-tutorial]="video.tipo === 'tutorial'"
+                    [class.badge-practica]="video.tipo === 'practica'">
+                    {{ video.tipo === 'tutorial' ? '📚 Tutorial' : '🎥 Práctica' }}
+                  </span>
+                  <span class="badge" *ngIf="video.nivel && video.nivel !== 'practica'">{{ video.nivel }}</span>
+                </div>
+              </div>
+              <button class="btn-icon delete"
+                (click)="confirmarEliminar(video.tipo === 'tutorial' ? 'video_tutorial' : 'video_practica', video.id, video.titulo)">
+                🗑️
+              </button>
             </div>
-            <button class="btn-icon delete" (click)="confirmarEliminar('video', video.id, video.titulo)">🗑️</button>
           </div>
+          <ng-template #sinVideos>
+            <div class="sin-elementos">
+              <p>No hay videos disponibles. Sube el primero usando el formulario.</p>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
 
+    
     <!-- ========== DOCUMENTOS ========== -->
     <div *ngIf="tabActivo === 'documentos'">
       <div class="upload-section card">
@@ -169,12 +185,18 @@
     <div *ngIf="tabActivo === 'insignias'">
       <div class="upload-section card">
         <h3>Nueva insignia</h3>
-        <div class="form-group"><label>Nombre</label><input class="form-control" [(ngModel)]="insigniaActual.nombre" /></div>
-        <div class="form-group"><label>Descripción</label><textarea class="form-control" [(ngModel)]="insigniaActual.descripcion" rows="2"></textarea></div>
-        <div class="form-group"><label>Icono (emoji)</label><input class="form-control" [(ngModel)]="insigniaActual.icono" /></div>
-        <div class="form-group"><label>Categoría</label><input class="form-control" [(ngModel)]="insigniaActual.categoria" /></div>
-        <div class="form-group"><label>Color (hex)</label><input type="color" class="form-control" [(ngModel)]="insigniaActual.color" style="width:60px;" /></div>
-        <div class="form-group"><label>Requisitos</label><textarea class="form-control" [(ngModel)]="insigniaActual.requisitos" rows="2"></textarea></div>
+        <div class="form-group"><label>Nombre</label><input class="form-control" [(ngModel)]="insigniaActual.nombre" />
+        </div>
+        <div class="form-group"><label>Descripción</label><textarea class="form-control"
+            [(ngModel)]="insigniaActual.descripcion" rows="2"></textarea></div>
+        <div class="form-group"><label>Icono (emoji)</label><input class="form-control"
+            [(ngModel)]="insigniaActual.icono" /></div>
+        <div class="form-group"><label>Categoría</label><input class="form-control"
+            [(ngModel)]="insigniaActual.categoria" /></div>
+        <div class="form-group"><label>Color (hex)</label><input type="color" class="form-control"
+            [(ngModel)]="insigniaActual.color" style="width:60px;" /></div>
+        <div class="form-group"><label>Requisitos</label><textarea class="form-control"
+            [(ngModel)]="insigniaActual.requisitos" rows="2"></textarea></div>
         <button class="btn btn-primary" (click)="guardarInsignia()">Guardar insignia</button>
       </div>
       <div class="list-section">
@@ -197,11 +219,16 @@
     <div *ngIf="tabActivo === 'eventos'">
       <div class="upload-section card">
         <h3>Nuevo evento</h3>
-        <div class="form-group"><label>Título</label><input class="form-control" [(ngModel)]="eventoActual.titulo" /></div>
-        <div class="form-group"><label>Descripción</label><textarea class="form-control" [(ngModel)]="eventoActual.descripcion" rows="2"></textarea></div>
-        <div class="form-group"><label>Fecha inicio</label><input type="datetime-local" class="form-control" [(ngModel)]="eventoActual.fechaInicio" /></div>
-        <div class="form-group"><label>Fecha fin</label><input type="datetime-local" class="form-control" [(ngModel)]="eventoActual.fechaFin" /></div>
-        <div class="form-group"><label>Lugar</label><input class="form-control" [(ngModel)]="eventoActual.lugar" /></div>
+        <div class="form-group"><label>Título</label><input class="form-control" [(ngModel)]="eventoActual.titulo" />
+        </div>
+        <div class="form-group"><label>Descripción</label><textarea class="form-control"
+            [(ngModel)]="eventoActual.descripcion" rows="2"></textarea></div>
+        <div class="form-group"><label>Fecha inicio</label><input type="datetime-local" class="form-control"
+            [(ngModel)]="eventoActual.fechaInicio" /></div>
+        <div class="form-group"><label>Fecha fin</label><input type="datetime-local" class="form-control"
+            [(ngModel)]="eventoActual.fechaFin" /></div>
+        <div class="form-group"><label>Lugar</label><input class="form-control" [(ngModel)]="eventoActual.lugar" />
+        </div>
         <div class="form-group"><label>Tipo</label>
           <select class="form-control" [(ngModel)]="eventoActual.tipo">
             <option value="regata">Regata</option>
@@ -210,8 +237,10 @@
             <option value="social">Social</option>
           </select>
         </div>
-        <div class="form-group"><label>Organizador</label><input class="form-control" [(ngModel)]="eventoActual.organizador" /></div>
-        <div class="form-group"><label>Contacto</label><input class="form-control" [(ngModel)]="eventoActual.contacto" /></div>
+        <div class="form-group"><label>Organizador</label><input class="form-control"
+            [(ngModel)]="eventoActual.organizador" /></div>
+        <div class="form-group"><label>Contacto</label><input class="form-control"
+            [(ngModel)]="eventoActual.contacto" /></div>
         <button class="btn btn-primary" (click)="guardarEvento()">Guardar evento</button>
       </div>
       <div class="list-section">
@@ -232,14 +261,8 @@
   </div>
 
   <!-- Modal de confirmación para eliminar (común a todas las pestañas) -->
-  <app-modal-confirmacion
-    *ngIf="modalEliminarVisible"
-    [isOpen]="true"
-    title="Confirmar eliminación"
-    [message]="mensajeEliminar"
-    (confirm)="eliminarElemento()"
-    (cancel)="cancelarEliminar()"
-    confirmText="Eliminar"
+  <app-modal-confirmacion *ngIf="modalEliminarVisible" [isOpen]="true" title="Confirmar eliminación"
+    [message]="mensajeEliminar" (confirm)="eliminarElemento()" (cancel)="cancelarEliminar()" confirmText="Eliminar"
     cancelText="Cancelar">
   </app-modal-confirmacion>
 </div>

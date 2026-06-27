@@ -83,7 +83,7 @@ export interface RespuestaUsuario {
 export class EvaluacionService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ==================== RÚBRICAS (práctica) ====================
   getRubricas(): Observable<Rubrica[]> {
@@ -121,8 +121,8 @@ export class EvaluacionService {
   }
 
   guardarEvaluacion(id: string, data: any): Observable<void> {
-  return this.http.post<void>(`${this.apiUrl}/evaluaciones/evaluar/${id}`, data);
-}
+    return this.http.post<void>(`${this.apiUrl}/evaluaciones/evaluar/${id}`, data);
+  }
 
   // ==================== VIDEOS PRÁCTICA ====================
   getVideosPendientes(): Observable<VideoPractica[]> {
@@ -130,8 +130,8 @@ export class EvaluacionService {
   }
 
   subirVideo(formData: FormData): Observable<any> {
-  return this.http.post<any>(`${this.apiUrl}/evaluaciones/videos`, formData);
-}
+    return this.http.post<any>(`${this.apiUrl}/evaluaciones/videos`, formData);
+  }
 
   getProgresoUsuario(usuarioId: string): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/evaluaciones/progreso/${usuarioId}`);
@@ -215,5 +215,8 @@ export class EvaluacionService {
 
   getResultadoTeorico(id: string): Observable<RespuestaUsuario> {
     return this.http.get<RespuestaUsuario>(`${this.apiUrl}/evaluaciones/teoricas/resultados/${id}`);
+  }
+  eliminarVideoPractica(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/evaluaciones/videos-practica/${id}`);
   }
 }

@@ -13,6 +13,7 @@ export interface Video {
   progreso?: number;
   completado: boolean;
   thumbnail?: string;
+  tipo?: 'tutorial' | 'practica';
 }
 export interface Modulo {
   id: string;
@@ -60,5 +61,8 @@ export class ContenidoService {
 
   getAdminStats(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/admin/estadisticas`);
+  }
+  getVideosPractica(): Observable<Video[]> {
+    return this.http.get<Video[]>(`${this.apiUrl}/videos/practicas`);
   }
 }
