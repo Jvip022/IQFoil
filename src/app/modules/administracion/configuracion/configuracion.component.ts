@@ -101,15 +101,12 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     private notificacionService: NotificacionService,
     private authService: AuthService,
     private usuarioService: UsuarioService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    // Restaurar tema guardado en localStorage
-    const temaGuardado = localStorage.getItem('tema') as 'claro' | 'oscuro' | 'sistema' | null;
-    if (temaGuardado) {
-      this.configApariencia.tema = temaGuardado;
-      this.aplicarTema(temaGuardado);
-    }
+    // Cargar tema guardado en localStorage (si existe)
+    this.cargarTemaDesdeLocalStorage();
+    // Cargar el resto de la configuración
     this.cargarConfiguracion();
   }
 
@@ -117,8 +114,21 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
+  /**
+   * Carga el tema desde localStorage y lo aplica
+   */
+  private cargarTemaDesdeLocalStorage(): void {
+    const temaGuardado = localStorage.getItem('tema') as 'claro' | 'oscuro' | 'sistema' | null;
+    if (temaGuardado) {
+      this.configApariencia.tema = temaGuardado;
+      this.aplicarTema(temaGuardado);
+    }
+  }
+
+  /**
+   * Carga la configuración desde el servidor
+   */
   cargarConfiguracion(): void {
-    // Cargar datos del usuario autenticado
     this.authService.getUser().subscribe({
       next: (user) => {
         if (user) {
@@ -127,23 +137,22 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
           // Cargar preferencias desde el servicio de usuario
           this.usuarioService.getPreferencias().subscribe({
             next: (pref) => {
+              // Solo asignamos las propiedades que existen en el backend
               this.configNotificaciones.emailNotificaciones = pref.notificacionesEmail ?? true;
+              // Estas otras propiedades las mantenemos en frontend (no vienen del backend)
               this.configNotificaciones.pushNotificaciones = true;
               this.configNotificaciones.recordatoriosEventos = true;
               this.configNotificaciones.nuevosContenidos = false;
-              
-              // Si el tema no está en localStorage, usar el de preferencias
+
+              // Tema: solo si no hay tema en localStorage
               if (!localStorage.getItem('tema')) {
                 this.configApariencia.tema = pref.tema || 'sistema';
                 this.aplicarTema(this.configApariencia.tema);
               }
-              this.configApariencia.tamanoFuente = 'mediano';
-              this.configApariencia.contraste = 'normal';
-              
-              this.configPrivacidad.perfilPublico = false;
-              this.configPrivacidad.mostrarEstadisticas = true;
-              this.configPrivacidad.visibilidadEmail = 'contactos';
-              
+              // Las demás propiedades de apariencia y privacidad son solo frontend
+              // y se mantienen con los valores por defecto o los que tenga localStorage
+              // No se sobreescriben desde el backend
+
               this.actualizarBackups();
               this.hayCambios = false;
             },
@@ -190,8 +199,11 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     }
 
     this.guardando = true;
-    
-    // 1. Actualizar perfil (nombre y email)
+
+    // 1. Guardar tema en localStorage inmediatamente
+    localStorage.setItem('tema', this.configApariencia.tema);
+
+    // 2. Actualizar perfil (nombre y email)
     const perfilActualizado = {
       nombre: this.configGeneral.nombre,
       email: this.configGeneral.email
@@ -199,17 +211,17 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
 
     this.usuarioService.actualizarPerfil(perfilActualizado).subscribe({
       next: () => {
-        // 2. Actualizar preferencias
+        // 3. Actualizar preferencias (solo las que el backend espera)
         const preferencias = {
           idioma: this.configGeneral.idioma,
           notificacionesEmail: this.configNotificaciones.emailNotificaciones,
           tema: this.configApariencia.tema
+          // No enviamos tamanoFuente, contraste, perfilPublico, etc. porque no están en el backend
         };
-        
+
         this.usuarioService.actualizarPreferencias(preferencias).subscribe({
           next: () => {
-            // Guardar tema en localStorage
-            localStorage.setItem('tema', this.configApariencia.tema);
+            this.aplicarTema(this.configApariencia.tema);
             this.actualizarBackups();
             this.hayCambios = false;
             this.guardando = false;
@@ -217,7 +229,9 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
           },
           error: (err) => {
             console.error('Error guardando preferencias', err);
-            this.notificacionService.mostrarError('Error al guardar las preferencias');
+            this.notificacionService.mostrarAdvertencia('Configuración guardada localmente, pero no se pudo sincronizar con el servidor.');
+            this.actualizarBackups();
+            this.hayCambios = false;
             this.guardando = false;
           }
         });
@@ -263,6 +277,7 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   }
 
   aplicarTema(tema: 'claro' | 'oscuro' | 'sistema'): void {
+    console.log('Aplicando tema:', tema);
     const html = document.documentElement;
     if (tema === 'sistema') {
       html.removeAttribute('data-theme');

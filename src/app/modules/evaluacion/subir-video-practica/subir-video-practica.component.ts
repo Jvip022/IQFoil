@@ -3,12 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-// Servicios
 import { EvaluacionService, Rubrica } from '../../../core/services/evaluacion.service';
 import { NotificacionService } from '../../../core/services/notificacion.service';
-import { FileSizePipe } from '../../../shared/biblioteca-offline/biblioteca-offline.component'; // reutilizado
+import { FileSizePipe } from '../../../shared/pipes/shared-pipes';
 
-// Componentes compartidos
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 
 @Component({
@@ -70,15 +68,28 @@ export class SubirVideoPracticaComponent implements OnInit {
     }
 
     this.subiendo = true;
-    // Simular subida
-    setTimeout(() => {
-      this.subiendo = false;
-      this.notificacionService.mostrarExito('Práctica subida correctamente');
-      this.router.navigate(['/evaluacion/lista-evaluaciones']);
-    }, 1500);
+
+    const formData = new FormData();
+    formData.append('titulo', this.videoData.titulo);
+    formData.append('descripcion', this.videoData.descripcion || '');
+    formData.append('rubricaId', this.videoData.rubricaId);
+    formData.append('archivo', this.archivoSeleccionado);
+
+    this.evaluacionService.subirVideo(formData).subscribe({
+      next: (response: any) => {
+        this.subiendo = false;
+        this.notificacionService.mostrarExito('Práctica subida correctamente');
+        this.router.navigate(['/evaluacion/lista']);
+      },
+      error: (err) => {
+        console.error('Error subiendo video', err);
+        this.subiendo = false;
+        this.notificacionService.mostrarError('No se pudo subir el video');
+      }
+    });
   }
 
   cancelar(): void {
-    this.router.navigate(['/evaluacion/lista-evaluaciones']);
+    this.router.navigate(['/evaluacion/lista']);
   }
 }

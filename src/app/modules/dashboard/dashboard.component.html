@@ -5,7 +5,7 @@
       <div class="header-left d-flex align-items-center gap-3">
         <h1 id="dashboard-title" class="greeting h4 mb-0">
           <!-- Logo circular -->
-          <img src="/iqfoil.png" alt="Logo IQFOIL" class="iqfoil-header-logo me-2 rounded-circle" style="height: 40px; width: 40px; object-fit: cover; border: none;">
+          <img src="iqfoil.png" alt="Logo IQFOIL" class="iqfoil-header-logo me-2 rounded-circle" style="height: 40px; width: 40px; object-fit: cover; border: none;">
           Hola, <span class="username fw-bold text-cyan">{{ (user$ | async)?.displayName || (user$ | async)?.nombre || 'Usuario' }}</span>
         </h1>
         <app-estado-conexion class="estado-conexion"></app-estado-conexion>

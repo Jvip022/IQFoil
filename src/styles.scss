@@ -26,17 +26,6 @@
   --glow-cyan: #{$glow-cyan};
 }
 
-// Modo claro por preferencia del sistema (adaptado)
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #{$bg-light};
-    --text: #{$text-light};
-    --card-bg: #{$card-bg-light};
-    --surface-elev: #{$surface-elev-light};
-    --muted: #{$muted-light};
-  }
-}
-
 // Cambio manual con atributo data-theme
 [data-theme='light'] {
   --bg: #{$bg-light};
