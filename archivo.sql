@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict y5wv6TPqgJaLCPLJVAMwgGavLEnm435y2o3rrkvXjYlWiPwH8uuuyxTF68Vz7ro
+\restrict EWwBTXhvcQidbaOMgBSvCSA0VoBNFtjY3xNVUR2ebUx8qR3kHji4PVfxyVHABm1
 
 -- Dumped from database version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
@@ -1116,7 +1116,6 @@ COPY public.evaluacion (id, titulo, usuario_id, evaluador_id, rubrica_id, video_
 1	Evaluación de Juan Pérez	3	2	1	https://example.com/videos/3_1781913615.mp4	2026-03-28 20:00:15.76706	2026-04-01 20:00:15.76706	evaluado	Comentario de prueba para Juan Pérez	6
 2	Evaluación de Juan Pérez	3	2	1	https://example.com/videos/3_1781913615.mp4	2026-02-21 20:00:15.777772	2026-02-26 20:00:15.777772	pendiente	Comentario de prueba para Juan Pérez	7
 3	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2026-04-20 20:00:15.783225	2026-04-25 20:00:15.783225	evaluado	Comentario de prueba para María García	10
-4	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2025-12-23 20:00:15.786964	2025-12-24 20:00:15.786964	pendiente	Comentario de prueba para María García	6
 5	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2025-12-22 20:00:15.79248	2025-12-26 20:00:15.79248	pendiente	Comentario de prueba para María García	6
 6	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2026-02-20 20:00:15.796967	2026-02-23 20:00:15.796967	pendiente	Comentario de prueba para María García	5
 7	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1781913615.mp4	2025-12-25 20:00:15.801029	2025-12-26 20:00:15.801029	evaluado	Comentario de prueba para Luis Fernández	14
@@ -1140,6 +1139,7 @@ COPY public.evaluacion (id, titulo, usuario_id, evaluador_id, rubrica_id, video_
 24	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1781913615.mp4	2026-06-10 20:00:15.842275	2026-06-14 20:00:15.842275	evaluado	Comentario de prueba para Roberto Mena	9
 25	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1781913615.mp4	2026-06-10 20:00:15.844235	2026-06-11 20:00:15.844235	evaluado	Comentario de prueba para Roberto Mena	4
 27	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1781913615.mp4	2026-05-19 20:00:15.848229	2026-05-21 20:00:15.848229	pendiente	Comentario de prueba para Roberto Mena	10
+4	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2025-12-23 20:00:15.786964	2025-12-24 20:00:15.786964	evaluado	Comentario de prueba para María García	10
 28	Evaluación de Juan Pérez - Mayo	3	2	1	https://example.com/videos/3_mayo.mp4	2026-05-15 10:00:00	2026-05-20 14:00:00	evaluado	Buena técnica	7
 29	Evaluación de Juan Pérez - Junio	3	2	1	https://example.com/videos/3_junio.mp4	2026-06-10 09:00:00	2026-06-15 16:00:00	evaluado	Excelente progreso	9
 30	Evaluación de María García - Mayo	4	2	1	https://example.com/videos/4_mayo.mp4	2026-05-20 11:00:00	2026-05-25 15:00:00	evaluado	Buen desempeño	3
@@ -1184,9 +1184,9 @@ COPY public.evaluacion (id, titulo, usuario_id, evaluador_id, rubrica_id, video_
 COPY public.evento (id, titulo, descripcion, fecha_inicio, fecha_fin, lugar, tipo, organizador_id, max_participantes, imagen_url, publico) FROM stdin;
 1	Regata de primavera	Competición anual	2025-05-15 10:00:00	\N	Club Náutico	regata	1	50	\N	t
 2	Entrenamiento de foil	Sesión práctica	2025-06-10 16:00:00	\N	Puerto Deportivo	entrenamiento	2	20	\N	t
-3	competencia	sdss	2026-06-18 21:02:00	2026-06-28 09:12:00	mata	entrenamiento	\N	\N	\N	t
 10	Regata de otoño	Regata de otoño	2026-07-19 20:00:15.951699	\N	Club Náutico	regata	1	\N	\N	t
 11	Entrenamiento de foil	Entrenamiento de foil	2026-07-04 20:00:15.951716	\N	Puerto Deportivo	entrenamiento	2	\N	\N	t
+3	competencia	competencia amistosa	2026-06-18 21:02:00	2026-06-28 09:12:00	mata	entrenamiento	\N	\N	\N	t
 \.
 
 
@@ -1569,52 +1569,36 @@ COPY public.pregunta (id, examen_id, texto, tipo, opciones, respuesta_correcta, 
 
 COPY public.progreso_video (usuario_id, video_id, progreso, completado, ultima_visualizacion) FROM stdin;
 3	1	100	t	2026-06-01 11:00:00
-3	12	30	f	2026-05-09 20:00:15.622649
 4	11	50	f	2026-05-23 20:00:15.647239
-4	12	50	f	2026-02-01 20:00:15.649487
-6	12	100	t	2025-12-24 20:00:15.669212
 5	1	0	f	2026-01-22 20:00:15.671032
 5	2	100	t	2026-02-05 20:00:15.6728
 5	3	30	f	2026-02-11 20:00:15.675428
-5	10	70	f	2026-04-13 20:00:15.681532
 5	11	100	t	2026-03-05 20:00:15.68335
-5	12	30	f	2026-01-03 20:00:15.685107
-8	12	70	f	2026-04-24 20:00:15.724421
 9	11	100	t	2026-03-30 20:00:15.738715
-9	12	100	t	2026-03-21 20:00:15.740767
-10	12	100	t	2026-05-11 20:00:15.754453
 3	2	100	t	2026-01-15 10:00:00
 3	3	70	f	2026-02-20 14:30:00
-3	10	100	t	2026-03-10 09:00:00
 3	11	50	f	2026-04-05 16:00:00
 4	1	100	t	2026-01-22 11:00:00
 4	2	80	f	2026-02-28 15:00:00
 4	3	100	t	2026-03-15 08:30:00
-4	10	60	f	2026-05-01 17:00:00
 6	1	100	t	2026-01-05 10:00:00
 6	2	100	t	2026-02-10 12:00:00
 6	3	90	f	2026-03-20 14:00:00
-6	10	100	t	2026-04-25 18:00:00
 6	11	70	f	2026-06-01 09:00:00
 7	1	100	t	2026-01-10 10:00:00
 7	2	100	t	2026-02-15 11:00:00
 7	3	100	t	2026-03-25 12:00:00
-7	10	80	f	2026-04-30 13:00:00
 7	11	60	f	2026-05-15 14:00:00
-7	12	40	f	2026-06-10 15:00:00
 8	1	100	t	2026-01-12 10:00:00
 8	2	100	t	2026-02-18 11:00:00
 8	3	100	t	2026-03-22 12:00:00
-8	10	70	f	2026-04-28 13:00:00
 8	11	50	f	2026-05-20 14:00:00
 9	1	100	t	2026-01-18 10:00:00
 9	2	100	t	2026-02-25 11:00:00
 9	3	80	f	2026-03-30 12:00:00
-9	10	60	f	2026-05-05 13:00:00
 10	1	100	t	2026-01-20 10:00:00
 10	2	100	t	2026-02-28 11:00:00
 10	3	90	f	2026-03-28 12:00:00
-10	10	70	f	2026-05-10 13:00:00
 10	11	50	f	2026-06-05 14:00:00
 3	26	30	f	2026-02-22 13:43:55.595838
 3	27	100	t	2026-02-25 13:43:55.599012
@@ -1943,8 +1927,8 @@ COPY public.usuario (id, email, password_hash, nombre, avatar_url, rol_id, activ
 9	atleta7@iqfoil.cu	scrypt:32768:8:1$ZY1jPhe4VaUBNgn6$983a03d9303edd19d874687b440184d7b0d9386610d11227040900438b620fadc8ad5a20821ab293c1fba07c63972504f7188a0fec4181cb95ac6de038902fa2	Marta Díaz	\N	3	t	2026-06-23 02:23:45.769195	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara
 10	atleta8@iqfoil.cu	scrypt:32768:8:1$pkDAzkoBNXgCPka0$b8cbf19a7b9b7df16d55ea9f807a034ffcc098b28086e1dae6a95b9aa661d3f287e7c2051ff4140918bcf372c8af93e1e8414386912f48d50d1a56a1ff04959b	Roberto Mena	\N	3	t	2026-06-26 09:58:44.213322	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
 2	entrenador@iqfoil.cu	scrypt:32768:8:1$s9LtZkIsgV5esacm$a4eefee377931a07b4ab57275f816f6654eac3f219a8d4d8afe2b5ae080ac21949ba9b661f615c78d63bea8e6993dc8ecdf497e134518755080a36713a43e931	Carlos Gómez	\N	2	t	2026-06-26 13:36:22.258917	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
+1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-26 14:15:18.458413	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
 3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-06-26 13:58:15.129065	2026-06-01 22:20:05.081416	\N	{"tema": "sistema", "idioma": "es", "notificacionesEmail": true}	La Habana
-1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-26 14:15:18.458413	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "en", "notificacionesEmail": true}	La Habana
 4	atleta2@iqfoil.cu	scrypt:32768:8:1$RH5ISwhSV192lBIf$9a36bc43f038529911c650c94e24fce1caf515c74d955b9452b223316de339f7fe1e2fc818db2a453be7dd1717384a600ec2b6b5d4fb53149e738fa265c7f4b8	María García	\N	3	t	2026-06-26 11:41:28.094673	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba
 \.
 
@@ -1990,8 +1974,6 @@ COPY public.video_tutorial (id, titulo, descripcion, url_video, duracion_seg, ni
 2	Técnica de virada	Aprende a virar correctamente	https://example.com/video2.mp4	480	intermedio	https://example.com/thumb2.jpg	2026-06-01 22:20:05.088735	t
 3	Navegación con viento fuerte	Consejos para condiciones extremas	https://example.com/video3.mp4	600	avanzado	https://example.com/thumb3.jpg	2026-06-01 22:20:05.088735	t
 11	Virada en ceñida	Virada en ceñida	uploads/videos/virada_ceñida.mp4	450	intermedio	\N	2026-06-19 20:00:15.572858	t
-12	Trasluchada	Trasluchada en popa	uploads/videos/trasluchada.mp4	600	avanzado	\N	2026-06-19 20:00:15.572858	t
-10	Técnica de salida	Salida en regata	uploads/videos/How to care for and finish a foil surface.mp4	300	principiante	\N	2026-06-19 20:00:15.572858	t
 28	I Hate Fairyland - Resumen	Contenido variado (no relacionado con vela, pero disponible).	uploads/videos/I Hate Fairyland_ ¡El Viaje Más Violento al País de las Maravillas_ - Resumen(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
 26	Cómo cuidar y terminar una superficie de foil	Tutorial sobre cuidado y acabado de superficies de foil.	uploads/videos/How to care for and finish a foil surface.mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
 27	Cómo hacer foil. Lección 1	Primera lección de foil: conceptos básicos.	uploads/videos/How to foil. Lesson 1(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
@@ -2032,21 +2014,21 @@ SELECT pg_catalog.setval('public.curso_id_seq', 3, true);
 -- Name: documento_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.documento_id_seq', 11, true);
+SELECT pg_catalog.setval('public.documento_id_seq', 13, true);
 
 
 --
 -- Name: evaluacion_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.evaluacion_id_seq', 61, true);
+SELECT pg_catalog.setval('public.evaluacion_id_seq', 63, true);
 
 
 --
 -- Name: evento_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.evento_id_seq', 4, true);
+SELECT pg_catalog.setval('public.evento_id_seq', 5, true);
 
 
 --
@@ -2799,5 +2781,5 @@ ALTER TABLE ONLY public.usuario
 -- PostgreSQL database dump complete
 --
 
-\unrestrict y5wv6TPqgJaLCPLJVAMwgGavLEnm435y2o3rrkvXjYlWiPwH8uuuyxTF68Vz7ro
+\unrestrict EWwBTXhvcQidbaOMgBSvCSA0VoBNFtjY3xNVUR2ebUx8qR3kHji4PVfxyVHABm1
 

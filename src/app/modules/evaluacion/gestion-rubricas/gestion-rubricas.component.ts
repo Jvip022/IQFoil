@@ -69,7 +69,7 @@ export class GestionRubricasComponent implements OnInit, OnDestroy {
     this.modoEdicion = false;
     this.rubricaActual = {
       titulo: '',
-      criterios: [{ id: Date.now().toString(), descripcion: '', puntuacionMaxima: 5 }]
+      criterios: [{ id: Date.now().toString(), descripcion: '', puntuacionMaxima: 10 }]
     };
     this.modalRubricaVisible = true;
   }
