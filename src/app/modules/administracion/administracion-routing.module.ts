@@ -6,7 +6,7 @@ import { rolGuard } from '../../core/guards/rol.guard';
 const routes: Routes = [
   {
     path: '',
-    canActivate: [AuthGuard], // Solo autenticación
+    canActivate: [AuthGuard], 
     children: [
       {
         path: 'configuracion',

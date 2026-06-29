@@ -7,7 +7,6 @@
     </div>
   </header>
 
-  <!-- Estado de conexión -->
   <app-estado-conexion class="foro__connection"></app-estado-conexion>
 
   <div class="foro__layout">
@@ -34,10 +33,8 @@
         </button>
       </div>
 
-      <!-- Loader -->
       <app-loading-spinner *ngIf="cargandoHilos" [text]="'Cargando hilos...'"></app-loading-spinner>
 
-      <!-- Lista de hilos -->
       <div class="hilos-list" *ngIf="!cargandoHilos">
         <div class="hilo-card" *ngFor="let hilo of hilos" (click)="verHilo(hilo)">
           <div class="hilo-icon">📋</div>
@@ -85,7 +82,7 @@
     </div>
   </app-modal-confirmacion>
 
-  <!-- Modal para ver hilo y respuestas -->
+  <!-- Modal para ver hilo y respuestas (CON BADGE DE ROL) -->
   <app-modal-confirmacion 
     *ngIf="hiloSeleccionado"
     [isOpen]="true"
@@ -101,6 +98,12 @@
       <div class="hilo-principal">
         <div class="hilo-autor-info">
           <span class="autor">{{ hiloSeleccionado.autor }}</span>
+          <span class="rol-badge" 
+                [class.rol-admin]="hiloSeleccionado.autorRol === 'admin'"
+                [class.rol-entrenador]="hiloSeleccionado.autorRol === 'entrenador'"
+                [class.rol-atleta]="hiloSeleccionado.autorRol === 'atleta'">
+            {{ hiloSeleccionado.autorRol === 'admin' ? '👑 Admin' : hiloSeleccionado.autorRol === 'entrenador' ? '👨‍🏫 Entrenador' : '🏃 Atleta' }}
+          </span>
           <span class="fecha">{{ hiloSeleccionado.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
         <div class="hilo-contenido">
@@ -114,6 +117,12 @@
         <div class="respuesta-item" *ngFor="let resp of respuestas">
           <div class="respuesta-autor-info">
             <span class="autor">{{ resp.autor }}</span>
+            <span class="rol-badge" 
+                  [class.rol-admin]="resp.autorRol === 'admin'"
+                  [class.rol-entrenador]="resp.autorRol === 'entrenador'"
+                  [class.rol-atleta]="resp.autorRol === 'atleta'">
+              {{ resp.autorRol === 'admin' ? '👑 Admin' : resp.autorRol === 'entrenador' ? '👨‍🏫 Entrenador' : '🏃 Atleta' }}
+            </span>
             <span class="fecha">{{ resp.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="respuesta-contenido">

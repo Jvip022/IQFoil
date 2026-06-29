@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 // Servicios
 import { NotificacionService } from '../../../core/services/notificacion.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { UsuarioService } from '../../../core/services/usuario.service';
+import { UsuarioService, PreferenciasUsuario } from '../../../core/services/usuario.service';
 
 // Componentes compartidos
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
@@ -104,8 +104,8 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    // Cargar tema guardado en localStorage (si existe)
-    this.cargarTemaDesdeLocalStorage();
+    // Cargar configuración de apariencia desde localStorage
+    this.cargarAparienciaDesdeLocalStorage();
     // Cargar el resto de la configuración
     this.cargarConfiguracion();
   }
@@ -115,55 +115,88 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga el tema desde localStorage y lo aplica
+   * Carga la apariencia desde localStorage y la aplica
    */
-  private cargarTemaDesdeLocalStorage(): void {
-    const temaGuardado = localStorage.getItem('tema') as 'claro' | 'oscuro' | 'sistema' | null;
-    if (temaGuardado) {
-      this.configApariencia.tema = temaGuardado;
-      this.aplicarTema(temaGuardado);
+  private cargarAparienciaDesdeLocalStorage(): void {
+    const tema = localStorage.getItem('tema') as 'claro' | 'oscuro' | 'sistema' | null;
+    const tamanoFuente = localStorage.getItem('tamanoFuente') as 'pequeno' | 'mediano' | 'grande' | null;
+    const contraste = localStorage.getItem('contraste') as 'normal' | 'alto' | null;
+
+    if (tema) {
+      this.configApariencia.tema = tema;
     }
+    if (tamanoFuente) {
+      this.configApariencia.tamanoFuente = tamanoFuente;
+    }
+    if (contraste) {
+      this.configApariencia.contraste = contraste;
+    }
+    this.aplicarApariencia();
   }
 
-  /**
-   * Carga la configuración desde el servidor
-   */
+  public aplicarApariencia(): void {
+    console.log('🔄 Aplicando apariencia:', this.configApariencia);
+    const html = document.documentElement;
+    const { tema, tamanoFuente, contraste } = this.configApariencia;
+
+    // 1. Tema
+    if (tema === 'sistema') {
+      html.removeAttribute('data-theme');
+    } else {
+      html.setAttribute('data-theme', tema);
+    }
+    localStorage.setItem('tema', tema);
+
+    // 2. Fuente
+    html.classList.remove('fuente-pequeno', 'fuente-mediano', 'fuente-grande');
+    html.classList.add(`fuente-${tamanoFuente}`);
+    localStorage.setItem('tamanoFuente', tamanoFuente);
+
+    // 3. Contraste
+    html.classList.remove('contraste-normal', 'contraste-alto');
+    html.classList.add(`contraste-${contraste}`);
+    localStorage.setItem('contraste', contraste);
+
+    // 🔥 Forzar repintado (opcional)
+    document.body.style.display = 'none';
+    document.body.offsetHeight; // reflow
+    document.body.style.display = '';
+  }
+
   cargarConfiguracion(): void {
     this.authService.getUser().subscribe({
       next: (user) => {
         if (user) {
           this.configGeneral.nombre = user.nombre || '';
           this.configGeneral.email = user.email || '';
-          // Cargar preferencias desde el servicio de usuario
           this.usuarioService.getPreferencias().subscribe({
-            next: (pref) => {
-              // Solo asignamos las propiedades que existen en el backend
+            next: (pref: PreferenciasUsuario) => {
               this.configNotificaciones.emailNotificaciones = pref.notificacionesEmail ?? true;
-              // Estas otras propiedades las mantenemos en frontend (no vienen del backend)
-              this.configNotificaciones.pushNotificaciones = true;
-              this.configNotificaciones.recordatoriosEventos = true;
-              this.configNotificaciones.nuevosContenidos = false;
 
-              // Tema: solo si no hay tema en localStorage
-              if (!localStorage.getItem('tema')) {
-                this.configApariencia.tema = pref.tema || 'sistema';
-                this.aplicarTema(this.configApariencia.tema);
-              }
-              // Las demás propiedades de apariencia y privacidad son solo frontend
-              // y se mantienen con los valores por defecto o los que tenga localStorage
-              // No se sobreescriben desde el backend
+              // 🔥 PRIORIDAD ABSOLUTA: localStorage
+              const temaLocal = localStorage.getItem('tema') as 'claro' | 'oscuro' | 'sistema' | null;
+              const tamanoLocal = localStorage.getItem('tamanoFuente') as 'pequeno' | 'mediano' | 'grande' | null;
+              const contrasteLocal = localStorage.getItem('contraste') as 'normal' | 'alto' | null;
 
+              this.configApariencia.tema = temaLocal || pref.tema || 'sistema';
+              this.configApariencia.tamanoFuente = tamanoLocal || pref.tamanoFuente || 'mediano';
+              this.configApariencia.contraste = contrasteLocal || pref.contraste || 'normal';
+
+              this.aplicarApariencia();
               this.actualizarBackups();
               this.hayCambios = false;
             },
             error: () => {
+              // Si falla el backend, usar solo localStorage
+              this.cargarAparienciaDesdeLocalStorage();
               this.actualizarBackups();
             }
           });
         }
       },
       error: () => {
-        this.notificacionService.mostrarError('No se pudo cargar la configuración');
+        // Si falla el usuario, usar solo localStorage
+        this.cargarAparienciaDesdeLocalStorage();
         this.actualizarBackups();
       }
     });
@@ -182,7 +215,7 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     this.configNotificaciones = { ...this.configNotificacionesBackup };
     this.configApariencia = { ...this.configAparienciaBackup };
     this.configPrivacidad = { ...this.configPrivacidadBackup };
-    this.aplicarTema(this.configApariencia.tema);
+    this.aplicarApariencia();
     this.hayCambios = false;
     this.modalRestablecerVisible = false;
     this.notificacionService.mostrarInfo('Configuración restablecida');
@@ -200,10 +233,7 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
 
     this.guardando = true;
 
-    // 1. Guardar tema en localStorage inmediatamente
-    localStorage.setItem('tema', this.configApariencia.tema);
-
-    // 2. Actualizar perfil (nombre y email)
+    // Guardar apariencia en localStorage (ya se hizo en tiempo real)
     const perfilActualizado = {
       nombre: this.configGeneral.nombre,
       email: this.configGeneral.email
@@ -211,17 +241,16 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
 
     this.usuarioService.actualizarPerfil(perfilActualizado).subscribe({
       next: () => {
-        // 3. Actualizar preferencias (solo las que el backend espera)
-        const preferencias = {
+        const preferencias: any = {
           idioma: this.configGeneral.idioma,
           notificacionesEmail: this.configNotificaciones.emailNotificaciones,
-          tema: this.configApariencia.tema
-          // No enviamos tamanoFuente, contraste, perfilPublico, etc. porque no están en el backend
+          tema: this.configApariencia.tema,
+          tamanoFuente: this.configApariencia.tamanoFuente,
+          contraste: this.configApariencia.contraste
         };
-
         this.usuarioService.actualizarPreferencias(preferencias).subscribe({
           next: () => {
-            this.aplicarTema(this.configApariencia.tema);
+            this.aplicarApariencia();
             this.actualizarBackups();
             this.hayCambios = false;
             this.guardando = false;
@@ -274,16 +303,5 @@ export class ConfiguracionComponent implements OnInit, OnDestroy {
     this.configAparienciaBackup = { ...this.configApariencia };
     this.configPrivacidadBackup = { ...this.configPrivacidad };
     this.hayCambios = false;
-  }
-
-  aplicarTema(tema: 'claro' | 'oscuro' | 'sistema'): void {
-    console.log('Aplicando tema:', tema);
-    const html = document.documentElement;
-    if (tema === 'sistema') {
-      html.removeAttribute('data-theme');
-    } else {
-      html.setAttribute('data-theme', tema);
-    }
-    localStorage.setItem('tema', tema);
   }
 }

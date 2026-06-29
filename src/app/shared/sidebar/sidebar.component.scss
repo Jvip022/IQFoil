@@ -266,6 +266,72 @@
   }
 }
 
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-cyan-alpha);
+  gap: 12px;
+
+  .user-avatar {
+    .initials {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0, 230, 214, 0.15);
+      color: var(--cyan);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+  }
+
+  .user-info {
+    flex: 1;
+    overflow: hidden;
+
+    &.collapsed {
+      display: none;
+    }
+
+    .user-name {
+      display: block;
+      font-weight: 600;
+      color: white;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-top: 4px;
+
+      &.role--admin {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+      }
+      &.role--entrenador {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+      }
+      &.role--atleta {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+      }
+    }
+  }
+}
+
 // Móvil
 @media (max-width: 768px) {
   .sidebar {

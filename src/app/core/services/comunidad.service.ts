@@ -17,6 +17,7 @@ export interface Hilo {
   titulo: string;
   contenido: string;
   autor: string;
+  autorRol?: string; 
   fechaCreacion: Date;
   ultimaRespuesta: Date;
   respuestas: number;
@@ -27,6 +28,7 @@ export interface Mensaje {
   id: string;
   hiloId: string;
   autor: string;
+  autorRol?: string; 
   contenido: string;
   fecha: Date;
   avatarAutor?: string;

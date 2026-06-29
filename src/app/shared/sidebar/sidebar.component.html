@@ -44,16 +44,13 @@
   </nav>
 
   <div class="sidebar__footer">
-    <div class="sidebar__user" *ngIf="user">
-      <div class="sidebar__avatar">
-        <img [src]="user.avatar" alt="Avatar" *ngIf="user.avatar; else initials" />
-        <ng-template #initials>
-          <span class="sidebar__initials">{{ userInitials }}</span>
-        </ng-template>
+    <div class="sidebar-user" *ngIf="user && !loadingUser">
+      <div class="user-avatar">
+        <span class="initials">{{ userInitials }}</span>
       </div>
-      <div class="sidebar__user-info" *ngIf="(!isCollapsed || isMobileExpanded)">
-        <span class="sidebar__user-name">{{ user.nombre || user.displayName }}</span>
-        <span class="sidebar__user-role">{{ user.role || (user.roles ? user.roles[0] : '') }}</span>
+      <div class="user-info" [class.collapsed]="isCollapsed">
+        <span class="user-name">{{ user.nombre || user.displayName || 'Usuario' }}</span>
+        <span class="user-role" [class]="'role--' + (user.role || (user.roles ? user.roles[0] : ''))">{{ userRole }}</span>
       </div>
     </div>
     <button class="sidebar__logout" (click)="logout()" *ngIf="user"

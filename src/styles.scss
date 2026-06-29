@@ -1,8 +1,10 @@
-// 1. Importar variables primero
+// 1. Importar variables
 @use 'variable' as *;
 @use 'sass:color';
 
-// 2. Variables CSS globales (modo oscuro por defecto - estilo foil-home)
+// ==========================================
+// VARIABLES GLOBALES (modo oscuro por defecto)
+// ==========================================
 :root {
   // Colores base
   --bg: #{$bg-dark};
@@ -20,33 +22,74 @@
   --gap: #{$gap};
   --max-width: #{$max-width};
 
-  // Transparencias
+  // Transparencias y efectos
   --border-cyan-alpha: #{$border-cyan-alpha};
   --bg-blur: #{$bg-blur};
   --glow-cyan: #{$glow-cyan};
-}
 
-// Cambio manual con atributo data-theme
-[data-theme='light'] {
-  --bg: #{$bg-light};
-  --text: #{$text-light};
-  --card-bg: #{$card-bg-light};
-  --surface-elev: #{$surface-elev-light};
-  --muted: #{$muted-light};
-}
-
-[data-theme='dark'] {
-  --bg: #{$bg-dark};
-  --text: #{$text-dark};
-  --card-bg: #{$card-bg-dark};
-  --surface-elev: #{$surface-elev-dark};
-  --muted: #{$muted-dark};
+  // Fondos oceánicos (modo oscuro)
+  --bg-fondo-oceano: radial-gradient(circle at 70% 20%, #0a3a5c, #021826 80%);
+  --bg-fondo-linas:
+    repeating-linear-gradient(45deg, rgba(0, 230, 200, 0.02) 0px, rgba(0, 230, 200, 0.02) 2px, transparent 2px, transparent 12px),
+    radial-gradient(circle at 20% 30%, rgba(0, 200, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 70%, rgba(0, 180, 216, 0.06) 0%, transparent 50%);
 }
 
 // ==========================================
-// Estilos base globales (estilo foil-home)
+// TEMA CLARO (forzado con !important y mayor especificidad)
 // ==========================================
+html[data-theme='light'] {
+  --bg: #{$bg-light} !important;
+  --text: #{$text-light} !important;
+  --card-bg: #{$card-bg-light} !important;
+  --surface-elev: #{$surface-elev-light} !important;
+  --muted: #{$muted-light} !important;
+  --bg-fondo-oceano: radial-gradient(circle at 70% 20%, #e0e8f0, #c8d4e0 80%) !important;
+  --bg-fondo-linas:
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.015) 0px, rgba(0, 0, 0, 0.015) 2px, transparent 2px, transparent 12px),
+    radial-gradient(circle at 20% 30%, rgba(0, 80, 120, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 90% 70%, rgba(0, 80, 120, 0.04) 0%, transparent 50%) !important;
+}
 
+// ==========================================
+// TEMA OSCURO (forzado)
+// ==========================================
+html[data-theme='dark'] {
+  --bg: #{$bg-dark} !important;
+  --text: #{$text-dark} !important;
+  --card-bg: #{$card-bg-dark} !important;
+  --surface-elev: #{$surface-elev-dark} !important;
+  --muted: #{$muted-dark} !important;
+  --bg-fondo-oceano: radial-gradient(circle at 70% 20%, #0a3a5c, #021826 80%) !important;
+  --bg-fondo-linas:
+    repeating-linear-gradient(45deg, rgba(0, 230, 200, 0.02) 0px, rgba(0, 230, 200, 0.02) 2px, transparent 2px, transparent 12px),
+    radial-gradient(circle at 20% 30%, rgba(0, 200, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 70%, rgba(0, 180, 216, 0.06) 0%, transparent 50%) !important;
+}
+
+// ==========================================
+// TAMAÑOS DE FUENTE
+// ==========================================
+html.fuente-pequeno {
+  font-size: 14px;
+}
+html.fuente-mediano {
+  font-size: 16px;
+}
+html.fuente-grande {
+  font-size: 18px;
+}
+
+// ==========================================
+// ALTO CONTRASTE
+// ==========================================
+html.contraste-alto {
+  filter: contrast(1.3) brightness(1.1);
+}
+
+// ==========================================
+// ESTILOS BASE GLOBALES
+// ==========================================
 * {
   margin: 0;
   padding: 0;
@@ -55,38 +98,36 @@
 
 body {
   font-family: 'Inter', Roboto, 'Helvetica Neue', sans-serif;
-  background: var(--bg);
+  background-color: var(--bg); // Respaldo para cuando ::before no funcione
   color: var(--text);
   line-height: 1.5;
   min-height: 100vh;
   position: relative;
   isolation: isolate;
+  transition: background-color 0.5s ease;
 }
 
-// Fondo oceánico global (similar a foil-home)
+// Fondo oceánico (se adapta al tema)
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -2;
-  background: radial-gradient(circle at 70% 20%, #0a3a5c, #021826 80%);
+  background: var(--bg-fondo-oceano);
   pointer-events: none;
+  transition: background 0.5s ease;
 }
 
-// Líneas foil de fondo
 body::after {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-image:
-    repeating-linear-gradient(45deg, rgba(0, 230, 200, 0.02) 0px, rgba(0, 230, 200, 0.02) 2px, transparent 2px, transparent 12px),
-    radial-gradient(circle at 20% 30%, rgba(0, 200, 255, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 90% 70%, rgba(0, 180, 216, 0.06) 0%, transparent 50%);
+  background-image: var(--bg-fondo-linas);
   pointer-events: none;
 }
 
-// Efecto glow que sigue al ratón (se puede aplicar a cualquier elemento)
+// Efecto glow (decorativo)
 .foil-glow {
   position: fixed;
   top: 20%;
@@ -111,17 +152,17 @@ body::after {
 }
 
 // ==========================================
-// Componentes globales (estilo foil-home)
+// COMPONENTES GLOBALES
 // ==========================================
 
-// Tarjetas estilo glassmorphism
+// Tarjetas
 .card {
   background-color: var(--card-bg);
   backdrop-filter: blur(16px);
   border: 1px solid var(--border-cyan-alpha);
   border-radius: var(--radius);
   box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s, border-color 0.2s;
+  transition: transform 0.2s, border-color 0.2s, background-color 0.5s ease;
 
   &:hover {
     border-color: var(--cyan);
@@ -129,7 +170,7 @@ body::after {
   }
 }
 
-// Botones estilo foil-home
+// Botones
 .btn {
   display: inline-flex;
   align-items: center;
@@ -208,7 +249,7 @@ body::after {
   }
 }
 
-// Estadísticas (similar a hero-stats)
+// Estadísticas
 .stat-item {
   display: flex;
   align-items: center;
@@ -245,12 +286,11 @@ body::after {
   border-radius: 1rem;
   overflow: hidden;
 }
-
 .progress-bar {
   background: linear-gradient(90deg, var(--cyan), var(--navy));
 }
 
-// Enlaces de acceso rápido
+// Enlaces rápidos
 .access-link {
   background-color: rgba(0, 230, 214, 0.05);
   transition: all 0.2s;
@@ -263,13 +303,11 @@ body::after {
     color: var(--cyan);
     font-size: 1.8rem;
   }
-
   .access-label {
     color: var(--text);
     font-size: 0.9rem;
     margin-top: 0.5rem;
   }
-
   &:hover {
     background-color: rgba(0, 230, 214, 0.15);
     transform: translateY(-3px);
@@ -281,7 +319,6 @@ body::after {
   background-color: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   transition: background-color 0.2s;
-
   &:hover {
     background-color: rgba(0, 230, 214, 0.05);
   }
@@ -294,7 +331,7 @@ body::after {
   font-weight: bold;
 }
 
-// Gráficos (ejemplo)
+// Gráficos
 .evolution-chart canvas {
   max-height: 200px;
   background: rgba(0, 0, 0, 0.2);
@@ -302,27 +339,25 @@ body::after {
 }
 
 // ==========================================
-// Utilidades específicas del tema foil-home
+// UTILIDADES
 // ==========================================
-
 .text-cyan {
   color: var(--cyan) !important;
 }
-
 .text-navy {
   color: var(--navy) !important;
 }
-
 .bg-soft-cyan {
   background-color: rgba(0, 230, 214, 0.1);
 }
-
 .badge.bg-orange {
   background-color: var(--orange);
   color: #02121e;
 }
 
-// Ondas decorativas (para componentes que las usen)
+// ==========================================
+// DECORACIONES (ondas, silueta foil)
+// ==========================================
 .wave-decoration {
   position: absolute;
   bottom: 0;
@@ -331,7 +366,6 @@ body::after {
   line-height: 0;
   z-index: 2;
   pointer-events: none;
-
   svg {
     display: block;
     width: 100%;
@@ -340,7 +374,6 @@ body::after {
   }
 }
 
-// Silueta de foil (decorativa)
 .foil-silhouette {
   position: absolute;
   right: 3%;
@@ -354,9 +387,8 @@ body::after {
 }
 
 // ==========================================
-// Responsive
+// RESPONSIVE
 // ==========================================
-
 @media (max-width: 768px) {
   .card {
     padding: 1rem;

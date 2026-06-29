@@ -211,7 +211,9 @@
 
     .hilo-autor-info {
       display: flex;
-      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
       margin-bottom: 10px;
       font-size: 0.9rem;
 
@@ -247,7 +249,9 @@
 
     .respuesta-autor-info {
       display: flex;
-      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
       margin-bottom: 5px;
       font-size: 0.85rem;
 
@@ -287,4 +291,36 @@
       margin-bottom: 10px;
     }
   }
+}
+
+// ==========================================
+// BADGE DE ROL (para autores en el foro)
+// ==========================================
+.rol-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  &.rol-admin {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+  }
+  &.rol-entrenador {
+    background: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+  }
+  &.rol-atleta {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+  }
+}
+
+
+.hilo-detalle .rol-badge {
+  font-size: 0.7rem;
+  margin-left: 4px;
 }

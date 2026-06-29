@@ -7,18 +7,21 @@
     </div>
   </header>
 
-  <!-- Estado de conexión -->
   <app-estado-conexion class="hilo-detalle__connection"></app-estado-conexion>
 
-  <!-- Loader mientras carga -->
   <app-loading-spinner *ngIf="cargando" [text]="'Cargando hilo...'"></app-loading-spinner>
 
-  <!-- Contenido principal -->
   <div class="hilo-detalle__content" *ngIf="!cargando && hilo">
     <!-- Mensaje principal -->
     <div class="hilo-principal">
       <div class="hilo-metadata">
         <span class="autor">{{ hilo.autor }}</span>
+        <span class="rol-badge" 
+              [class.rol-admin]="hilo.autorRol === 'admin'"
+              [class.rol-entrenador]="hilo.autorRol === 'entrenador'"
+              [class.rol-atleta]="hilo.autorRol === 'atleta'">
+          {{ hilo.autorRol === 'admin' ? '👑 Admin' : hilo.autorRol === 'entrenador' ? '👨‍🏫 Entrenador' : '🏃 Atleta' }}
+        </span>
         <span class="fecha">{{ hilo.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
       <div class="hilo-contenido">
@@ -33,6 +36,12 @@
         <div class="respuesta-item" *ngFor="let resp of respuestas">
           <div class="respuesta-metadata">
             <span class="autor">{{ resp.autor }}</span>
+            <span class="rol-badge" 
+                  [class.rol-admin]="resp.autorRol === 'admin'"
+                  [class.rol-entrenador]="resp.autorRol === 'entrenador'"
+                  [class.rol-atleta]="resp.autorRol === 'atleta'">
+              {{ resp.autorRol === 'admin' ? '👑 Admin' : resp.autorRol === 'entrenador' ? '👨‍🏫 Entrenador' : '🏃 Atleta' }}
+            </span>
             <span class="fecha">{{ resp.fecha | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
           <div class="respuesta-contenido">
@@ -48,11 +57,7 @@
     <!-- Formulario de nueva respuesta -->
     <div class="nueva-respuesta">
       <h3>Responder</h3>
-      <textarea 
-        [(ngModel)]="nuevaRespuesta" 
-        rows="4" 
-        class="form-control" 
-        placeholder="Escribe tu respuesta..."
+      <textarea [(ngModel)]="nuevaRespuesta" rows="4" class="form-control" placeholder="Escribe tu respuesta..."
         [disabled]="enviando"></textarea>
       <div class="acciones">
         <button class="btn btn-primary" (click)="enviarRespuesta()" [disabled]="!nuevaRespuesta.trim() || enviando">

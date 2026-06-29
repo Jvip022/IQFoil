@@ -85,22 +85,22 @@
                     <label>Tema</label>
                     <div class="radio-group">
                         <label class="radio-label">
-                            <input type="radio" name="tema" value="claro" [(ngModel)]="configApariencia.tema" (ngModelChange)="aplicarTema($event); detectarCambios()" />
+                            <input type="radio" name="tema" value="claro" [(ngModel)]="configApariencia.tema" (ngModelChange)="aplicarApariencia(); detectarCambios()" />
                             Claro
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="tema" value="oscuro" [(ngModel)]="configApariencia.tema" (ngModelChange)="aplicarTema($event); detectarCambios()" />
+                            <input type="radio" name="tema" value="oscuro" [(ngModel)]="configApariencia.tema" (ngModelChange)="aplicarApariencia(); detectarCambios()" />
                             Oscuro
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="tema" value="sistema" [(ngModel)]="configApariencia.tema" (ngModelChange)="aplicarTema($event); detectarCambios()" />
+                            <input type="radio" name="tema" value="sistema" [(ngModel)]="configApariencia.tema" (ngModelChange)="aplicarApariencia(); detectarCambios()" />
                             Seguir sistema
                         </label>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="tamanoFuente">Tamaño de fuente</label>
-                    <select id="tamanoFuente" [(ngModel)]="configApariencia.tamanoFuente" (ngModelChange)="detectarCambios()" class="form-control">
+                    <select id="tamanoFuente" [(ngModel)]="configApariencia.tamanoFuente" (ngModelChange)="aplicarApariencia(); detectarCambios()" class="form-control">
                         <option value="pequeno">Pequeño</option>
                         <option value="mediano">Mediano</option>
                         <option value="grande">Grande</option>
@@ -108,7 +108,7 @@
                 </div>
                 <div class="form-group">
                     <label for="contraste">Contraste</label>
-                    <select id="contraste" [(ngModel)]="configApariencia.contraste" (ngModelChange)="detectarCambios()" class="form-control">
+                    <select id="contraste" [(ngModel)]="configApariencia.contraste" (ngModelChange)="aplicarApariencia(); detectarCambios()" class="form-control">
                         <option value="normal">Normal</option>
                         <option value="alto">Alto contraste</option>
                     </select>

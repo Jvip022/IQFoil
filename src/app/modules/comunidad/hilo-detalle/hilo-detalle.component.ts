@@ -44,7 +44,7 @@ export class HiloDetalleComponent implements OnInit, OnDestroy {
     private comunidadService: ComunidadService,
     private notificacionService: NotificacionService,
     private authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -95,35 +95,30 @@ export class HiloDetalleComponent implements OnInit, OnDestroy {
 
   enviarRespuesta(): void {
     if (!this.hilo || !this.nuevaRespuesta.trim()) return;
-
     this.enviando = true;
 
-    this.authService.getUser().subscribe(user => {
-      const autor = user?.nombre || user?.displayName || 'Usuario';
+    
+    const nuevoMensaje: Partial<Mensaje> = {
+      hiloId: this.hilo!.id,
+      contenido: this.nuevaRespuesta
+    };
 
-      const nuevoMensaje: Partial<Mensaje> = {
-        hiloId: this.hilo!.id,
-        contenido: this.nuevaRespuesta,
-        autor: autor
-      };
-
-      this.comunidadService.enviarMensaje(nuevoMensaje).subscribe({
-        next: (mensaje: Mensaje) => {
-          this.respuestas.push(mensaje);
-          if (this.hilo) {
-            this.hilo.respuestas = (this.hilo.respuestas || 0) + 1;
-            this.hilo.ultimaRespuesta = new Date();
-          }
-          this.nuevaRespuesta = '';
-          this.enviando = false;
-          this.notificacionService.mostrarExito('Respuesta enviada');
-        },
-        error: (err: any) => {
-          console.error('Error enviando respuesta', err);
-          this.notificacionService.mostrarError('No se pudo enviar la respuesta');
-          this.enviando = false;
+    this.comunidadService.enviarMensaje(nuevoMensaje).subscribe({
+      next: (mensaje: Mensaje) => {
+        this.respuestas.push(mensaje);
+        if (this.hilo) {
+          this.hilo.respuestas = (this.hilo.respuestas || 0) + 1;
+          this.hilo.ultimaRespuesta = new Date();
         }
-      });
+        this.nuevaRespuesta = '';
+        this.enviando = false;
+        this.notificacionService.mostrarExito('Respuesta enviada');
+      },
+      error: (err: any) => {
+        console.error('Error enviando respuesta', err);
+        this.notificacionService.mostrarError('No se pudo enviar la respuesta');
+        this.enviando = false;
+      }
     });
   }
 }

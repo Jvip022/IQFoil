@@ -4,13 +4,19 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { User } from './auth.service';
 
-export interface PreferenciasUsuario { idioma: string; notificacionesEmail: boolean; tema: 'claro' | 'oscuro' | 'sistema'; }
+export interface PreferenciasUsuario { 
+  idioma: string; 
+  notificacionesEmail: boolean; 
+  tema: 'claro' | 'oscuro' | 'sistema';
+  tamanoFuente?: 'pequeno' | 'mediano' | 'grande';
+  contraste?: 'normal' | 'alto';
+}
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getPerfil(): Observable<User | null> {
     return this.http.get<User | null>(`${this.apiUrl}/usuarios/perfil`);
@@ -36,5 +42,20 @@ export class UsuarioService {
 
   cambiarPassword(oldPass: string, newPass: string): Observable<boolean> {
     return this.http.post<boolean>(`${this.apiUrl}/usuarios/cambiar-password`, { oldPass, newPass });
+  }
+  solicitarCambioEntrenador(nuevoEntrenadorId: number, comentario: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/usuarios/solicitar-cambio-entrenador`, { nuevoEntrenadorId, comentario });
+  }
+
+  getSolicitudesPendientes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/usuarios/solicitudes-cambio`);
+  }
+
+  resolverSolicitud(solicitudId: number, accion: 'aprobar' | 'rechazar'): Observable<any> {
+    return this.http.put(`${this.apiUrl}/usuarios/solicitudes-cambio/${solicitudId}`, { accion });
+  }
+
+  getAtletasAsignados(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/usuarios/atletas`);
   }
 }

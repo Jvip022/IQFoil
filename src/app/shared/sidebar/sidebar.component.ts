@@ -18,7 +18,7 @@ interface MenuItem {
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush // ← mejora rendimiento
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent implements OnInit {
   @Input() collapsed = false;
@@ -28,8 +28,9 @@ export class SidebarComponent implements OnInit {
   isMobileExpanded = false;
   user: User | null = null;
   userInitials = '';
+  userRole = '';
   loadingUser = true;
-  menuItems: MenuItem[] = []; // ← propiedad calculada, no getter
+  menuItems: MenuItem[] = [];
 
   private fullMenuItems: MenuItem[] = [
     {
@@ -114,32 +115,30 @@ export class SidebarComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    // Cargar usuario si hay token
     if (this.authService.isAuthenticated()) {
       this.authService.getUser().subscribe();
     }
 
-    // Suscribirse a cambios del usuario
     this.authService.currentUser$.subscribe(user => {
       this.user = user;
       this.loadingUser = false;
       const displayName = user?.nombre || user?.displayName;
       this.userInitials = this.getInitials(displayName);
-      // Actualizar menú cuando el usuario cambia
+      this.userRole = this.getRoleName(user);
       this.updateMenuItems();
       this.cdr.detectChanges();
     });
 
-    // Reaccionar a cambios en autenticación
     this.authService.getAuthStatus().subscribe(isAuthenticated => {
       if (!isAuthenticated) {
         this.user = null;
         this.userInitials = '';
+        this.userRole = '';
         this.loadingUser = false;
-        this.menuItems = []; // Vaciar menú al cerrar sesión
+        this.menuItems = [];
         this.cdr.detectChanges();
       }
     });
@@ -156,7 +155,6 @@ export class SidebarComponent implements OnInit {
         if (item.children) {
           let filteredChildren = item.children;
 
-          // Filtro para Administración
           if (item.label === 'Administración') {
             if (isAdmin) {
               filteredChildren = item.children;
@@ -173,7 +171,6 @@ export class SidebarComponent implements OnInit {
             }
           }
 
-          // Filtro para Evaluación
           if (item.label === 'Evaluación') {
             if (isAdmin || isEntrenador) {
               filteredChildren = item.children;
@@ -218,5 +215,14 @@ export class SidebarComponent implements OnInit {
   private getInitials(name?: string): string {
     if (!name) return '?';
     return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+  }
+
+  private getRoleName(user: User | null): string {
+    if (!user) return '';
+    const roles = user.roles || [];
+    if (roles.includes('admin')) return 'Administrador';
+    if (roles.includes('entrenador')) return 'Entrenador';
+    if (roles.includes('atleta')) return 'Atleta';
+    return '';
   }
 }
