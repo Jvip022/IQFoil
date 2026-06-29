@@ -9,17 +9,15 @@
 
   <app-estado-conexion class="evaluar-con-rubrica__connection"></app-estado-conexion>
 
-  <!-- Loader -->
   <app-loading-spinner *ngIf="cargando" [text]="'Cargando datos de evaluación...'"></app-loading-spinner>
 
-  <!-- Contenido principal -->
   <div class="evaluar-con-rubrica__content" *ngIf="!cargando && evaluacion">
     <!-- Información de la práctica -->
     <div class="info-practica card">
       <div class="info-practica__header">
         <h3>{{ evaluacion.titulo || 'Práctica' }}</h3>
         <span class="estado-badge" [class.estado--evaluado]="evaluacion.estado === 'evaluado'">
-          {{ evaluacion.estado === 'evaluado' ? 'Evaluado' : 'Pendiente' }}
+          {{ evaluacion.estado === 'evaluado' ? '✅ Evaluado' : '⏳ Pendiente' }}
         </span>
       </div>
       <div class="info-practica__detalles">
@@ -30,6 +28,12 @@
           <a [href]="evaluacion.videoUrl" target="_blank" rel="noopener">Ver práctica</a>
         </p>
       </div>
+    </div>
+
+    <!-- Mensaje si ya está evaluado -->
+    <div *ngIf="evaluacion.estado === 'evaluado'" class="alert alert-info card">
+      <strong>✅ Evaluación ya realizada</strong>
+      <p>Esta práctica ya fue evaluada. Las puntuaciones son de solo lectura.</p>
     </div>
 
     <!-- Rúbrica de evaluación -->
@@ -49,7 +53,8 @@
               [step]="0.5"
               [(ngModel)]="puntuaciones[criterio.id]"
               (input)="calcularTotal()"
-              class="slider" />
+              class="slider"
+              [disabled]="evaluacion.estado === 'evaluado'" />
             <input 
               type="number" 
               [min]="0" 
@@ -57,7 +62,8 @@
               [step]="0.5"
               [(ngModel)]="puntuaciones[criterio.id]"
               (input)="calcularTotal()"
-              class="number-input" />
+              class="number-input"
+              [disabled]="evaluacion.estado === 'evaluado'" />
             <div class="criterio__barra">
               <div class="barra-progreso" [style.width.%]="(puntuaciones[criterio.id] / criterio.puntuacionMaxima) * 100"></div>
             </div>
@@ -88,7 +94,8 @@
         [(ngModel)]="comentarios" 
         rows="4" 
         class="form-control" 
-        placeholder="Escribe observaciones sobre la práctica..."></textarea>
+        placeholder="Escribe observaciones sobre la práctica..."
+        [disabled]="evaluacion.estado === 'evaluado'"></textarea>
     </div>
 
     <!-- Botones de acción -->
@@ -96,7 +103,9 @@
       <button class="btn btn-outline" (click)="cancelar()" [disabled]="guardando">
         Cancelar
       </button>
+      <!-- Ocultar botón Guardar si ya está evaluado -->
       <button 
+        *ngIf="evaluacion.estado !== 'evaluado'"
         class="btn btn-primary" 
         (click)="guardarEvaluacion()" 
         [disabled]="guardando || !evaluacion || !rubrica || !todasPuntuacionesAsignadas()">

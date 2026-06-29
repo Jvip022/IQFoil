@@ -61,6 +61,12 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
+  // Getter para saber si es solo lectura
+  get esSoloLectura(): boolean {
+    return this.evaluacion?.estado === 'evaluado';
+  }
+
+  
   cargarDatos(evaluacionId: string): void {
     this.cargando = true;
     this.evaluacionService.getEvaluacionById(evaluacionId).subscribe({
@@ -126,6 +132,12 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
   }
 
   guardarEvaluacion(): void {
+    // Prevenir guardado si ya está evaluado
+    if (this.esSoloLectura) {
+      this.notificacionService.mostrarAdvertencia('Esta evaluación ya fue realizada y no se puede modificar');
+      return;
+    }
+
     if (!this.evaluacion || !this.rubrica) {
       this.notificacionService.mostrarError('Faltan datos de evaluación');
       return;
