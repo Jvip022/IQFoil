@@ -50,7 +50,12 @@
       </div>
       <div class="user-info" [class.collapsed]="isCollapsed">
         <span class="user-name">{{ user.nombre || user.displayName || 'Usuario' }}</span>
-        <span class="user-role" [class]="'role--' + (user.role || (user.roles ? user.roles[0] : ''))">{{ userRole }}</span>
+        <span class="user-role" [class]="'role--' + (user.role || (user.roles ? user.roles[0] : ''))">
+          {{ userRole }}
+        </span>
+        <span class="user-mentor" *ngIf="user.roles?.includes('atleta') && mentorNombre">
+          👨‍🏫 {{ mentorNombre }}
+        </span>
       </div>
     </div>
     <button class="sidebar__logout" (click)="logout()" *ngIf="user"

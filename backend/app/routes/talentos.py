@@ -4,10 +4,10 @@ from app import db
 from app.models.insignia import Insignia
 from app.models.usuario_insignia import UsuarioInsignia
 from app.models.usuario import Usuario
-from app.models.evaluacion import Evaluacion          # ← importación necesaria
-from app.models.progreso_video import ProgresoVideo   # ← importación necesaria
-from app.models.video import VideoTutorial            # ← importación necesaria
-from app.models.mentoria import Mentoria              # ← importación necesaria
+from app.models.evaluacion import Evaluacion          
+from app.models.progreso_video import ProgresoVideo   
+from app.models.video import VideoTutorial            
+from app.models.mentoria import Mentoria              
 
 bp = Blueprint('talentos', __name__, url_prefix='/api/talentos')
 

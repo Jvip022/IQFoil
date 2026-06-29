@@ -19,15 +19,19 @@
   @media (hover: hover) and (min-width: 769px) {
     &:hover {
       width: 260px;
+
       .sidebar__label {
         display: inline-block;
       }
+
       .sidebar__user-info {
         display: flex;
       }
+
       .sidebar__logo img {
         width: auto;
       }
+
       .submenu-arrow {
         display: inline-block;
       }
@@ -36,24 +40,31 @@
 
   &--collapsed {
     width: 72px;
+
     .sidebar__label {
       display: none;
     }
+
     .sidebar__user-info {
       display: none;
     }
+
     .sidebar__logo img {
       width: 32px;
     }
+
     .sidebar__toggle {
       display: flex;
     }
+
     .sidebar__toggle-mobile {
       display: none;
     }
+
     .submenu-arrow {
       display: none;
     }
+
     .sidebar__submenu {
       display: none !important;
     }
@@ -61,21 +72,27 @@
 
   &--expanded {
     width: 260px;
+
     .sidebar__label {
       display: inline-block;
     }
+
     .sidebar__user-info {
       display: flex;
     }
+
     .sidebar__logo img {
       width: auto;
     }
+
     .sidebar__toggle {
       display: flex;
     }
+
     .sidebar__toggle-mobile {
       display: none;
     }
+
     .submenu-arrow {
       display: inline-block;
     }
@@ -92,6 +109,7 @@
   &__logo {
     display: flex;
     align-items: center;
+
     img {
       height: 40px;
       width: auto;
@@ -99,7 +117,8 @@
     }
   }
 
-  &__toggle, &__toggle-mobile {
+  &__toggle,
+  &__toggle-mobile {
     background: none;
     border: none;
     cursor: pointer;
@@ -107,22 +126,32 @@
     flex-direction: column;
     gap: 4px;
     padding: 4px;
+
     span {
       display: block;
       background-color: var(--cyan);
       transition: all 0.3s;
     }
   }
+
   &__toggle span {
     width: 20px;
     height: 2px;
-    &:first-child { transform-origin: left center; }
-    &:last-child { transform-origin: left center; }
+
+    &:first-child {
+      transform-origin: left center;
+    }
+
+    &:last-child {
+      transform-origin: left center;
+    }
   }
+
   &__toggle-mobile {
     width: 30px;
     height: 30px;
     justify-content: space-around;
+
     span {
       width: 100%;
       height: 3px;
@@ -181,6 +210,7 @@
     margin-left: auto;
     font-size: 0.8rem;
     transition: transform 0.2s;
+
     &.rotated {
       transform: rotate(180deg);
     }
@@ -190,6 +220,7 @@
     list-style: none;
     padding-left: 2rem;
     margin: 0;
+
     .sidebar__link {
       padding-left: 1rem;
       font-size: 0.9rem;
@@ -219,6 +250,7 @@
     justify-content: center;
     color: white;
     font-weight: 600;
+
     img {
       width: 100%;
       height: 100%;
@@ -241,6 +273,7 @@
     font-weight: 600;
     color: var(--text);
   }
+
   &__user-role {
     font-size: 0.75rem;
     color: var(--muted);
@@ -257,9 +290,11 @@
     cursor: pointer;
     color: var(--muted);
     transition: color 0.2s;
+
     &:hover {
       color: var(--orange);
     }
+
     .sidebar__icon {
       font-size: 1.2rem;
     }
@@ -320,14 +355,35 @@
         background: rgba(231, 76, 60, 0.2);
         color: #e74c3c;
       }
+
+      &.role--entrenador_nacional {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+      }
+
+      &.role--entrenador_provincial {
+        background: rgba(52, 152, 219, 0.2);
+        color: #3498db;
+      }
+
       &.role--entrenador {
         background: rgba(52, 152, 219, 0.2);
         color: #3498db;
       }
+
       &.role--atleta {
         background: rgba(46, 204, 113, 0.2);
         color: #2ecc71;
       }
+    }
+
+    .user-mentor {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 2px;
+      font-weight: 400;
+      opacity: 0.8;
     }
   }
 }
@@ -341,12 +397,15 @@
     backdrop-filter: blur(16px);
     border-right: none;
     overflow: hidden;
+
     &--expanded {
       width: 260px;
     }
+
     &__toggle-mobile {
       display: flex;
     }
+
     &__toggle {
       display: none;
     }

@@ -2,6 +2,7 @@ import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectionStrategy
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService, User } from '../../core/services/auth.service';
+import { TalentoService } from '../../core/services/talento.service';
 
 interface MenuItem {
   route?: string;
@@ -31,6 +32,7 @@ export class SidebarComponent implements OnInit {
   userRole = '';
   loadingUser = true;
   menuItems: MenuItem[] = [];
+  mentorNombre: string = '';
 
   private fullMenuItems: MenuItem[] = [
     {
@@ -115,8 +117,9 @@ export class SidebarComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private talentoService: TalentoService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
@@ -130,6 +133,13 @@ export class SidebarComponent implements OnInit {
       this.userInitials = this.getInitials(displayName);
       this.userRole = this.getRoleName(user);
       this.updateMenuItems();
+
+      if (user?.uid && user.roles?.includes('atleta')) {
+        this.cargarMentor(user.uid);
+      } else {
+        this.mentorNombre = '';
+      }
+
       this.cdr.detectChanges();
     });
 
@@ -222,8 +232,22 @@ export class SidebarComponent implements OnInit {
     if (!user) return '';
     const roles = user.roles || [];
     if (roles.includes('admin')) return 'Administrador';
+    if (roles.includes('entrenador_nacional')) return 'Entrenador Nacional';
+    if (roles.includes('entrenador_provincial')) return 'Entrenador Provincial';
     if (roles.includes('entrenador')) return 'Entrenador';
     if (roles.includes('atleta')) return 'Atleta';
     return '';
+  }
+  private cargarMentor(usuarioId: string): void {
+    this.talentoService.getMentorFor(usuarioId).subscribe({
+      next: (mentor) => {
+        this.mentorNombre = mentor?.nombre || 'Sin entrenador asignado';
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.mentorNombre = 'Sin entrenador asignado';
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

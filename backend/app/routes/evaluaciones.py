@@ -16,10 +16,15 @@ from app.models.respuesta_usuario import RespuestaUsuario
 bp = Blueprint('evaluaciones', __name__, url_prefix='/api/evaluaciones')
 
 # ==================== FUNCIÓN DE AUTORIZACIÓN ====================
-def is_admin_or_coach():
+def is_admin_or_any_coach():
     user_id = get_jwt_identity()
     user = Usuario.query.get(user_id)
-    return user and user.rol_id in [1, 2]
+    return user and user.rol_id in [1, 2, 4, 5]
+
+def is_admin_or_national_coach():
+    user_id = get_jwt_identity()
+    user = Usuario.query.get(user_id)
+    return user and user.rol_id in [1, 4] 
 
 # ==================== EVALUACIÓN PRÁCTICA ====================
 
@@ -77,7 +82,7 @@ def get_rubrica(id):
 @bp.route('/rubricas', methods=['POST'])
 @jwt_required()
 def crear_rubrica():
-    if not is_admin_or_coach():
+    if not is_admin_or_any_coach():
         return jsonify({'error': 'No autorizado'}), 403
     data = request.get_json()
     titulo = data.get('titulo')
@@ -119,7 +124,7 @@ def crear_rubrica():
 @bp.route('/rubricas/<int:id>', methods=['PUT'])
 @jwt_required()
 def actualizar_rubrica(id):
-    if not is_admin_or_coach():
+    if not is_admin_or_any_coach():
         return jsonify({'error': 'No autorizado'}), 403
     rubrica = Rubrica.query.get_or_404(id)
     data = request.get_json()
@@ -161,7 +166,7 @@ def actualizar_rubrica(id):
 @bp.route('/rubricas/<int:id>', methods=['DELETE'])
 @jwt_required()
 def eliminar_rubrica(id):
-    if not is_admin_or_coach():
+    if not is_admin_or_national_coach():
         return jsonify({'error': 'No autorizado'}), 403
     
     rubrica = Rubrica.query.get_or_404(id)

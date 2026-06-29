@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict EWwBTXhvcQidbaOMgBSvCSA0VoBNFtjY3xNVUR2ebUx8qR3kHji4PVfxyVHABm1
+\restrict Kc6YXOv3KZ6PafcYx4r56n0qDKlNodSEGtMbwNVfAAwZctj12mJeVsoB0jbyZ5r
 
 -- Dumped from database version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
@@ -1114,9 +1114,7 @@ COPY public.documento (id, titulo, descripcion, tipo, url_archivo, tamano_bytes,
 
 COPY public.evaluacion (id, titulo, usuario_id, evaluador_id, rubrica_id, video_url, fecha_entrega, fecha_evaluacion, estado, comentarios, puntuacion_total) FROM stdin;
 1	Evaluación de Juan Pérez	3	2	1	https://example.com/videos/3_1781913615.mp4	2026-03-28 20:00:15.76706	2026-04-01 20:00:15.76706	evaluado	Comentario de prueba para Juan Pérez	6
-2	Evaluación de Juan Pérez	3	2	1	https://example.com/videos/3_1781913615.mp4	2026-02-21 20:00:15.777772	2026-02-26 20:00:15.777772	pendiente	Comentario de prueba para Juan Pérez	7
 3	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2026-04-20 20:00:15.783225	2026-04-25 20:00:15.783225	evaluado	Comentario de prueba para María García	10
-5	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2025-12-22 20:00:15.79248	2025-12-26 20:00:15.79248	pendiente	Comentario de prueba para María García	6
 6	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2026-02-20 20:00:15.796967	2026-02-23 20:00:15.796967	pendiente	Comentario de prueba para María García	5
 7	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1781913615.mp4	2025-12-25 20:00:15.801029	2025-12-26 20:00:15.801029	evaluado	Comentario de prueba para Luis Fernández	14
 8	Evaluación de Luis Fernández	6	2	1	https://example.com/videos/6_1781913615.mp4	2026-02-27 20:00:15.8034	2026-03-04 20:00:15.8034	pendiente	Comentario de prueba para Luis Fernández	10
@@ -1140,6 +1138,8 @@ COPY public.evaluacion (id, titulo, usuario_id, evaluador_id, rubrica_id, video_
 25	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1781913615.mp4	2026-06-10 20:00:15.844235	2026-06-11 20:00:15.844235	evaluado	Comentario de prueba para Roberto Mena	4
 27	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1781913615.mp4	2026-05-19 20:00:15.848229	2026-05-21 20:00:15.848229	pendiente	Comentario de prueba para Roberto Mena	10
 4	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2025-12-23 20:00:15.786964	2025-12-24 20:00:15.786964	evaluado	Comentario de prueba para María García	10
+2	Evaluación de Juan Pérez	3	2	1	https://example.com/videos/3_1781913615.mp4	2026-02-21 20:00:15.777772	2026-02-26 20:00:15.777772	evaluado	Comentario de prueba para Juan Pérez	8
+5	Evaluación de María García	4	2	1	https://example.com/videos/4_1781913615.mp4	2025-12-22 20:00:15.79248	2025-12-26 20:00:15.79248	evaluado	Comentario de prueba para María García	10
 28	Evaluación de Juan Pérez - Mayo	3	2	1	https://example.com/videos/3_mayo.mp4	2026-05-15 10:00:00	2026-05-20 14:00:00	evaluado	Buena técnica	7
 29	Evaluación de Juan Pérez - Junio	3	2	1	https://example.com/videos/3_junio.mp4	2026-06-10 09:00:00	2026-06-15 16:00:00	evaluado	Excelente progreso	9
 30	Evaluación de María García - Mayo	4	2	1	https://example.com/videos/4_mayo.mp4	2026-05-20 11:00:00	2026-05-25 15:00:00	evaluado	Buen desempeño	3
@@ -1174,6 +1174,7 @@ COPY public.evaluacion (id, titulo, usuario_id, evaluador_id, rubrica_id, video_
 59	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1782495836.mp4	2026-03-01 13:43:56.229571	2026-03-03 13:43:56.229571	pendiente	Comentario de prueba para Roberto Mena	15
 60	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1782495836.mp4	2026-02-17 13:43:56.232185	2026-02-22 13:43:56.232185	pendiente	Comentario de prueba para Roberto Mena	13
 61	Evaluación de Roberto Mena	10	2	1	https://example.com/videos/10_1782495836.mp4	2026-05-08 13:43:56.234475	2026-05-13 13:43:56.234475	evaluado	Comentario de prueba para Roberto Mena	9
+64	carrera Ejemplo	3	\N	1	/home/joel/Documentos/tesis/codigo/backend/uploads/videos_practica/3_1782772411.851686_IQFoil_-_Race_Day_-_2022_Singapore_Slalom_Nationals_at_Changi_Beach360P.mp4	2026-06-29 18:33:31.936285	\N	pendiente	un video corto de regata	\N
 \.
 
 
@@ -1217,7 +1218,7 @@ COPY public.foro (id, titulo, descripcion, orden) FROM stdin;
 --
 
 COPY public.hilo (id, foro_id, titulo, autor_id, fecha_creacion, ultima_respuesta, contenido, respuestas, vistas, activo) FROM stdin;
-1	1	¿Cómo se penaliza un fuera de línea?	3	2026-06-01 22:20:05.094293	\N	En una regata, ¿cuándo se considera fuera de línea?	0	0	t
+1	1	¿Cómo se penaliza un fuera de línea?	3	2026-06-01 22:20:05.094293	2026-06-29 13:55:39.774699	En una regata, ¿cuándo se considera fuera de línea?	0	0	t
 \.
 
 
@@ -1509,6 +1510,10 @@ COPY public.log_actividad (id, usuario_id, accion, detalles, ip, fecha) FROM std
 302	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 13:57:36.263561
 303	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-26 13:58:14.983483
 304	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-26 14:15:18.320484
+305	2	login	{"email": "entrenador@iqfoil.cu", "nombre": "Carlos Gómez"}	127.0.0.1	2026-06-29 13:54:55.561546
+306	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-29 15:42:12.485074
+307	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-29 15:46:03.115222
+308	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-29 15:52:26.341249
 \.
 
 
@@ -1518,6 +1523,8 @@ COPY public.log_actividad (id, usuario_id, accion, detalles, ip, fecha) FROM std
 
 COPY public.mensaje (id, hilo_id, autor_id, contenido, fecha) FROM stdin;
 1	1	2	depende de la bandera	2026-06-01 22:20:05.094293
+3	1	1	hola se considera el uso de bandera negra\n	2026-06-29 13:53:50.310058
+4	1	2	recuerden que con la bandera p tienen hasta un minuto para volver a entrar y salir por la linea\n	2026-06-29 13:55:39.774699
 \.
 
 
@@ -1717,7 +1724,6 @@ COPY public.puntuacion_evaluacion (evaluacion_id, criterio_id, puntuacion) FROM 
 4	2	5
 4	3	4
 5	1	5
-5	2	0
 5	3	3
 6	1	0
 6	2	5
@@ -1884,6 +1890,7 @@ COPY public.puntuacion_evaluacion (evaluacion_id, criterio_id, puntuacion) FROM 
 61	1	3
 61	2	3
 61	3	5
+5	2	2
 \.
 
 
@@ -1926,9 +1933,9 @@ COPY public.usuario (id, email, password_hash, nombre, avatar_url, rol_id, activ
 8	atleta6@iqfoil.cu	scrypt:32768:8:1$JPLigriBjuUooHKu$9af4b2bad7378a8e518222d0e9f711285aeb173c8b599df46f5fb36e329a2736d14d5014689750aea4addf84e939cd1afde21dd2175b98b2cba2235c3eb688e7	José Ramírez	\N	3	t	2026-06-21 18:42:16.637331	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Holguín
 9	atleta7@iqfoil.cu	scrypt:32768:8:1$ZY1jPhe4VaUBNgn6$983a03d9303edd19d874687b440184d7b0d9386610d11227040900438b620fadc8ad5a20821ab293c1fba07c63972504f7188a0fec4181cb95ac6de038902fa2	Marta Díaz	\N	3	t	2026-06-23 02:23:45.769195	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara
 10	atleta8@iqfoil.cu	scrypt:32768:8:1$pkDAzkoBNXgCPka0$b8cbf19a7b9b7df16d55ea9f807a034ffcc098b28086e1dae6a95b9aa661d3f287e7c2051ff4140918bcf372c8af93e1e8414386912f48d50d1a56a1ff04959b	Roberto Mena	\N	3	t	2026-06-26 09:58:44.213322	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
-2	entrenador@iqfoil.cu	scrypt:32768:8:1$s9LtZkIsgV5esacm$a4eefee377931a07b4ab57275f816f6654eac3f219a8d4d8afe2b5ae080ac21949ba9b661f615c78d63bea8e6993dc8ecdf497e134518755080a36713a43e931	Carlos Gómez	\N	2	t	2026-06-26 13:36:22.258917	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
-1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-26 14:15:18.458413	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
-3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-06-26 13:58:15.129065	2026-06-01 22:20:05.081416	\N	{"tema": "sistema", "idioma": "es", "notificacionesEmail": true}	La Habana
+2	entrenador@iqfoil.cu	scrypt:32768:8:1$s9LtZkIsgV5esacm$a4eefee377931a07b4ab57275f816f6654eac3f219a8d4d8afe2b5ae080ac21949ba9b661f615c78d63bea8e6993dc8ecdf497e134518755080a36713a43e931	Carlos Gómez	\N	2	t	2026-06-29 13:54:55.747113	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "contraste": "normal", "tamanoFuente": "mediano", "notificacionesEmail": true}	La Habana
+1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-29 15:46:03.253202	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
+3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-06-29 15:52:26.511171	2026-06-01 22:20:05.081416	\N	{"tema": "sistema", "idioma": "es", "notificacionesEmail": true}	La Habana
 4	atleta2@iqfoil.cu	scrypt:32768:8:1$RH5ISwhSV192lBIf$9a36bc43f038529911c650c94e24fce1caf515c74d955b9452b223316de339f7fe1e2fc818db2a453be7dd1717384a600ec2b6b5d4fb53149e738fa265c7f4b8	María García	\N	3	t	2026-06-26 11:41:28.094673	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba
 \.
 
@@ -2000,7 +2007,7 @@ SELECT pg_catalog.setval('public.conversacion_id_seq', 1, false);
 -- Name: criterio_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.criterio_id_seq', 3, true);
+SELECT pg_catalog.setval('public.criterio_id_seq', 7, true);
 
 
 --
@@ -2021,7 +2028,7 @@ SELECT pg_catalog.setval('public.documento_id_seq', 13, true);
 -- Name: evaluacion_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.evaluacion_id_seq', 63, true);
+SELECT pg_catalog.setval('public.evaluacion_id_seq', 64, true);
 
 
 --
@@ -2063,14 +2070,14 @@ SELECT pg_catalog.setval('public.insignia_id_seq', 4, true);
 -- Name: log_actividad_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.log_actividad_id_seq', 304, true);
+SELECT pg_catalog.setval('public.log_actividad_id_seq', 308, true);
 
 
 --
 -- Name: mensaje_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.mensaje_id_seq', 2, true);
+SELECT pg_catalog.setval('public.mensaje_id_seq', 4, true);
 
 
 --
@@ -2112,7 +2119,7 @@ SELECT pg_catalog.setval('public.rol_id_seq', 3, true);
 -- Name: rubrica_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.rubrica_id_seq', 1, true);
+SELECT pg_catalog.setval('public.rubrica_id_seq', 3, true);
 
 
 --
@@ -2781,5 +2788,5 @@ ALTER TABLE ONLY public.usuario
 -- PostgreSQL database dump complete
 --
 
-\unrestrict EWwBTXhvcQidbaOMgBSvCSA0VoBNFtjY3xNVUR2ebUx8qR3kHji4PVfxyVHABm1
+\unrestrict Kc6YXOv3KZ6PafcYx4r56n0qDKlNodSEGtMbwNVfAAwZctj12mJeVsoB0jbyZ5r
 
