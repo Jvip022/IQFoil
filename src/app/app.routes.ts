@@ -31,13 +31,12 @@ export const routes: Routes = [
   {
     path: 'administracion',
     loadChildren: () => import('./modules/administracion/administracion.module').then(m => m.AdministracionModule),
-    canActivate: [autenticacionGuard] // ← solo autenticación, roles gestionados internamente
+    canActivate: [autenticacionGuard]
   },
   {
     path: 'evaluacion',
     loadChildren: () => import('./modules/evaluacion/evaluacion.module').then(m => m.EvaluacionModule),
-    canActivate: [autenticacionGuard, rolGuard],
-    data: { roles: ['admin', 'entrenador'] }
+    canActivate: [autenticacionGuard] // ✅ Sin rolGuard, permisos en rutas hijas
   },
   {
     path: 'simulaciones',

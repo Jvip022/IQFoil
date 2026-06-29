@@ -1,5 +1,4 @@
 <div class="evaluar-con-rubrica">
-  <!-- Encabezado -->
   <header class="evaluar-con-rubrica__header">
     <div class="header-left">
       <h2 class="evaluar-con-rubrica__title">📝 Evaluar con rúbrica</h2>
@@ -23,9 +22,15 @@
       <div class="info-practica__detalles">
         <p><strong>Usuario:</strong> {{ evaluacion.usuarioNombre || 'No asignado' }}</p>
         <p><strong>Fecha de entrega:</strong> {{ evaluacion.fechaEntrega | date:'dd/MM/yyyy HH:mm' }}</p>
-        <p *ngIf="evaluacion.videoUrl">
-          <strong>Video:</strong> 
-          <a [href]="evaluacion.videoUrl" target="_blank" rel="noopener">Ver práctica</a>
+        
+        <!-- 🔽 Reproductor de video en lugar de solo enlace -->
+        <div *ngIf="evaluacion.videoUrl" class="video-container">
+          <strong>Video:</strong>
+          <video controls width="100%" max-height="300" [src]="evaluacion.videoUrl" class="video-player"></video>
+          <a [href]="evaluacion.videoUrl" target="_blank" rel="noopener" class="video-link">📥 Abrir en nueva pestaña</a>
+        </div>
+        <p *ngIf="!evaluacion.videoUrl" class="sin-video">
+          <strong>Video:</strong> No hay video disponible para esta práctica.
         </p>
       </div>
     </div>
@@ -46,23 +51,11 @@
             <span class="criterio__max">Máx: {{ criterio.puntuacionMaxima }}</span>
           </div>
           <div class="criterio__puntuacion">
-            <input 
-              type="range" 
-              [min]="0" 
-              [max]="criterio.puntuacionMaxima" 
-              [step]="0.5"
-              [(ngModel)]="puntuaciones[criterio.id]"
-              (input)="calcularTotal()"
-              class="slider"
+            <input type="range" [min]="0" [max]="criterio.puntuacionMaxima" [step]="0.5"
+              [(ngModel)]="puntuaciones[criterio.id]" (input)="calcularTotal()" class="slider"
               [disabled]="evaluacion.estado === 'evaluado'" />
-            <input 
-              type="number" 
-              [min]="0" 
-              [max]="criterio.puntuacionMaxima" 
-              [step]="0.5"
-              [(ngModel)]="puntuaciones[criterio.id]"
-              (input)="calcularTotal()"
-              class="number-input"
+            <input type="number" [min]="0" [max]="criterio.puntuacionMaxima" [step]="0.5"
+              [(ngModel)]="puntuaciones[criterio.id]" (input)="calcularTotal()" class="number-input"
               [disabled]="evaluacion.estado === 'evaluado'" />
             <div class="criterio__barra">
               <div class="barra-progreso" [style.width.%]="(puntuaciones[criterio.id] / criterio.puntuacionMaxima) * 100"></div>
@@ -90,10 +83,7 @@
     <!-- Comentarios adicionales -->
     <div class="comentarios card">
       <h3>Comentarios (opcional)</h3>
-      <textarea 
-        [(ngModel)]="comentarios" 
-        rows="4" 
-        class="form-control" 
+      <textarea [(ngModel)]="comentarios" rows="4" class="form-control"
         placeholder="Escribe observaciones sobre la práctica..."
         [disabled]="evaluacion.estado === 'evaluado'"></textarea>
     </div>
@@ -103,11 +93,8 @@
       <button class="btn btn-outline" (click)="cancelar()" [disabled]="guardando">
         Cancelar
       </button>
-      <!-- Ocultar botón Guardar si ya está evaluado -->
-      <button 
-        *ngIf="evaluacion.estado !== 'evaluado'"
-        class="btn btn-primary" 
-        (click)="guardarEvaluacion()" 
+      <button *ngIf="evaluacion.estado !== 'evaluado'"
+        class="btn btn-primary" (click)="guardarEvaluacion()"
         [disabled]="guardando || !evaluacion || !rubrica || !todasPuntuacionesAsignadas()">
         <span *ngIf="!guardando">Guardar evaluación</span>
         <span *ngIf="guardando">Guardando...</span>

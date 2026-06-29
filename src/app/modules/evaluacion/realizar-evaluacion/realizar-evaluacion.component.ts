@@ -24,6 +24,8 @@ export class RealizarEvaluacionComponent implements OnInit, OnDestroy {
   pendientes: VideoPractica[] = [];
   examenesTeoricos: ExamenTeorico[] = [];
 
+  esAdminOEntrenador = false;
+
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -34,8 +36,26 @@ export class RealizarEvaluacionComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.cargarPendientes();
-    this.cargarExamenesTeoricos();
+    this.authService.getUser().subscribe(user => {
+      this.esAdminOEntrenador = user?.roles?.includes('admin') || user?.roles?.includes('entrenador') || false;
+      // Si es atleta, mostrar directamente la pestaña de exámenes
+      if (!this.esAdminOEntrenador) {
+        this.tabActivo = 'teoricos';
+        // Cargar exámenes teóricos si no se han cargado
+        if (this.examenesTeoricos.length === 0) {
+          this.cargarExamenesTeoricos();
+        }
+      } else {
+        // Para admin/entrenador, cargar prácticas y exámenes
+        this.cargarPendientes();
+        this.cargarExamenesTeoricos();
+      }
+    });
+
+    // Si por alguna razón el usuario es atleta pero la pestaña está en prácticas, forzar
+    if (!this.esAdminOEntrenador && this.tabActivo === 'practicas') {
+      this.tabActivo = 'teoricos';
+    }
   }
 
   ngOnDestroy(): void {

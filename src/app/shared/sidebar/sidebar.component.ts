@@ -45,7 +45,7 @@ export class SidebarComponent implements OnInit {
       children: [
         { label: 'Videoteca', icon: '🎬', route: '/contenidos/lista-videos' },
         { label: 'Certificados', icon: '📜', route: '/contenidos/certificado' },
-        { label: 'Progreso de módulos', icon: '📈', route: '/contenidos/progreso-modulo' },
+        { label: 'Progreso de módulos', icon: '📈', route: '/contenidos/progreso-modulo' }
       ]
     },
     {
@@ -86,6 +86,7 @@ export class SidebarComponent implements OnInit {
       children: [
         { label: 'Lista de evaluaciones', icon: '📋', route: '/evaluacion/lista' },
         { label: 'Realizar evaluación', icon: '✍️', route: '/evaluacion/realizar' },
+        { label: 'Realizar examen', icon: '✍️', route: '/evaluacion/examen-teorico/:id' },
         { label: 'Gestionar rúbricas', icon: '✍️', route: '/evaluacion/rubricas' },
         { label: 'Reporte de progreso', icon: '📈', route: '/evaluacion/reporte' },
         { label: 'Subir video práctica', icon: '🎥', route: '/evaluacion/subir' }

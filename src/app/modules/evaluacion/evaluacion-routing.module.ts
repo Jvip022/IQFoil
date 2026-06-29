@@ -22,17 +22,20 @@ const routes: Routes = [
       {
         path: 'evaluar/:id',
         loadComponent: () => import('./evaluar-con-rubrica/evaluar-con-rubrica.component').then(m => m.EvaluarConRubricaComponent),
-        canActivate: [autenticacionGuard]
+        canActivate: [rolGuard],
+        data: { roles: ['admin', 'entrenador'] }
       },
       {
         path: 'examen-teorico/:id', 
         loadComponent: () => import('./examen-teorico/examen-teorico.component').then(m => m.ExamenTeoricoComponent),
-        canActivate: [autenticacionGuard]
+        canActivate: [autenticacionGuard, rolGuard], 
+        data: { roles: ['admin', 'entrenador'] }
       },
       {
         path: 'rubricas',
         loadComponent: () => import('./gestion-rubricas/gestion-rubricas.component').then(m => m.GestionRubricasComponent),
-        canActivate: [autenticacionGuard]
+        canActivate: [rolGuard],
+        data: { roles: ['admin', 'entrenador'] }
       },
       {
         path: 'realizar',
@@ -42,7 +45,8 @@ const routes: Routes = [
       {
         path: 'reporte',
         loadComponent: () => import('./reporte-progreso/reporte-progreso.component').then(m => m.ReporteProgresoComponent),
-        canActivate: [autenticacionGuard]
+        canActivate: [rolGuard],
+        data: { roles: ['admin', 'entrenador'] }
       },
       {
         path: 'subir',

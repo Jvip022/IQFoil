@@ -7,4 +7,4 @@ class Criterio(db.Model):
     descripcion = db.Column(db.String(255), nullable=False)
     puntuacion_maxima = db.Column(db.Integer, nullable=False)
 
-    rubrica = db.relationship('Rubrica', backref='criterios')
+    rubrica = db.relationship('Rubrica', backref=db.backref('criterios', cascade='all, delete-orphan'))

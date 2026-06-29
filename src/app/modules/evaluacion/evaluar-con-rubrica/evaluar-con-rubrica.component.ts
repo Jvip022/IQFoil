@@ -10,11 +10,12 @@ import { NotificacionService } from '../../../core/services/notificacion.service
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 
-// Interfaz extendida para incluir campos adicionales que vienen del backend
+// Extender la interfaz Evaluacion para incluir video_url (que viene del backend)
 interface EvaluacionDetalle extends Evaluacion {
   usuarioNombre?: string;
   fechaEntrega: Date;
-  videoUrl?: string;
+  video_url?: string; // ← tipado correcto
+  videoUrl?: string;  // para compatibilidad
 }
 
 @Component({
@@ -26,7 +27,6 @@ interface EvaluacionDetalle extends Evaluacion {
 })
 export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
   evaluacionId!: string;
-
   cargando = false;
   guardando = false;
 
@@ -61,16 +61,14 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  // Getter para saber si es solo lectura
   get esSoloLectura(): boolean {
     return this.evaluacion?.estado === 'evaluado';
   }
 
-  
   cargarDatos(evaluacionId: string): void {
     this.cargando = true;
     this.evaluacionService.getEvaluacionById(evaluacionId).subscribe({
-      next: (evaluacion: Evaluacion | undefined) => {
+      next: (evaluacion: any) => { // 'any' para capturar video_url
         if (!evaluacion) {
           this.notificacionService.mostrarError('Evaluación no encontrada');
           this.cargando = false;
@@ -78,14 +76,15 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // Obtener videoUrl desde cualquier propiedad que pueda tener el objeto
-        const videoUrl = (evaluacion as any).video_url || (evaluacion as any).videoUrl || '';
+        // ✅ Obtener video_url directamente del objeto
+        const videoUrl = evaluacion.video_url || evaluacion.videoUrl || '';
 
         this.evaluacion = {
           ...evaluacion,
           usuarioNombre: 'Usuario ' + evaluacion.usuarioId,
           fechaEntrega: evaluacion.fecha || new Date(),
-          videoUrl: videoUrl
+          video_url: videoUrl,
+          videoUrl: videoUrl // por compatibilidad
         };
         this.comentarios = evaluacion.comentarios || '';
 
@@ -99,9 +98,8 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
             this.rubrica = rubrica;
             this.puntuacionMaxima = rubrica.criterios.reduce((sum, c) => sum + c.puntuacionMaxima, 0);
 
-            // Inicializar puntuaciones desde datos guardados o a cero
             if (evaluacion.puntuaciones && evaluacion.puntuaciones.length > 0) {
-              evaluacion.puntuaciones.forEach(p => {
+              evaluacion.puntuaciones.forEach((p: any) => {
                 this.puntuaciones[p.criterioId] = p.puntuacion;
               });
             } else {
@@ -132,7 +130,6 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
   }
 
   guardarEvaluacion(): void {
-    // Prevenir guardado si ya está evaluado
     if (this.esSoloLectura) {
       this.notificacionService.mostrarAdvertencia('Esta evaluación ya fue realizada y no se puede modificar');
       return;
@@ -143,7 +140,6 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validar que todas las puntuaciones estén asignadas
     const todosCriterios = this.rubrica.criterios.every(c => 
       this.puntuaciones[c.id] !== undefined && this.puntuaciones[c.id] !== null
     );
@@ -180,7 +176,6 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
     this.router.navigate(['/evaluacion/lista']);
   }
 
-  // Método para verificar si todas las puntuaciones han sido asignadas
   todasPuntuacionesAsignadas(): boolean {
     if (!this.rubrica) return false;
     return this.rubrica.criterios.every(c => 
@@ -188,7 +183,6 @@ export class EvaluarConRubricaComponent implements OnInit, OnDestroy {
     );
   }
 
-  // Método opcional para trackBy (mejora rendimiento en listas largas)
   trackByCriterio(index: number, criterio: any): string {
     return criterio.id;
   }

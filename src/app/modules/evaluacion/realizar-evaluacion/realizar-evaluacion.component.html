@@ -8,18 +8,20 @@
 
   <app-estado-conexion class="realizar-evaluacion__connection"></app-estado-conexion>
 
-  <!-- Pestañas (opcional) -->
+  <!-- Pestañas -->
   <div class="realizar-evaluacion__tabs">
-    <button class="tab-btn" [class.active]="tabActivo === 'practicas'" (click)="tabActivo = 'practicas'">
+    <!-- ✅ Pestaña de prácticas (solo visible para admin/entrenador) -->
+    <button class="tab-btn" *ngIf="esAdminOEntrenador" [class.active]="tabActivo === 'practicas'" (click)="tabActivo = 'practicas'">
       📹 Prácticas pendientes
     </button>
+    <!-- ✅ Pestaña de exámenes (visible para todos) -->
     <button class="tab-btn" [class.active]="tabActivo === 'teoricos'" (click)="tabActivo = 'teoricos'">
       📚 Exámenes teóricos
     </button>
   </div>
 
-  <!-- Contenido de prácticas pendientes -->
-  <div class="realizar-evaluacion__content" *ngIf="tabActivo === 'practicas'">
+  <!-- Contenido de prácticas pendientes (solo admin/entrenador) -->
+  <div class="realizar-evaluacion__content" *ngIf="tabActivo === 'practicas' && esAdminOEntrenador">
     <app-loading-spinner *ngIf="cargandoPracticas" [text]="'Cargando prácticas pendientes...'"></app-loading-spinner>
     <div *ngIf="!cargandoPracticas">
       <div class="pendientes-list" *ngIf="pendientes.length > 0; else sinPendientes">
@@ -42,7 +44,7 @@
     </div>
   </div>
 
-  <!-- Contenido de exámenes teóricos -->
+  <!-- Contenido de exámenes teóricos (visible para todos) -->
   <div class="realizar-evaluacion__content" *ngIf="tabActivo === 'teoricos'">
     <app-loading-spinner *ngIf="cargandoTeoricos" [text]="'Cargando exámenes teóricos...'"></app-loading-spinner>
     <div *ngIf="!cargandoTeoricos">

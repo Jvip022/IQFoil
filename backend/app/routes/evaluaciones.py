@@ -163,10 +163,26 @@ def actualizar_rubrica(id):
 def eliminar_rubrica(id):
     if not is_admin_or_coach():
         return jsonify({'error': 'No autorizado'}), 403
+    
     rubrica = Rubrica.query.get_or_404(id)
-    db.session.delete(rubrica)
-    db.session.commit()
-    return jsonify({'message': 'Rúbrica eliminada'}), 200
+    
+    # Verificar si la rúbrica está siendo usada en alguna evaluación
+    from app.models.evaluacion import Evaluacion
+    evaluacion_en_uso = Evaluacion.query.filter_by(rubrica_id=id).first()
+    if evaluacion_en_uso:
+        return jsonify({
+            'error': 'No se puede eliminar la rúbrica porque está siendo usada en una evaluación. '
+                     'Reasigna las evaluaciones a otra rúbrica o elimínalas primero.'
+        }), 400
+    
+    try:
+        db.session.delete(rubrica)
+        db.session.commit()
+        return jsonify({'message': 'Rúbrica eliminada'}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error eliminando rúbrica {id}: {str(e)}")
+        return jsonify({'error': 'Error interno al eliminar la rúbrica'}), 500
 
 # ==================== VIDEOS PENDIENTES Y EVALUACIÓN ====================
 
