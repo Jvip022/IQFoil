@@ -19,15 +19,13 @@ export interface User {
 export class AuthService {
   private apiUrl = environment.apiUrl;
   private authStatusSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
-  private currentUserSubject = new BehaviorSubject<User | null>(this.loadUserFromStorage()); // ← cargar desde localStorage
+  private currentUserSubject = new BehaviorSubject<User | null>(this.loadUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    // Si hay token y no hay usuario en memoria, intentar cargar perfil
     if (this.isAuthenticated() && !this.currentUserSubject.value) {
       this.loadUserProfile();
     }
-    // Si hay usuario en localStorage pero token no, limpiar
     if (!this.isAuthenticated()) {
       localStorage.removeItem('user');
       this.currentUserSubject.next(null);
@@ -49,7 +47,6 @@ export class AuthService {
           if (response && response.token) {
             localStorage.setItem('token', response.token);
             const user = this.normalizeUser(response.user);
-            // Guardar usuario en localStorage para restaurar al recargar
             localStorage.setItem('user', JSON.stringify(user));
             this.authStatusSubject.next(true);
             this.currentUserSubject.next(user);
@@ -94,20 +91,16 @@ export class AuthService {
   }
 
   getUser(): Observable<User | null> {
-    // Si ya tenemos el usuario en memoria, devolverlo
     if (this.currentUserSubject.value) {
       return of(this.currentUserSubject.value);
     }
-    // Si no, intentar cargar desde localStorage (fallback rápido)
     const cached = this.loadUserFromStorage();
     if (cached) {
       this.currentUserSubject.next(cached);
       this.authStatusSubject.next(true);
-      // Aún así, intentar actualizar desde el backend en segundo plano
       this.refreshUserProfile();
       return of(cached);
     }
-    // Si no hay caché, hacer la petición al backend
     return this.http.get<any>(`${this.apiUrl}/usuarios/perfil`).pipe(
       map(user => this.normalizeUser(user)),
       tap(user => {
@@ -119,15 +112,12 @@ export class AuthService {
       }),
       catchError(error => {
         console.warn('⚠️ Error al cargar perfil:', error);
-        // Si es 401, token inválido → desactivar autenticación
         if (error.status === 401) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           this.authStatusSubject.next(false);
           this.currentUserSubject.next(null);
         } else {
-          // Para otros errores, mantener autenticación si hay token
-          // y usar usuario en caché si existe
           const cachedUser = this.loadUserFromStorage();
           if (cachedUser) {
             this.currentUserSubject.next(cachedUser);
@@ -147,7 +137,6 @@ export class AuthService {
   }
 
   private refreshUserProfile(): void {
-    // Actualizar perfil en segundo plano sin bloquear
     this.http.get<any>(`${this.apiUrl}/usuarios/perfil`).pipe(
       map(user => this.normalizeUser(user)),
       tap(user => {
@@ -171,13 +160,27 @@ export class AuthService {
     return null;
   }
 
+  // ============================================================
+  // NORMALIZACIÓN DE USUARIO (CORREGIDO)
+  // ============================================================
   private normalizeUser(user: any): User | null {
     if (!user) return null;
+
+    // 1. Mapear rol_id a roles
     let roles: string[] = [];
     if (user.rol_id === 1) roles = ['admin'];
     else if (user.rol_id === 2) roles = ['entrenador'];
     else if (user.rol_id === 3) roles = ['atleta'];
-    if (user.roles && Array.isArray(user.roles)) roles = user.roles;
+    else if (user.rol_id === 4) roles = ['entrenador_nacional', 'entrenador']; // ✅ NUEVO
+    else if (user.rol_id === 5) roles = ['entrenador_provincial', 'entrenador']; // ✅ NUEVO
+
+    // 2. Si el backend envía roles adicionales en un array, combinarlos
+    if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
+      // Fusionar sin duplicados
+      const combined = new Set([...roles, ...user.roles]);
+      roles = Array.from(combined);
+    }
+
     return {
       uid: user.id?.toString(),
       nombre: user.nombre,
@@ -186,7 +189,7 @@ export class AuthService {
       avatar: user.avatar || null,
       displayName: user.nombre,
       name: user.nombre,
-      role: roles[0] || undefined
+      role: roles.length > 0 ? roles[0] : undefined
     };
   }
 }

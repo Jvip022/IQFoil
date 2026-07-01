@@ -1,26 +1,25 @@
 <div class="mentorias">
-  <!-- Encabezado -->
   <header class="mentorias__header">
     <div class="header-left">
       <h2 class="mentorias__title">🧑‍🏫 Mentorías</h2>
       <p class="mentorias__subtitle">Conecta con expertos para acelerar tu aprendizaje</p>
     </div>
-    <div class="header-right">
+    <div class="header-right" *ngIf="esAtleta">
       <button class="btn btn-primary" (click)="abrirModalSolicitar()">
         ➕ Solicitar mentoría
       </button>
     </div>
   </header>
 
-  <!-- Estado de conexión -->
   <app-estado-conexion class="mentorias__connection"></app-estado-conexion>
 
-  <!-- Pestañas -->
   <div class="mentorias__tabs">
+    <!-- Mostrar "Disponibles" si es atleta o administrador -->
     <button 
       class="tab-btn" 
       [class.active]="tabActivo === 'disponibles'"
-      (click)="cambiarTab('disponibles')">
+      (click)="cambiarTab('disponibles')"
+      *ngIf="esAtleta || esAdmin">
       <span>Disponibles</span>
     </button>
     <button 
@@ -31,11 +30,10 @@
     </button>
   </div>
 
-  <!-- Loader mientras carga -->
   <app-loading-spinner *ngIf="cargando" [text]="'Cargando...'"></app-loading-spinner>
 
-  <!-- Contenido: Mentorías disponibles -->
-  <div class="mentorias__content" *ngIf="!cargando && tabActivo === 'disponibles'">
+  <!-- Mentorías disponibles (para atletas y administradores) -->
+  <div class="mentorias__content" *ngIf="!cargando && tabActivo === 'disponibles' && (esAtleta || esAdmin)">
     <div class="filtros">
       <input 
         type="text" 
@@ -55,7 +53,10 @@
           <p class="mentor-experiencia">{{ mentor.experiencia }} años de experiencia</p>
         </div>
         <div class="mentor-card__actions">
-          <button class="btn btn-primary" (click)="solicitarMentoria(mentor)">Solicitar</button>
+          <!-- Botón "Solicitar" solo para atletas -->
+          <button class="btn btn-primary" (click)="solicitarMentoria(mentor)" *ngIf="esAtleta">
+            Solicitar
+          </button>
           <button class="btn btn-outline" (click)="verPerfil(mentor)">Ver perfil</button>
         </div>
       </div>
@@ -65,7 +66,7 @@
     </ng-template>
   </div>
 
-  <!-- Contenido: Mis mentorías -->
+  <!-- Mis mentorías -->
   <div class="mentorias__content" *ngIf="!cargando && tabActivo === 'mis-mentorias'">
     <div class="mis-mentorias-list" *ngIf="misMentorias.length > 0; else sinMentorias">
       <div class="mentoria-item" *ngFor="let m of misMentorias">
@@ -80,7 +81,15 @@
           <div class="mentor-info">
             <h4>{{ m.mentorNombre }}</h4>
             <p>{{ m.area }}</p>
+            <p *ngIf="m.estado === 'pendiente' && esEntrenador" class="text-muted">
+              Solicitud de {{ m.aprendizNombre }}
+            </p>
           </div>
+        </div>
+        <!-- Acciones según estado y rol -->
+        <div class="mentoria-item__actions" *ngIf="m.estado === 'pendiente' && esEntrenador">
+          <button class="btn btn-success btn-sm" (click)="aceptarSolicitud(m)">✓ Aceptar</button>
+          <button class="btn btn-danger btn-sm" (click)="rechazarSolicitud(m)">✕ Rechazar</button>
         </div>
         <div class="mentoria-item__actions" *ngIf="m.estado === 'activa'">
           <button class="btn btn-outline btn-sm" (click)="iniciarChat(m)">💬 Mensaje</button>
@@ -92,11 +101,13 @@
       </div>
     </div>
     <ng-template #sinMentorias>
-      <p class="sin-resultados">No tienes mentorías activas. ¡Solicita una en la pestaña "Disponibles"!</p>
+      <p class="sin-resultados">
+        {{ (esAtleta || esAdmin) ? 'No tienes mentorías activas. ¡Solicita una en la pestaña "Disponibles"!' : 'No hay solicitudes pendientes.' }}
+      </p>
     </ng-template>
   </div>
 
-  <!-- Modal de solicitud de mentoría -->
+  <!-- Modal de solicitud -->
   <app-modal-confirmacion 
     *ngIf="modalSolicitudVisible"
     [isOpen]="true"

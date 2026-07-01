@@ -21,3 +21,6 @@ from .mentoria import Mentoria
 from .configuracion_usuario import ConfiguracionUsuario
 from .log_actividad import LogActividad
 from .curso import Curso
+from .solicitud_cambio_entrenador import SolicitudCambioEntrenador
+from .alerta import Alerta
+from .recomendacion import Recomendacion

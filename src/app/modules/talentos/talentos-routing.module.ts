@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from '../../core/guards/auth.guard';
+import { rolGuard } from '../../core/guards/rol.guard'; // ✅ Importar rolGuard
 
 const routes: Routes = [
   {
@@ -13,7 +14,9 @@ const routes: Routes = [
       },
       {
         path: 'alertas',
-        loadComponent: () => import('./alertas-talento/alertas-talento.component').then(m => m.AlertasTalentoComponent)
+        loadComponent: () => import('./alertas-talento/alertas-talento.component').then(m => m.AlertasTalentoComponent),
+        canActivate: [rolGuard], 
+        data: { roles: ['admin', 'entrenador'] }
       },
       {
         path: 'recomendaciones',

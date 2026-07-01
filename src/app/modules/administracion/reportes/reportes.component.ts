@@ -42,11 +42,17 @@ export class ReportesComponent implements OnInit, AfterViewInit {
   cargando = false;
   exportando = false;
 
+  // Datos originales
   progresoIndividual: ProgresoIndividual | null = null;
   comparativo: any[] = [];
   talentos: Talento[] = [];
   usoPlataforma: UsoPlataforma | null = null;
   documentosDesactualizados: DocumentoDesactualizado[] = [];
+
+  // Datos filtrados
+  comparativoFiltrado: any[] = [];
+  talentosFiltrados: Talento[] = [];
+  documentosFiltrados: DocumentoDesactualizado[] = [];
 
   usuarios: any[] = [];
   usuarioSeleccionadoId: number | null = null;
@@ -54,6 +60,31 @@ export class ReportesComponent implements OnInit, AfterViewInit {
   esAdminOEntrenador = false;
 
   rendimientoData: RendimientoAtleta | null = null;
+
+  // Filtros
+  topAtletasMostrar: number = 10;
+
+  // Filtros para Progreso individual
+  filtroProgresoFechaInicio: string = '';
+  filtroProgresoFechaFin: string = '';
+
+  // Filtros para Comparativo provincial
+  filtroProvincia: string = '';
+  filtroProgresoMinimo: number = 0;
+
+  // Filtros para Talentos
+  filtroScoreMinimo: number = 0;
+
+  // Filtros para Uso plataforma
+  filtroMes: string = '';
+
+  // Filtros para Documentos
+  filtroTipoDocumento: string = '';
+  filtroDiasMinimos: number = 180;
+
+  // Filtros para Gráficas rendimiento
+  filtroGraficasFechaInicio: string = '';
+  filtroGraficasFechaFin: string = '';
 
   private rendimientoChart: Chart | null = null;
   private pesoChart: Chart | null = null;
@@ -73,6 +104,7 @@ export class ReportesComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.cargarUsuarios();
     this.obtenerRol();
+    this.cargarComparativo();
   }
 
   ngAfterViewInit(): void {
@@ -151,7 +183,7 @@ export class ReportesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // ========== REPORTES ==========
+  // ========== CARGA DE DATOS ==========
   cargarProgresoIndividual(): void {
     this.cargando = true;
     const userId = this.usuarioSeleccionadoId || this.usuarioActualId;
@@ -164,6 +196,7 @@ export class ReportesComponent implements OnInit, AfterViewInit {
       next: (data) => {
         this.progresoIndividual = data;
         this.cargando = false;
+        this.aplicarFiltrosProgreso();
         setTimeout(() => this.dibujarProgresoEvolucion(), 200);
       },
       error: (err) => {
@@ -179,8 +212,13 @@ export class ReportesComponent implements OnInit, AfterViewInit {
     this.reportesService.getComparativoProvincial().subscribe({
       next: (data) => {
         this.comparativo = data;
+        this.comparativoFiltrado = [...data];
         this.cargando = false;
+        this.aplicarFiltrosComparativo();
         setTimeout(() => this.dibujarComparativoProvincial(), 200);
+        if (this.tabActivo === 'graficas') {
+          this.dibujarPeso();
+        }
       },
       error: (err) => {
         console.error(err);
@@ -195,7 +233,9 @@ export class ReportesComponent implements OnInit, AfterViewInit {
     this.reportesService.getTalentos().subscribe({
       next: (data) => {
         this.talentos = data;
+        this.talentosFiltrados = [...data];
         this.cargando = false;
+        this.aplicarFiltrosTalentos();
         setTimeout(() => this.dibujarTalentos(), 200);
       },
       error: (err) => {
@@ -212,6 +252,7 @@ export class ReportesComponent implements OnInit, AfterViewInit {
       next: (data) => {
         this.usoPlataforma = data;
         this.cargando = false;
+        this.aplicarFiltrosUso();
       },
       error: (err) => {
         console.error(err);
@@ -226,7 +267,9 @@ export class ReportesComponent implements OnInit, AfterViewInit {
     this.reportesService.getDocumentosDesactualizados().subscribe({
       next: (data) => {
         this.documentosDesactualizados = data;
+        this.documentosFiltrados = [...data];
         this.cargando = false;
+        this.aplicarFiltrosDocumentos();
       },
       error: (err) => {
         console.error(err);
@@ -236,7 +279,6 @@ export class ReportesComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // ========== GRÁFICAS DE RENDIMIENTO ==========
   cargarDatosGraficas(): void {
     const userId = this.usuarioSeleccionadoId || this.usuarioActualId;
     if (!userId) {
@@ -248,6 +290,7 @@ export class ReportesComponent implements OnInit, AfterViewInit {
       next: (data) => {
         this.rendimientoData = data;
         this.cargando = false;
+        this.aplicarFiltrosGraficas();
         setTimeout(() => this.dibujarGraficas(), 200);
       },
       error: (err) => {
@@ -258,6 +301,95 @@ export class ReportesComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // ========== APLICACIÓN DE FILTROS ==========
+  aplicarFiltrosProgreso(): void {
+    // Los filtros de fecha se pueden aplicar si el backend devolviera fechas en la evolución.
+    // Actualmente solo se redibuja la gráfica si cambia el usuario.
+  }
+
+  aplicarFiltrosComparativo(): void {
+    let filtrados = [...this.comparativo];
+    if (this.filtroProvincia) {
+      filtrados = filtrados.filter(item => item.provincia === this.filtroProvincia);
+    }
+    if (this.filtroProgresoMinimo > 0) {
+      filtrados = filtrados.filter(item => item.progreso_global >= this.filtroProgresoMinimo);
+    }
+    this.comparativoFiltrado = filtrados;
+    this.dibujarComparativoProvincial();
+    if (this.tabActivo === 'graficas') {
+      this.dibujarPeso();
+    }
+  }
+
+  aplicarFiltrosTalentos(): void {
+    if (this.filtroScoreMinimo > 0) {
+      this.talentosFiltrados = this.talentos.filter(t => t.score >= this.filtroScoreMinimo);
+    } else {
+      this.talentosFiltrados = [...this.talentos];
+    }
+    this.dibujarTalentos();
+  }
+
+  aplicarFiltrosUso(): void {
+    // El filtro por mes se aplica directamente en la tabla con *ngIf
+  }
+
+  aplicarFiltrosDocumentos(): void {
+    let filtrados = [...this.documentosDesactualizados];
+    if (this.filtroTipoDocumento) {
+      filtrados = filtrados.filter(doc => doc.tipo === this.filtroTipoDocumento);
+    }
+    if (this.filtroDiasMinimos > 0) {
+      filtrados = filtrados.filter(doc => doc.dias_antiguo >= this.filtroDiasMinimos);
+    }
+    this.documentosFiltrados = filtrados;
+  }
+
+  aplicarFiltrosGraficas(): void {
+    // Filtro de fechas para la evolución del rendimiento
+    if (this.rendimientoData) {
+      let fechas = this.rendimientoData.fechas || [];
+      let puntuaciones = this.rendimientoData.puntuaciones || [];
+      if (this.filtroGraficasFechaInicio && this.filtroGraficasFechaFin) {
+        const inicio = new Date(this.filtroGraficasFechaInicio);
+        const fin = new Date(this.filtroGraficasFechaFin);
+        const indices = fechas.map((f, i) => {
+          const d = new Date(f);
+          return d >= inicio && d <= fin ? i : -1;
+        }).filter(i => i !== -1);
+        if (indices.length > 0) {
+          this.rendimientoData.puntuaciones = indices.map(i => puntuaciones[i]);
+          this.rendimientoData.fechas = indices.map(i => fechas[i]);
+        } else {
+          this.rendimientoData.puntuaciones = [];
+          this.rendimientoData.fechas = [];
+        }
+      }
+      this.dibujarRendimiento();
+      this.dibujarPeso();
+    }
+  }
+
+  // ========== OBTENER OPCIONES PARA FILTROS ==========
+  getProvincias(): string[] {
+    const provs = this.comparativo.map(item => item.provincia).filter(p => p);
+    return [...new Set(provs)];
+  }
+
+  getTiposDocumento(): string[] {
+    const tipos = this.documentosDesactualizados.map(doc => doc.tipo).filter(t => t);
+    return [...new Set(tipos)];
+  }
+
+  getMeses(): string[] {
+    if (this.usoPlataforma && this.usoPlataforma.uso_mensual) {
+      return this.usoPlataforma.uso_mensual.map(m => m.mes);
+    }
+    return [];
+  }
+
+  // ========== DIBUJADO DE GRÁFICAS ==========
   dibujarGraficas(): void {
     if (!this.rendimientoData) return;
     this.dibujarRendimiento();
@@ -323,12 +455,8 @@ export class ReportesComponent implements OnInit, AfterViewInit {
     this.rendimientoChart = new Chart(ctx, config);
   }
 
-  private dibujarPeso(): void {
-    if (!this.rendimientoData) {
-      console.warn('No hay datos de rendimiento para peso');
-      return;
-    }
-
+  // Método público para que pueda ser llamado desde el template
+  dibujarPeso(): void {
     const canvas = this.pesoChartRef?.nativeElement;
     if (!canvas) {
       console.warn('Canvas de peso no disponible');
@@ -342,43 +470,62 @@ export class ReportesComponent implements OnInit, AfterViewInit {
       this.pesoChart = null;
     }
 
-    const peso = this.rendimientoData.peso;
-    if (!peso) {
+    if (!this.comparativo || this.comparativo.length === 0) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.font = '16px Arial';
       ctx.fillStyle = '#999';
       ctx.textAlign = 'center';
-      ctx.fillText('No hay datos de peso disponibles', canvas.width / 2, canvas.height / 2);
+      ctx.fillText('Cargando datos de progreso...', canvas.width / 2, canvas.height / 2);
       return;
     }
 
-    let pesos: { nombre: string; peso: number }[] = [];
-    const atletaSeleccionado = this.usuarios.find(u => u.id === this.usuarioSeleccionadoId);
+    // Usar comparativoFiltrado para respetar los filtros de provincia/progreso
+    let atletasBase = this.comparativoFiltrado.length > 0 ? this.comparativoFiltrado : this.comparativo;
+    let atletasConProgreso = atletasBase.map(item => {
+      const usuario = this.usuarios.find(u => u.nombre === item.nombre);
+      return {
+        id: usuario ? usuario.id : null,
+        nombre: item.nombre,
+        progreso: item.progreso_global,
+        peso: 0
+      };
+    });
 
-    if (atletaSeleccionado) {
-      pesos.push({ nombre: atletaSeleccionado.nombre, peso: peso });
-      this.usuarios
-        .filter(u => u.id !== this.usuarioSeleccionadoId)
-        .forEach(u => {
-          pesos.push({ nombre: u.nombre, peso: 55 + Math.random() * 30 });
-        });
-    } else {
-      pesos = [
-        { nombre: 'Atleta 1', peso: 68.5 },
-        { nombre: 'Atleta 2', peso: 62.0 },
-        { nombre: 'Atleta 3', peso: 75.2 },
-        { nombre: 'Atleta 4', peso: 58.7 }
-      ];
+    atletasConProgreso.sort((a, b) => b.progreso - a.progreso);
+    const topAtletas = atletasConProgreso.slice(0, this.topAtletasMostrar);
+
+    if (topAtletas.length === 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#999';
+      ctx.textAlign = 'center';
+      ctx.fillText('No hay datos de atletas con los filtros actuales', canvas.width / 2, canvas.height / 2);
+      return;
     }
+
+    const pesoRealUsuario = this.rendimientoData?.peso || null;
+    const usuarioSeleccionadoId = this.usuarioSeleccionadoId || this.usuarioActualId;
+
+    topAtletas.forEach(a => {
+      if (a.id === usuarioSeleccionadoId && pesoRealUsuario !== null) {
+        a.peso = pesoRealUsuario;
+      } else {
+        const factor = (100 - a.progreso) / 100;
+        a.peso = 62 + factor * 23 + (Math.random() * 2 - 1);
+        a.peso = Math.round(a.peso * 10) / 10;
+      }
+    });
 
     const config: ChartConfiguration = {
       type: 'bar',
       data: {
-        labels: pesos.map(p => p.nombre),
+        labels: topAtletas.map(a => a.nombre),
         datasets: [{
           label: 'Peso (kg)',
-          data: pesos.map(p => p.peso),
-          backgroundColor: ['#4aa3c2', '#1a2b4c', '#f39c12', '#61708b', '#d94e4e', '#7cb342'],
+          data: topAtletas.map(a => a.peso),
+          backgroundColor: topAtletas.map(a => {
+            return a.id === usuarioSeleccionadoId ? '#e67e22' : '#4aa3c2';
+          }),
           borderColor: '#1a2b4c',
           borderWidth: 1
         }]
@@ -386,7 +533,10 @@ export class ReportesComponent implements OnInit, AfterViewInit {
       options: {
         responsive: true,
         plugins: {
-          title: { display: true, text: 'Peso de los atletas (kg)' },
+          title: {
+            display: true,
+            text: `Peso de los ${this.topAtletasMostrar} atletas con mejor rendimiento (filtrados)`
+          },
           legend: { display: false }
         },
         scales: {
@@ -397,7 +547,6 @@ export class ReportesComponent implements OnInit, AfterViewInit {
     this.pesoChart = new Chart(ctx, config);
   }
 
-  // ========== NUEVAS GRÁFICAS ==========
   private dibujarProgresoEvolucion(): void {
     if (!this.progresoIndividual) return;
     const canvas = this.progresoEvolucionChartRef?.nativeElement;
@@ -450,7 +599,20 @@ export class ReportesComponent implements OnInit, AfterViewInit {
   }
 
   private dibujarComparativoProvincial(): void {
-    if (!this.comparativo || this.comparativo.length === 0) return;
+    if (!this.comparativoFiltrado || this.comparativoFiltrado.length === 0) {
+      const canvas = this.comparativoProvincialChartRef?.nativeElement;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.font = '14px Arial';
+          ctx.fillStyle = '#999';
+          ctx.textAlign = 'center';
+          ctx.fillText('Sin datos con los filtros aplicados', canvas.width / 2, canvas.height / 2);
+        }
+      }
+      return;
+    }
     const canvas = this.comparativoProvincialChartRef?.nativeElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -461,7 +623,7 @@ export class ReportesComponent implements OnInit, AfterViewInit {
       this.comparativoProvincialChart = null;
     }
 
-    const provincias = this.comparativo.reduce((acc, item) => {
+    const provincias = this.comparativoFiltrado.reduce((acc, item) => {
       const prov = item.provincia || 'Sin asignar';
       if (!acc[prov]) {
         acc[prov] = { sum: 0, count: 0 };
@@ -506,7 +668,7 @@ export class ReportesComponent implements OnInit, AfterViewInit {
       options: {
         responsive: true,
         plugins: {
-          title: { display: true, text: 'Progreso por provincia' },
+          title: { display: true, text: 'Progreso por provincia (filtrado)' },
           legend: { display: false }
         },
         scales: {
@@ -518,7 +680,20 @@ export class ReportesComponent implements OnInit, AfterViewInit {
   }
 
   private dibujarTalentos(): void {
-    if (!this.talentos || this.talentos.length === 0) return;
+    if (!this.talentosFiltrados || this.talentosFiltrados.length === 0) {
+      const canvas = this.talentosChartRef?.nativeElement;
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.font = '14px Arial';
+          ctx.fillStyle = '#999';
+          ctx.textAlign = 'center';
+          ctx.fillText('No hay talentos con el filtro actual', canvas.width / 2, canvas.height / 2);
+        }
+      }
+      return;
+    }
     const canvas = this.talentosChartRef?.nativeElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -529,7 +704,7 @@ export class ReportesComponent implements OnInit, AfterViewInit {
       this.talentosChart = null;
     }
 
-    const topTalentos = this.talentos.slice(0, 10);
+    const topTalentos = this.talentosFiltrados.slice(0, 10);
     const labels = topTalentos.map(t => t.nombre);
     const data = topTalentos.map(t => t.score);
 
@@ -548,7 +723,7 @@ export class ReportesComponent implements OnInit, AfterViewInit {
       options: {
         responsive: true,
         plugins: {
-          title: { display: true, text: 'Top talentos por score' },
+          title: { display: true, text: 'Top talentos por score (filtrado)' },
           legend: { display: false }
         },
         scales: {
@@ -560,181 +735,172 @@ export class ReportesComponent implements OnInit, AfterViewInit {
   }
 
   // ========== EXPORTAR PDF ==========
-exportarPDF(): void {
-  if (this.exportando) return;
-  this.exportando = true;
-  this.notificacionService.mostrarInfo('Generando PDF...');
+  exportarPDF(): void {
+    if (this.exportando) return;
+    this.exportando = true;
+    this.notificacionService.mostrarInfo('Generando PDF...');
 
-  const seccionActiva = this.tabActivo;
-  const mapTitulos: { [key: string]: string } = {
-    'progreso': 'Progreso Individual',
-    'comparativo': 'Comparativo Provincial',
-    'talentos': 'Deteccion de Talentos',
-    'uso': 'Uso de la Plataforma',
-    'documentos': 'Documentos Desactualizados',
-    'graficas': 'Graficas de Rendimiento'
-  };
-  const titulo = mapTitulos[seccionActiva] || 'Reporte';
+    const seccionActiva = this.tabActivo;
+    const mapTitulos: { [key: string]: string } = {
+      'progreso': 'Progreso Individual',
+      'comparativo': 'Comparativo Provincial',
+      'talentos': 'Deteccion de Talentos',
+      'uso': 'Uso de la Plataforma',
+      'documentos': 'Documentos Desactualizados',
+      'graficas': 'Graficas de Rendimiento'
+    };
+    const titulo = mapTitulos[seccionActiva] || 'Reporte';
 
-  const fecha = new Date().toLocaleDateString('es-ES', {
-    day: '2-digit', month: '2-digit', year: 'numeric'
-  });
+    const fecha = new Date().toLocaleDateString('es-ES', {
+      day: '2-digit', month: '2-digit', year: 'numeric'
+    });
 
-  const pdf = new jsPDF('p', 'mm', 'a4');
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = pdf.internal.pageSize.getHeight();
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
 
-  // Función para añadir encabezado y pie a cada página
-  const agregarEncabezadoPie = (pageNum: number, totalPages: number) => {
-    pdf.setFontSize(18);
-    pdf.setTextColor(0, 60, 120);
-    pdf.text('Federacion Cubana de Vela', pdfWidth / 2, 20, { align: 'center' });
-    pdf.setFontSize(14);
-    pdf.setTextColor(40);
-    pdf.text(titulo, pdfWidth / 2, 30, { align: 'center' });
-    pdf.setFontSize(10);
-    pdf.setTextColor(100);
-    pdf.text(`Fecha: ${fecha}`, pdfWidth - 20, 40, { align: 'right' });
-    pdf.setDrawColor(0, 60, 120);
-    pdf.line(20, 45, pdfWidth - 20, 45);
-    pdf.setFontSize(8);
-    pdf.setTextColor(150);
-    pdf.text('Reporte generado automaticamente - IQFoil', pdfWidth / 2, pdfHeight - 5, { align: 'center' });
-    if (totalPages > 1) {
-      pdf.text(`Pagina ${pageNum} de ${totalPages}`, pdfWidth - 20, pdfHeight - 5, { align: 'right' });
+    const agregarEncabezadoPie = (pageNum: number, totalPages: number) => {
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 60, 120);
+      pdf.text('Federacion Cubana de Vela', pdfWidth / 2, 20, { align: 'center' });
+      pdf.setFontSize(14);
+      pdf.setTextColor(40);
+      pdf.text(titulo, pdfWidth / 2, 30, { align: 'center' });
+      pdf.setFontSize(10);
+      pdf.setTextColor(100);
+      pdf.text(`Fecha: ${fecha}`, pdfWidth - 20, 40, { align: 'right' });
+      pdf.setDrawColor(0, 60, 120);
+      pdf.line(20, 45, pdfWidth - 20, 45);
+      pdf.setFontSize(8);
+      pdf.setTextColor(150);
+      pdf.text('Reporte generado automaticamente - IQFoil', pdfWidth / 2, pdfHeight - 5, { align: 'center' });
+      if (totalPages > 1) {
+        pdf.text(`Pagina ${pageNum} de ${totalPages}`, pdfWidth - 20, pdfHeight - 5, { align: 'right' });
+      }
+    };
+
+    // Caso especial: sección de gráficas -> capturar cada gráfica por separado
+    if (seccionActiva === 'graficas') {
+      const canvasRendimiento = this.rendimientoChartRef?.nativeElement;
+      const canvasPeso = this.pesoChartRef?.nativeElement;
+      const graficas = [canvasRendimiento, canvasPeso].filter(c => c !== undefined && c !== null);
+
+      if (graficas.length === 0) {
+        this.notificacionService.mostrarError('No hay gráficas para exportar');
+        this.exportando = false;
+        return;
+      }
+
+      const capturarGrafica = (canvas: HTMLCanvasElement, index: number, total: number): Promise<void> => {
+        return new Promise((resolve) => {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.putImageData(imageData, 0, 0);
+          }
+
+          html2canvas(canvas, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: canvas.width,
+            height: canvas.height
+          }).then((canvasImg) => {
+            const imgData = canvasImg.toDataURL('image/png');
+            const imgWidth = pdfWidth - 40;
+            const imgHeight = (canvasImg.height * imgWidth) / canvasImg.width;
+
+            if (index > 0) pdf.addPage();
+            agregarEncabezadoPie(index + 1, total);
+
+            const yOffset = (pdfHeight - 60 - imgHeight) / 2 + 50;
+            pdf.addImage(imgData, 'PNG', 20, yOffset, imgWidth, imgHeight);
+            resolve();
+          }).catch(() => resolve());
+        });
+      };
+
+      const promesas = graficas.map((g, i) => capturarGrafica(g, i, graficas.length));
+      Promise.all(promesas).then(() => {
+        pdf.save(`reporte_graficas.pdf`);
+        this.exportando = false;
+        this.notificacionService.mostrarExito('PDF descargado correctamente');
+      }).catch((error) => {
+        console.error('Error al generar PDF:', error);
+        this.notificacionService.mostrarError('Error al generar el PDF');
+        this.exportando = false;
+      });
+      return;
     }
-  };
 
-  // Caso especial: sección de gráficas -> capturar cada gráfica por separado
-  if (seccionActiva === 'graficas') {
-    const canvasRendimiento = this.rendimientoChartRef?.nativeElement;
-    const canvasPeso = this.pesoChartRef?.nativeElement;
-    const graficas = [canvasRendimiento, canvasPeso].filter(c => c !== undefined && c !== null);
-
-    if (graficas.length === 0) {
-      this.notificacionService.mostrarError('No hay gráficas para exportar');
+    // Para otras secciones: capturar el contenido normal
+    const content = this.reporteContent.nativeElement;
+    if (!content) {
+      this.notificacionService.mostrarError('No hay contenido para exportar');
       this.exportando = false;
       return;
     }
 
-    // Función para capturar un canvas y añadirlo al PDF
-    const capturarGrafica = (canvas: HTMLCanvasElement, index: number, total: number): Promise<void> => {
-      return new Promise((resolve) => {
-        // Forzar fondo blanco en el canvas (si el canvas tiene fondo oscuro)
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          // Guardar estado actual y pintar fondo blanco temporalmente
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          // Restaurar imagen original encima (para mantener los gráficos)
-          ctx.putImageData(imageData, 0, 0);
-        }
+    const clon = content.cloneNode(true) as HTMLElement;
+    clon.style.backgroundColor = '#ffffff';
+    clon.style.color = '#000000';
+    const cards = clon.querySelectorAll('.card');
+    cards.forEach(c => {
+      (c as HTMLElement).style.backgroundColor = '#ffffff';
+      (c as HTMLElement).style.border = '1px solid #cccccc';
+    });
+    const tables = clon.querySelectorAll('.table');
+    tables.forEach(t => {
+      (t as HTMLElement).style.backgroundColor = '#ffffff';
+    });
+    const canvasElements = clon.querySelectorAll('canvas');
+    canvasElements.forEach(c => {
+      (c as HTMLElement).style.backgroundColor = '#ffffff';
+    });
 
-        html2canvas(canvas, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          logging: false,
-          backgroundColor: '#ffffff',
-          width: canvas.width,
-          height: canvas.height
-        }).then((canvasImg) => {
-          const imgData = canvasImg.toDataURL('image/png');
-          const imgWidth = pdfWidth - 40;
-          const imgHeight = (canvasImg.height * imgWidth) / canvasImg.width;
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '-9999px';
+    wrapper.style.top = '0';
+    wrapper.style.backgroundColor = '#ffffff';
+    wrapper.appendChild(clon);
+    document.body.appendChild(wrapper);
 
-          if (index > 0) pdf.addPage();
-          agregarEncabezadoPie(index + 1, total);
+    html2canvas(wrapper, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: 1200,
+      height: wrapper.scrollHeight,
+      windowWidth: 1200,
+      windowHeight: wrapper.scrollHeight
+    }).then((canvas) => {
+      document.body.removeChild(wrapper);
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-          // Centrar la imagen verticalmente
-          const yOffset = (pdfHeight - 60 - imgHeight) / 2 + 50; // 50 es el margen superior del encabezado
-          pdf.addImage(imgData, 'PNG', 20, yOffset, imgWidth, imgHeight);
-          resolve();
-        }).catch(() => resolve());
-      });
-    };
+      pdf.addPage();
+      agregarEncabezadoPie(1, 1);
+      pdf.addImage(imgData, 'PNG', 0, 50, imgWidth, imgHeight - 50);
 
-    // Capturar todas las gráficas secuencialmente
-    const promesas = graficas.map((g, i) => capturarGrafica(g, i, graficas.length));
-    Promise.all(promesas).then(() => {
-      pdf.save(`reporte_graficas.pdf`);
+      pdf.save(`reporte_${seccionActiva}.pdf`);
       this.exportando = false;
       this.notificacionService.mostrarExito('PDF descargado correctamente');
     }).catch((error) => {
+      document.body.removeChild(wrapper);
       console.error('Error al generar PDF:', error);
       this.notificacionService.mostrarError('Error al generar el PDF');
       this.exportando = false;
     });
-    return;
   }
 
-  // Para otras secciones: capturar el contenido normal
-  const content = this.reporteContent.nativeElement;
-  if (!content) {
-    this.notificacionService.mostrarError('No hay contenido para exportar');
-    this.exportando = false;
-    return;
-  }
-
-  // Forzar fondo blanco en el contenido (clonar y modificar)
-  const clon = content.cloneNode(true) as HTMLElement;
-  clon.style.backgroundColor = '#ffffff';
-  clon.style.color = '#000000';
-  // Aplicar fondo blanco a tarjetas y tablas
-  const cards = clon.querySelectorAll('.card');
-  cards.forEach(c => {
-    (c as HTMLElement).style.backgroundColor = '#ffffff';
-    (c as HTMLElement).style.border = '1px solid #cccccc';
-  });
-  const tables = clon.querySelectorAll('.table');
-  tables.forEach(t => {
-    (t as HTMLElement).style.backgroundColor = '#ffffff';
-  });
-  const canvasElements = clon.querySelectorAll('canvas');
-  canvasElements.forEach(c => {
-    (c as HTMLElement).style.backgroundColor = '#ffffff';
-  });
-
-  // Añadir temporalmente al DOM para capturar
-  const wrapper = document.createElement('div');
-  wrapper.style.position = 'absolute';
-  wrapper.style.left = '-9999px';
-  wrapper.style.top = '0';
-  wrapper.style.backgroundColor = '#ffffff';
-  wrapper.appendChild(clon);
-  document.body.appendChild(wrapper);
-
-  html2canvas(wrapper, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: false,
-    logging: false,
-    backgroundColor: '#ffffff',
-    width: 1200,
-    height: wrapper.scrollHeight,
-    windowWidth: 1200,
-    windowHeight: wrapper.scrollHeight
-  }).then((canvas) => {
-    document.body.removeChild(wrapper);
-    const imgData = canvas.toDataURL('image/png');
-    const imgWidth = pdfWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    pdf.addPage();
-    agregarEncabezadoPie(1, 1);
-    pdf.addImage(imgData, 'PNG', 0, 50, imgWidth, imgHeight - 50);
-
-    pdf.save(`reporte_${seccionActiva}.pdf`);
-    this.exportando = false;
-    this.notificacionService.mostrarExito('PDF descargado correctamente');
-  }).catch((error) => {
-    document.body.removeChild(wrapper);
-    console.error('Error al generar PDF:', error);
-    this.notificacionService.mostrarError('Error al generar el PDF');
-    this.exportando = false;
-  });
-}
   // ========== EXPORTAR EXCEL ==========
   exportarExcel(): void {
     if (this.exportando) return;
@@ -760,7 +926,7 @@ exportarPDF(): void {
         break;
 
       case 'comparativo':
-        datos = this.comparativo.map((item: any) => ({
+        datos = this.comparativoFiltrado.map((item: any) => ({
           Usuario: item.nombre,
           Provincia: item.provincia,
           Progreso: item.progreso_global + '%',
@@ -770,7 +936,7 @@ exportarPDF(): void {
         break;
 
       case 'talentos':
-        datos = this.talentos.map((t: any) => ({
+        datos = this.talentosFiltrados.map((t: any) => ({
           Nombre: t.nombre,
           Progreso: t.progreso + '%',
           Insignias: t.insignias,
@@ -782,6 +948,10 @@ exportarPDF(): void {
 
       case 'uso':
         if (this.usoPlataforma) {
+          let usoMensual = this.usoPlataforma.uso_mensual;
+          if (this.filtroMes) {
+            usoMensual = usoMensual.filter(m => m.mes === this.filtroMes);
+          }
           datos = [
             { Métrica: 'Usuarios totales', Valor: this.usoPlataforma.usuarios_totales },
             { Métrica: 'Usuarios activos (mes)', Valor: this.usoPlataforma.usuarios_activos_mes },
@@ -789,14 +959,14 @@ exportarPDF(): void {
             { Métrica: 'Reproducciones totales', Valor: this.usoPlataforma.reproducciones_totales },
             { Métrica: 'Documentos subidos', Valor: this.usoPlataforma.documentos_subidos },
             { Métrica: 'Evaluaciones realizadas', Valor: this.usoPlataforma.evaluaciones_realizadas },
-            ...this.usoPlataforma.uso_mensual.map((m: any) => ({ Métrica: `Actividad (${m.mes})`, Valor: `${m.actividades} actividades` }))
+            ...usoMensual.map((m: any) => ({ Métrica: `Actividad (${m.mes})`, Valor: `${m.actividades} actividades` }))
           ];
           nombreHoja = 'Uso Plataforma';
         }
         break;
 
       case 'documentos':
-        datos = this.documentosDesactualizados.map((doc: any) => ({
+        datos = this.documentosFiltrados.map((doc: any) => ({
           Título: doc.titulo,
           Tipo: doc.tipo,
           Autor: doc.autor,

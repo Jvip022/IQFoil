@@ -7,7 +7,7 @@
     </div>
     <div class="header-right">
       <button class="btn btn-outline" (click)="refrescarRecomendaciones()" [disabled]="cargando">
-        <span>🔄</span> Refrescar
+        🔄 Refrescar
       </button>
     </div>
   </header>
@@ -80,12 +80,15 @@
     <ng-template #sinRecomendaciones>
       <div class="sin-recomendaciones">
         <p *ngIf="filtroTipo !== 'todos'">No hay recomendaciones de tipo "{{ filtroTipo }}" en este momento.</p>
-        <p *ngIf="filtroTipo === 'todos'">No hay recomendaciones disponibles en este momento. Vuelve más tarde.</p>
+        <p *ngIf="filtroTipo === 'todos'">No hay recomendaciones disponibles en este momento.</p>
+        <button class="btn btn-outline" (click)="refrescarRecomendaciones()" [disabled]="cargando">
+          🔄 Buscar recomendaciones
+        </button>
       </div>
     </ng-template>
   </div>
 
-  <!-- Modal de confirmación para "Me interesa" -->
+  <!-- Modal de confirmación para "Me interesa" (solo confirmación) -->
   <app-modal-confirmacion 
     *ngIf="modalVisible"
     [isOpen]="true"

@@ -20,8 +20,8 @@ export const routes: Routes = [
   {
     path: 'talentos',
     loadChildren: () => import('./modules/talentos/talentos.module').then(m => m.TalentosModule),
-    canActivate: [autenticacionGuard, rolGuard],
-    data: { roles: ['admin', 'entrenador'] }
+    canActivate: [autenticacionGuard] // Ahora solo requiere autenticación
+    // Se eliminó rolGuard y data: { roles: ['admin', 'entrenador'] }
   },
   {
     path: 'comunidad',
@@ -36,7 +36,7 @@ export const routes: Routes = [
   {
     path: 'evaluacion',
     loadChildren: () => import('./modules/evaluacion/evaluacion.module').then(m => m.EvaluacionModule),
-    canActivate: [autenticacionGuard] // ✅ Sin rolGuard, permisos en rutas hijas
+    canActivate: [autenticacionGuard]
   },
   {
     path: 'simulaciones',

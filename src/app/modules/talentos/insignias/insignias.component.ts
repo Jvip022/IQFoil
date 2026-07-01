@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
-// Servicios
 import { TalentoService, Insignia } from '../../../core/services/talento.service';
 import { NotificacionService } from '../../../core/services/notificacion.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AdminService } from '../../../core/services/admin.service'; // Para obtener usuarios reales
 
-// Componentes compartidos
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 import { ModalConfirmacionComponent } from '../../../shared/modal-confirmacion/modal-confirmacion.component';
@@ -47,7 +46,7 @@ export class InsigniasComponent implements OnInit, OnDestroy {
   insigniaAOtorgarId = '';
 
   get insigniasDisponibles(): Insignia[] {
-    // Filtramos aquellas que no tienen fechaObtenida (no obtenidas)
+    // Filtramos aquellas que NO tienen fechaObtenida (no obtenidas)
     return this.insignias.filter(i => !i.fechaObtenida);
   }
 
@@ -56,7 +55,8 @@ export class InsigniasComponent implements OnInit, OnDestroy {
   constructor(
     private talentoService: TalentoService,
     private notificacionService: NotificacionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private adminService: AdminService
   ) {}
 
   ngOnInit(): void {
@@ -69,18 +69,23 @@ export class InsigniasComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
+  // ============================================================
+  // CARGAR INSIGNIAS (con fallback)
+  // ============================================================
   cargarInsignias(): void {
     this.cargando = true;
     this.talentoService.getInsignias().subscribe({
-      next: (insignias: Insignia[]) => {
+      next: (insignias) => {
         this.insignias = insignias;
         this.extraerCategorias();
         this.filtrarInsignias();
         this.cargando = false;
       },
-      error: (err: any) => {
+      error: (err) => {
         console.error('Error cargando insignias', err);
         this.notificacionService.mostrarError('No se pudieron cargar las insignias');
+        // Aunque el servicio ya devuelve mock, por si acaso:
+        this.insignias = [];
         this.cargando = false;
       }
     });
@@ -99,21 +104,49 @@ export class InsigniasComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ============================================================
+  // USUARIOS (desde backend o mock)
+  // ============================================================
   cargarUsuarios(): void {
+    this.adminService.getUsuarios().subscribe({
+      next: (users) => {
+        // Filtrar solo atletas (rol_id === 3) o todos según necesidad
+        this.usuarios = users
+          .filter(u => u.rol_id === 3) // asumiendo que rol_id=3 es atleta
+          .map(u => ({ id: u.id.toString(), nombre: u.nombre }));
+        if (this.usuarios.length === 0) {
+          // Fallback a usuarios mock
+          this.cargarUsuariosMock();
+        }
+      },
+      error: () => {
+        this.cargarUsuariosMock();
+      }
+    });
+  }
+
+  private cargarUsuariosMock(): void {
     this.usuarios = [
-      { id: '1', nombre: 'Juan Pérez' },
-      { id: '2', nombre: 'María García' },
-      { id: '3', nombre: 'Carlos López' },
-      { id: '4', nombre: 'Ana Martínez' }
+      { id: '3', nombre: 'Juan Pérez' },
+      { id: '4', nombre: 'María García' },
+      { id: '5', nombre: 'Pedro Rodríguez' },
+      { id: '6', nombre: 'Luis Fernández' },
+      { id: '7', nombre: 'Ana Torres' }
     ];
   }
 
+  // ============================================================
+  // PERMISOS
+  // ============================================================
   verificarPermisos(): void {
     this.authService.getUser().subscribe(user => {
       this.puedeOtorgar = user?.roles?.includes('admin') || user?.roles?.includes('entrenador') || false;
     });
   }
 
+  // ============================================================
+  // DETALLE DE INSIGNIA
+  // ============================================================
   seleccionarInsignia(insignia: Insignia): void {
     this.insigniaSeleccionada = insignia;
   }
@@ -122,7 +155,14 @@ export class InsigniasComponent implements OnInit, OnDestroy {
     this.insigniaSeleccionada = null;
   }
 
+  // ============================================================
+  // OTORGAR INSIGNIA (con backend + simulación)
+  // ============================================================
   abrirModalOtorgar(): void {
+    if (this.insigniasDisponibles.length === 0) {
+      this.notificacionService.mostrarAdvertencia('No hay insignias disponibles para otorgar.');
+      return;
+    }
     this.usuarioSeleccionadoId = '';
     this.insigniaAOtorgarId = '';
     this.modalOtorgarVisible = true;
@@ -138,20 +178,31 @@ export class InsigniasComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const insignia = this.insignias.find(i => i.id === this.insigniaAOtorgarId);
-    if (insignia) {
-      // Simulación: marcar como obtenida estableciendo fechaObtenida
-      const idx = this.insignias.findIndex(i => i.id === this.insigniaAOtorgarId);
-      if (idx !== -1) {
-        this.insignias[idx] = {
-          ...this.insignias[idx],
-          fechaObtenida: new Date()
-        };
-        this.filtrarInsignias();
-      }
-
-      this.notificacionService.mostrarExito(`Insignia "${insignia.nombre}" otorgada correctamente`);
-      this.cerrarModalOtorgar();
-    }
+    // Llamar al servicio para otorgar
+    this.talentoService.otorgarInsignia(this.usuarioSeleccionadoId, this.insigniaAOtorgarId)
+      .subscribe({
+        next: (respuesta) => {
+          if (respuesta.success) {
+            // Actualizar la insignia en la lista local (marcar como obtenida)
+            const idx = this.insignias.findIndex(i => i.id === this.insigniaAOtorgarId);
+            if (idx !== -1) {
+              this.insignias[idx] = {
+                ...this.insignias[idx],
+                fechaObtenida: new Date()
+              };
+              this.filtrarInsignias();
+            }
+            const nombreInsignia = this.insignias.find(i => i.id === this.insigniaAOtorgarId)?.nombre || '';
+            this.notificacionService.mostrarExito(`Insignia "${nombreInsignia}" otorgada correctamente`);
+          } else {
+            this.notificacionService.mostrarError('Error al otorgar la insignia');
+          }
+          this.cerrarModalOtorgar();
+        },
+        error: () => {
+          this.notificacionService.mostrarError('Error al otorgar la insignia');
+          this.cerrarModalOtorgar();
+        }
+      });
   }
 }

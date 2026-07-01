@@ -6,6 +6,15 @@
       <p class="panel-metricas__subtitle">Estadísticas y análisis de rendimiento</p>
     </div>
     <div class="header-right">
+      <!-- Botón Refrescar -->
+      <button 
+        class="btn btn-outline" 
+        (click)="refrescarMetricas()" 
+        [disabled]="cargando"
+        title="Actualizar métricas">
+        🔄 Refrescar
+      </button>
+      <!-- Selector de período -->
       <select class="period-selector" [(ngModel)]="periodoSeleccionado" (change)="cambiarPeriodo()">
         <option value="semana">Última semana</option>
         <option value="mes">Último mes</option>
@@ -125,7 +134,12 @@
         </div>
       </div>
       <ng-template #sinActividades>
-        <p class="sin-actividades">No hay actividades recientes.</p>
+        <div class="sin-actividades">
+          <p>No hay actividades recientes.</p>
+          <button class="btn btn-outline" (click)="refrescarMetricas()" [disabled]="cargando">
+            🔄 Buscar actividades
+          </button>
+        </div>
       </ng-template>
     </div>
   </div>

@@ -158,7 +158,10 @@ export class SidebarComponent implements OnInit {
   private updateMenuItems(): void {
     const roles = this.user?.roles || [];
     const isAdmin = roles.includes('admin');
-    const isEntrenador = roles.includes('entrenador');
+    // ✅ CORREGIDO: Reconoce entrenador_nacional y entrenador_provincial como entrenadores
+    const isEntrenador = roles.some(r => 
+      ['entrenador', 'entrenador_nacional', 'entrenador_provincial'].includes(r)
+    );
     const isAtleta = roles.includes('atleta');
 
     this.menuItems = this.fullMenuItems
@@ -238,6 +241,7 @@ export class SidebarComponent implements OnInit {
     if (roles.includes('atleta')) return 'Atleta';
     return '';
   }
+
   private cargarMentor(usuarioId: string): void {
     this.talentoService.getMentorFor(usuarioId).subscribe({
       next: (mentor) => {

@@ -6,10 +6,19 @@
       <p class="alertas-talento__subtitle">Notificaciones sobre nuevos talentos, logros y recomendaciones</p>
     </div>
     <div class="header-right">
+      <!-- Botón Refrescar -->
+      <button 
+        class="btn btn-outline" 
+        (click)="refrescarAlertas()" 
+        [disabled]="cargando"
+        title="Actualizar alertas">
+        🔄 Refrescar
+      </button>
+      <!-- Botón Marcar todas como leídas -->
       <button 
         class="btn btn-outline" 
         (click)="marcarTodasLeidas()" 
-        [disabled]="!tieneNoLeidas"
+        [disabled]="!tieneNoLeidas || cargando"
         *ngIf="alertas.length > 0">
         Marcar todas como leídas
       </button>
@@ -60,6 +69,9 @@
     <ng-template #sinAlertas>
       <div class="sin-alertas">
         <p>No hay alertas nuevas en este momento.</p>
+        <button class="btn btn-outline" (click)="refrescarAlertas()" [disabled]="cargando">
+          🔄 Buscar alertas
+        </button>
       </div>
     </ng-template>
   </div>

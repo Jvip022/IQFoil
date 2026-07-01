@@ -7,12 +7,15 @@ from app.models.progreso_video import ProgresoVideo
 from app.models.video import VideoTutorial
 from app.models.usuario_insignia import UsuarioInsignia
 from app.models.evaluacion import Evaluacion
+from app.models.solicitud_cambio_entrenador import SolicitudCambioEntrenador  # ← AGREGADO
+from app.models.respuesta_usuario import RespuestaUsuario  # ← AGREGADO
 from app.utils.response import success_response, error_response
 from app.utils.decorators import handle_errors
 from datetime import datetime, timedelta
 from sqlalchemy import func, extract
 
 bp = Blueprint('usuarios', __name__, url_prefix='/api/usuarios')
+
 
 # Decorador para permitir OPTIONS sin JWT
 def optional_jwt_for_options(fn):
@@ -23,6 +26,11 @@ def optional_jwt_for_options(fn):
             return '', 200
         return jwt_required()(fn)(*args, **kwargs)
     return wrapper
+
+
+# ============================================================
+# PERFIL Y PREFERENCIAS
+# ============================================================
 
 @bp.route('/perfil', methods=['GET', 'OPTIONS'])
 @optional_jwt_for_options
@@ -44,6 +52,7 @@ def get_perfil():
         'avatar': usuario.avatar
     })
 
+
 @bp.route('/perfil', methods=['PUT', 'OPTIONS'])
 @optional_jwt_for_options
 @handle_errors()
@@ -60,6 +69,7 @@ def actualizar_perfil():
     db.session.commit()
     return success_response({'mensaje': 'Perfil actualizado'})
 
+
 @bp.route('/preferencias', methods=['GET', 'OPTIONS'])
 @optional_jwt_for_options
 def get_preferencias():
@@ -69,6 +79,7 @@ def get_preferencias():
     usuario = Usuario.query.get(user_id)
     preferencias = getattr(usuario, 'preferencias', {'idioma': 'es', 'notificacionesEmail': True, 'tema': 'claro'})
     return success_response(preferencias)
+
 
 @bp.route('/preferencias', methods=['PUT', 'OPTIONS'])
 @optional_jwt_for_options
@@ -81,6 +92,7 @@ def actualizar_preferencias():
     usuario.preferencias = data
     db.session.commit()
     return success_response(data)
+
 
 @bp.route('/avatar', methods=['POST', 'OPTIONS'])
 @optional_jwt_for_options
@@ -103,6 +115,7 @@ def subir_avatar():
     db.session.commit()
     return success_response({'url': usuario.avatar})
 
+
 @bp.route('/cambiar-password', methods=['POST', 'OPTIONS'])
 @optional_jwt_for_options
 @handle_errors()
@@ -121,7 +134,11 @@ def cambiar_password():
     db.session.commit()
     return success_response({'mensaje': 'Contraseña cambiada'})
 
-# ==================== NUEVO ENDPOINT PARA PROGRESO ====================
+
+# ============================================================
+# PROGRESO DEL USUARIO
+# ============================================================
+
 @bp.route('/progreso/<int:usuario_id>', methods=['GET'])
 @jwt_required()
 def get_progreso_usuario(usuario_id):
@@ -134,13 +151,13 @@ def get_progreso_usuario(usuario_id):
     # Videos completados
     progresos = ProgresoVideo.query.filter_by(usuario_id=usuario_id, completado=True).count()
     total_videos = VideoTutorial.query.count()
-    
+
     # Insignias obtenidas
     insignias = UsuarioInsignia.query.filter_by(usuario_id=usuario_id).count()
-    
+
     # Evaluaciones realizadas
     evaluaciones = Evaluacion.query.filter_by(usuario_id=usuario_id, estado='evaluado').count()
-    
+
     # Evolución (últimos 6 meses)
     evolucion = []
     for i in range(6):
@@ -165,8 +182,13 @@ def get_progreso_usuario(usuario_id):
         'evolucion': evolucion[::-1]  # orden cronológico
     })
 
+
+# ============================================================
+# EXAMEN TEÓRICO (inicio)
+# ============================================================
+
 @bp.route('/teoricas/iniciar', methods=['POST', 'OPTIONS'])
-@jwt_required()
+@optional_jwt_for_options  # ← CORREGIDO: permite OPTIONS sin JWT
 def iniciar_examen_teorico():
     if request.method == 'OPTIONS':
         return '', 200
@@ -191,6 +213,11 @@ def iniciar_examen_teorico():
     db.session.commit()
     return jsonify({'id': nuevo.id}), 201
 
+
+# ============================================================
+# ATLETAS Y CAMBIOS DE ENTRENADOR
+# ============================================================
+
 @bp.route('/atletas', methods=['GET'])
 @jwt_required()
 def get_atletas():
@@ -200,6 +227,7 @@ def get_atletas():
         return jsonify({'error': 'No autorizado'}), 403
     atletas = Usuario.query.filter_by(entrenador_id=user_id).all()
     return jsonify([{'id': u.id, 'nombre': u.nombre, 'email': u.email} for u in atletas])
+
 
 @bp.route('/solicitar-cambio-entrenador', methods=['POST'])
 @jwt_required()
@@ -235,10 +263,8 @@ def solicitar_cambio_entrenador():
     db.session.add(solicitud)
     db.session.commit()
 
-    # Notificar al entrenador actual y al nuevo entrenador (opcional)
-    # (se puede implementar con el servicio de notificaciones)
-
     return jsonify({'message': 'Solicitud enviada correctamente'}), 201
+
 
 @bp.route('/solicitudes-cambio', methods=['GET'])
 @jwt_required()
@@ -282,14 +308,10 @@ def resolver_solicitud_cambio(solicitud_id):
         return jsonify({'error': 'No autorizado'}), 403
 
     if accion == 'aprobar':
-        # Asignar nuevo entrenador al atleta
         atleta = Usuario.query.get(solicitud.atleta_id)
         atleta.entrenador_id = solicitud.entrenador_deseado_id
         solicitud.estado = 'aprobada'
         db.session.commit()
-        # Notificar al atleta
-        mensaje = f'Tu solicitud de cambio a entrenador {solicitud.entrenador_deseado.nombre} ha sido aprobada.'
-        # (enviar notificación)
         return jsonify({'message': 'Solicitud aprobada y asignación actualizada'}), 200
     else:
         solicitud.estado = 'rechazada'

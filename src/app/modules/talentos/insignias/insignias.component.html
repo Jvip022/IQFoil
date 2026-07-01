@@ -6,6 +6,15 @@
       <p class="insignias__subtitle">Reconocimientos obtenidos por tu trayectoria y habilidades</p>
     </div>
     <div class="header-right">
+      <!-- Botón Refrescar -->
+      <button 
+        class="btn btn-outline" 
+        (click)="cargarInsignias()" 
+        [disabled]="cargando"
+        title="Actualizar lista de insignias">
+        🔄 Refrescar
+      </button>
+      <!-- Botón Otorgar insignia (solo admin/entrenador) -->
       <button 
         class="btn btn-primary" 
         (click)="abrirModalOtorgar()" 
@@ -78,17 +87,21 @@
         <p *ngIf="insignias.length > 0 && insigniasFiltradas.length === 0">
           No hay insignias en la categoría "{{ filtroCategoria }}".
         </p>
+        <!-- Botón para refrescar desde el mensaje vacío -->
+        <button class="btn btn-outline" (click)="cargarInsignias()" [disabled]="cargando">
+          🔄 Cargar insignias
+        </button>
       </div>
     </ng-template>
   </div>
 
-  <!-- Modal de detalle de insignia -->
+  <!-- Modal de detalle de insignia (solo cierre) -->
   <app-modal-confirmacion 
     *ngIf="insigniaSeleccionada"
     [isOpen]="true"
     [title]="insigniaSeleccionada.nombre"
     [width]="'500px'"
-    (cancel)="cerrarDetalle()"
+    (confirm)="cerrarDetalle()"
     [confirmText]="'Cerrar'"
     [cancelText]="''"
     [closeOnOverlayClick]="true">

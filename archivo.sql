@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict Kc6YXOv3KZ6PafcYx4r56n0qDKlNodSEGtMbwNVfAAwZctj12mJeVsoB0jbyZ5r
+\restrict doWjukcdFQnE6dkAKbCJZwQCFkIuOP9KGmDOCfAzhuk5BKfaSdJBaDZaa8Gn40O
 
 -- Dumped from database version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
 -- Dumped by pg_dump version 16.14 (Ubuntu 16.14-0ubuntu0.24.04.1)
@@ -35,6 +35,44 @@ COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UU
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: alertas; Type: TABLE; Schema: public; Owner: joel
+--
+
+CREATE TABLE public.alertas (
+    id integer NOT NULL,
+    tipo character varying(50) NOT NULL,
+    mensaje text NOT NULL,
+    usuario_id integer,
+    fecha timestamp without time zone DEFAULT now(),
+    leida boolean DEFAULT false
+);
+
+
+ALTER TABLE public.alertas OWNER TO joel;
+
+--
+-- Name: alertas_id_seq; Type: SEQUENCE; Schema: public; Owner: joel
+--
+
+CREATE SEQUENCE public.alertas_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.alertas_id_seq OWNER TO joel;
+
+--
+-- Name: alertas_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: joel
+--
+
+ALTER SEQUENCE public.alertas_id_seq OWNED BY public.alertas.id;
+
 
 --
 -- Name: configuracion_usuario; Type: TABLE; Schema: public; Owner: joel
@@ -698,6 +736,46 @@ CREATE TABLE public.puntuacion_evaluacion (
 ALTER TABLE public.puntuacion_evaluacion OWNER TO joel;
 
 --
+-- Name: recomendaciones; Type: TABLE; Schema: public; Owner: joel
+--
+
+CREATE TABLE public.recomendaciones (
+    id integer NOT NULL,
+    tipo character varying(50) NOT NULL,
+    titulo character varying(200) NOT NULL,
+    descripcion text,
+    razon text,
+    meta jsonb,
+    usuario_id integer,
+    fecha timestamp without time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.recomendaciones OWNER TO joel;
+
+--
+-- Name: recomendaciones_id_seq; Type: SEQUENCE; Schema: public; Owner: joel
+--
+
+CREATE SEQUENCE public.recomendaciones_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.recomendaciones_id_seq OWNER TO joel;
+
+--
+-- Name: recomendaciones_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: joel
+--
+
+ALTER SEQUENCE public.recomendaciones_id_seq OWNED BY public.recomendaciones.id;
+
+
+--
 -- Name: respuesta_usuario; Type: TABLE; Schema: public; Owner: joel
 --
 
@@ -812,6 +890,46 @@ ALTER SEQUENCE public.rubrica_id_seq OWNED BY public.rubrica.id;
 
 
 --
+-- Name: solicitud_cambio_entrenador; Type: TABLE; Schema: public; Owner: joel
+--
+
+CREATE TABLE public.solicitud_cambio_entrenador (
+    id integer NOT NULL,
+    atleta_id integer NOT NULL,
+    entrenador_actual_id integer,
+    entrenador_deseado_id integer NOT NULL,
+    estado character varying(20),
+    comentario text,
+    fecha_solicitud timestamp without time zone,
+    fecha_resolucion timestamp without time zone
+);
+
+
+ALTER TABLE public.solicitud_cambio_entrenador OWNER TO joel;
+
+--
+-- Name: solicitud_cambio_entrenador_id_seq; Type: SEQUENCE; Schema: public; Owner: joel
+--
+
+CREATE SEQUENCE public.solicitud_cambio_entrenador_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.solicitud_cambio_entrenador_id_seq OWNER TO joel;
+
+--
+-- Name: solicitud_cambio_entrenador_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: joel
+--
+
+ALTER SEQUENCE public.solicitud_cambio_entrenador_id_seq OWNED BY public.solicitud_cambio_entrenador.id;
+
+
+--
 -- Name: usuario; Type: TABLE; Schema: public; Owner: joel
 --
 
@@ -828,6 +946,7 @@ CREATE TABLE public.usuario (
     avatar character varying(255) DEFAULT NULL::character varying,
     preferencias jsonb DEFAULT '{"tema": "claro", "idioma": "es", "notificacionesEmail": true}'::jsonb NOT NULL,
     provincia character varying(100),
+    entrenador_id integer,
     CONSTRAINT email_valido CHECK (((email)::text ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'::text))
 );
 
@@ -910,6 +1029,13 @@ ALTER SEQUENCE public.video_tutorial_id_seq OWNER TO joel;
 --
 
 ALTER SEQUENCE public.video_tutorial_id_seq OWNED BY public.video_tutorial.id;
+
+
+--
+-- Name: alertas id; Type: DEFAULT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.alertas ALTER COLUMN id SET DEFAULT nextval('public.alertas_id_seq'::regclass);
 
 
 --
@@ -1018,6 +1144,13 @@ ALTER TABLE ONLY public.pregunta ALTER COLUMN id SET DEFAULT nextval('public.pre
 
 
 --
+-- Name: recomendaciones id; Type: DEFAULT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.recomendaciones ALTER COLUMN id SET DEFAULT nextval('public.recomendaciones_id_seq'::regclass);
+
+
+--
 -- Name: respuesta_usuario id; Type: DEFAULT; Schema: public; Owner: joel
 --
 
@@ -1039,6 +1172,13 @@ ALTER TABLE ONLY public.rubrica ALTER COLUMN id SET DEFAULT nextval('public.rubr
 
 
 --
+-- Name: solicitud_cambio_entrenador id; Type: DEFAULT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.solicitud_cambio_entrenador ALTER COLUMN id SET DEFAULT nextval('public.solicitud_cambio_entrenador_id_seq'::regclass);
+
+
+--
 -- Name: usuario id; Type: DEFAULT; Schema: public; Owner: joel
 --
 
@@ -1050,6 +1190,18 @@ ALTER TABLE ONLY public.usuario ALTER COLUMN id SET DEFAULT nextval('public.usua
 --
 
 ALTER TABLE ONLY public.video_tutorial ALTER COLUMN id SET DEFAULT nextval('public.video_tutorial_id_seq'::regclass);
+
+
+--
+-- Data for Name: alertas; Type: TABLE DATA; Schema: public; Owner: joel
+--
+
+COPY public.alertas (id, tipo, mensaje, usuario_id, fecha, leida) FROM stdin;
+1	nuevo-talento	María Pérez ha completado el nivel avanzado de foil con un 95% de puntuación.	4	2026-07-01 02:14:21.514605	f
+2	logro-destacado	Juan Martínez obtuvo la insignia "Navegante Experto" después de 10 horas de navegación.	3	2026-06-30 04:14:21.514605	f
+3	recomendacion	Se recomienda a Ana García para el programa de alto rendimiento por su progreso excepcional.	7	2026-06-28 04:14:21.514605	t
+4	nuevo-talento	Carlos López ha completado 5 videos de técnica y muestra un progreso del 80%.	5	2026-06-30 16:14:21.514605	f
+\.
 
 
 --
@@ -1514,6 +1666,13 @@ COPY public.log_actividad (id, usuario_id, accion, detalles, ip, fecha) FROM std
 306	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-29 15:42:12.485074
 307	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-06-29 15:46:03.115222
 308	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-06-29 15:52:26.341249
+309	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-07-01 02:11:44.853404
+310	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-07-01 03:15:36.395782
+311	2	login	{"email": "entrenador@iqfoil.cu", "nombre": "Carlos Gómez"}	127.0.0.1	2026-07-01 03:16:41.519405
+312	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-07-01 03:18:12.584888
+313	1	login	{"email": "admin@iqfoil.cu", "nombre": "Administrador"}	127.0.0.1	2026-07-01 03:18:45.933331
+314	3	login	{"email": "atleta1@iqfoil.cu", "nombre": "Juan Pérez"}	127.0.0.1	2026-07-01 03:19:09.611492
+315	2	login	{"email": "entrenador@iqfoil.cu", "nombre": "Carlos Gómez"}	127.0.0.1	2026-07-01 03:19:27.097998
 \.
 
 
@@ -1541,6 +1700,8 @@ COPY public.mensaje_privado (id, conversacion_id, remitente_id, contenido, fecha
 --
 
 COPY public.mentoria (id, mentor_id, aprendiz_id, area, estado, fecha_inicio, fecha_solicitud) FROM stdin;
+1	2	3	General	activa	2026-06-29 18:50:56.378685	2026-06-29 18:50:56.378685
+2	2	5	General	activa	2026-06-29 18:50:56.378685	2026-06-29 18:50:56.378685
 \.
 
 
@@ -1895,6 +2056,17 @@ COPY public.puntuacion_evaluacion (evaluacion_id, criterio_id, puntuacion) FROM 
 
 
 --
+-- Data for Name: recomendaciones; Type: TABLE DATA; Schema: public; Owner: joel
+--
+
+COPY public.recomendaciones (id, tipo, titulo, descripcion, razon, meta, usuario_id, fecha) FROM stdin;
+1	curso	Técnicas de foils avanzadas	Domina las técnicas de foil en condiciones de viento fuerte y olas.	Has completado el nivel intermedio con un 85% de progreso.	{"nivel": "Avanzado", "duracion": "6 módulos"}	\N	2026-07-01 04:14:21.52907
+2	mentoria	Mentoría con Carlos Sainz	Sesiones personalizadas para mejorar tu estrategia de regata.	Has participado en 3 regatas y tu puntuación ha mejorado un 20%.	{"nivel": "Todos los niveles", "duracion": "4 sesiones"}	\N	2026-07-01 04:14:21.52907
+3	evento	Regata Nacional de Foil 2025	Participa en la competición nacional y pon a prueba tus habilidades.	Tu rendimiento en las últimas regatas te sitúa en el top 10 regional.	{"nivel": "Competitivo", "duracion": "3 días"}	\N	2026-07-01 04:14:21.52907
+\.
+
+
+--
 -- Data for Name: respuesta_usuario; Type: TABLE DATA; Schema: public; Owner: joel
 --
 
@@ -1910,6 +2082,8 @@ COPY public.rol (id, nombre, descripcion) FROM stdin;
 1	admin	Administrador del sistema
 2	entrenador	Entrenador o evaluador
 3	atleta	Usuario atleta
+4	entrenador_nacional	Entrenador con autoridad a nivel nacional
+5	entrenador_provincial	Entrenador con autoridad a nivel provincial
 \.
 
 
@@ -1923,20 +2097,29 @@ COPY public.rubrica (id, titulo, descripcion, creador_id, fecha_creacion) FROM s
 
 
 --
+-- Data for Name: solicitud_cambio_entrenador; Type: TABLE DATA; Schema: public; Owner: joel
+--
+
+COPY public.solicitud_cambio_entrenador (id, atleta_id, entrenador_actual_id, entrenador_deseado_id, estado, comentario, fecha_solicitud, fecha_resolucion) FROM stdin;
+\.
+
+
+--
 -- Data for Name: usuario; Type: TABLE DATA; Schema: public; Owner: joel
 --
 
-COPY public.usuario (id, email, password_hash, nombre, avatar_url, rol_id, activo, ultimo_acceso, fecha_registro, avatar, preferencias, provincia) FROM stdin;
-5	atleta3@iqfoil.cu	scrypt:32768:8:1$F24BJKFz5RJ2SihH$86704f4a09e724463afc5802484d254c9f4abcd92751e02f511156cd21c53fbadc99c5d0a2f98189526c86140e0a6644329460ffbaf9532369629b3046edc326	Pedro Rodríguez	\N	3	t	2026-06-19 18:45:40.218277	2026-06-19 17:41:16.556994	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara
-6	atleta4@iqfoil.cu	scrypt:32768:8:1$XvWsiScpcKzKHDtm$b7fa92667441851702f049edc2546b8b8c6f8c59f1ec9e47914dc455753d4177c393c3c853a219944c36f87921698a8f35c90d934dbdb62e5bc46ae06d7f91b3	Luis Fernández	\N	3	t	2026-06-25 18:19:40.116979	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Camagüey
-7	atleta5@iqfoil.cu	scrypt:32768:8:1$kXSFv4sBXPTEWIbc$86de0148d516c6ccfeb2c0f84a89e8729fb42c2d2d04d7c28eedd5ff29edcee1754cf3f982b73e13e8c95b06f54ccafce5118ae5ba5e0bc6289523eef2e00a3c	Ana Torres	\N	3	t	2026-06-24 23:22:13.17207	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba
-8	atleta6@iqfoil.cu	scrypt:32768:8:1$JPLigriBjuUooHKu$9af4b2bad7378a8e518222d0e9f711285aeb173c8b599df46f5fb36e329a2736d14d5014689750aea4addf84e939cd1afde21dd2175b98b2cba2235c3eb688e7	José Ramírez	\N	3	t	2026-06-21 18:42:16.637331	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Holguín
-9	atleta7@iqfoil.cu	scrypt:32768:8:1$ZY1jPhe4VaUBNgn6$983a03d9303edd19d874687b440184d7b0d9386610d11227040900438b620fadc8ad5a20821ab293c1fba07c63972504f7188a0fec4181cb95ac6de038902fa2	Marta Díaz	\N	3	t	2026-06-23 02:23:45.769195	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara
-10	atleta8@iqfoil.cu	scrypt:32768:8:1$pkDAzkoBNXgCPka0$b8cbf19a7b9b7df16d55ea9f807a034ffcc098b28086e1dae6a95b9aa661d3f287e7c2051ff4140918bcf372c8af93e1e8414386912f48d50d1a56a1ff04959b	Roberto Mena	\N	3	t	2026-06-26 09:58:44.213322	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
-2	entrenador@iqfoil.cu	scrypt:32768:8:1$s9LtZkIsgV5esacm$a4eefee377931a07b4ab57275f816f6654eac3f219a8d4d8afe2b5ae080ac21949ba9b661f615c78d63bea8e6993dc8ecdf497e134518755080a36713a43e931	Carlos Gómez	\N	2	t	2026-06-29 13:54:55.747113	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "contraste": "normal", "tamanoFuente": "mediano", "notificacionesEmail": true}	La Habana
-1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-06-29 15:46:03.253202	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana
-3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-06-29 15:52:26.511171	2026-06-01 22:20:05.081416	\N	{"tema": "sistema", "idioma": "es", "notificacionesEmail": true}	La Habana
-4	atleta2@iqfoil.cu	scrypt:32768:8:1$RH5ISwhSV192lBIf$9a36bc43f038529911c650c94e24fce1caf515c74d955b9452b223316de339f7fe1e2fc818db2a453be7dd1717384a600ec2b6b5d4fb53149e738fa265c7f4b8	María García	\N	3	t	2026-06-26 11:41:28.094673	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba
+COPY public.usuario (id, email, password_hash, nombre, avatar_url, rol_id, activo, ultimo_acceso, fecha_registro, avatar, preferencias, provincia, entrenador_id) FROM stdin;
+6	atleta4@iqfoil.cu	scrypt:32768:8:1$XvWsiScpcKzKHDtm$b7fa92667441851702f049edc2546b8b8c6f8c59f1ec9e47914dc455753d4177c393c3c853a219944c36f87921698a8f35c90d934dbdb62e5bc46ae06d7f91b3	Luis Fernández	\N	3	t	2026-06-25 18:19:40.116979	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Camagüey	\N
+7	atleta5@iqfoil.cu	scrypt:32768:8:1$kXSFv4sBXPTEWIbc$86de0148d516c6ccfeb2c0f84a89e8729fb42c2d2d04d7c28eedd5ff29edcee1754cf3f982b73e13e8c95b06f54ccafce5118ae5ba5e0bc6289523eef2e00a3c	Ana Torres	\N	3	t	2026-06-24 23:22:13.17207	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba	\N
+8	atleta6@iqfoil.cu	scrypt:32768:8:1$JPLigriBjuUooHKu$9af4b2bad7378a8e518222d0e9f711285aeb173c8b599df46f5fb36e329a2736d14d5014689750aea4addf84e939cd1afde21dd2175b98b2cba2235c3eb688e7	José Ramírez	\N	3	t	2026-06-21 18:42:16.637331	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Holguín	\N
+9	atleta7@iqfoil.cu	scrypt:32768:8:1$ZY1jPhe4VaUBNgn6$983a03d9303edd19d874687b440184d7b0d9386610d11227040900438b620fadc8ad5a20821ab293c1fba07c63972504f7188a0fec4181cb95ac6de038902fa2	Marta Díaz	\N	3	t	2026-06-23 02:23:45.769195	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara	\N
+10	atleta8@iqfoil.cu	scrypt:32768:8:1$pkDAzkoBNXgCPka0$b8cbf19a7b9b7df16d55ea9f807a034ffcc098b28086e1dae6a95b9aa661d3f287e7c2051ff4140918bcf372c8af93e1e8414386912f48d50d1a56a1ff04959b	Roberto Mena	\N	3	t	2026-06-26 09:58:44.213322	2026-06-19 20:00:14.933259	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana	\N
+5	atleta3@iqfoil.cu	scrypt:32768:8:1$F24BJKFz5RJ2SihH$86704f4a09e724463afc5802484d254c9f4abcd92751e02f511156cd21c53fbadc99c5d0a2f98189526c86140e0a6644329460ffbaf9532369629b3046edc326	Pedro Rodríguez	\N	3	t	2026-06-19 18:45:40.218277	2026-06-19 17:41:16.556994	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Villa Clara	2
+1	admin@iqfoil.cu	scrypt:32768:8:1$VT4JiKLKk40tMPFE$3cc794ca61f444d35aad6d1a81e18aef7d3781d741c95eb22ce3120f8c29cd035507f960281bb0be6e8dcaeb09466b92cdc9b6707a2637b757e1d32ed7a43ad7	Administrador	\N	1	t	2026-07-01 03:18:46.086561	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana	\N
+3	atleta1@iqfoil.cu	scrypt:32768:8:1$ZdgwSvRctEglinIi$ad33c68da4378825633e8b346efd128aaceb3a0f87aa8027447e1641039b08ccb0c7e8ccd83f2ec17cd584ffbe119d32231d270cc672e23484e150d047aaa3e7	Juan Pérez	\N	3	t	2026-07-01 03:19:09.780616	2026-06-01 22:20:05.081416	\N	{"tema": "sistema", "idioma": "es", "notificacionesEmail": true}	La Habana	2
+11	provincial@iqfoil.cu	scrypt:32768:8:1$0NkHD5eEh96V7APd$548059c274071aa6b73c74abf3fa87da0d2367815fb29709bbcacca8f41c03d5a188a4a4d6d51e483b5ed6e361f62a27677653cadb5b1b6e65300a98321f3abf	Entrenador Provincial	\N	5	t	\N	2026-07-01 01:57:27.782568	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	La Habana	\N
+4	atleta2@iqfoil.cu	scrypt:32768:8:1$RH5ISwhSV192lBIf$9a36bc43f038529911c650c94e24fce1caf515c74d955b9452b223316de339f7fe1e2fc818db2a453be7dd1717384a600ec2b6b5d4fb53149e738fa265c7f4b8	María García	\N	3	t	2026-06-26 11:41:28.094673	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "notificacionesEmail": true}	Santiago de Cuba	\N
+2	entrenador@iqfoil.cu	scrypt:32768:8:1$s9LtZkIsgV5esacm$a4eefee377931a07b4ab57275f816f6654eac3f219a8d4d8afe2b5ae080ac21949ba9b661f615c78d63bea8e6993dc8ecdf497e134518755080a36713a43e931	Carlos Gómez	\N	4	t	2026-07-01 03:19:27.247601	2026-06-01 22:20:05.081416	\N	{"tema": "claro", "idioma": "es", "contraste": "normal", "tamanoFuente": "mediano", "notificacionesEmail": true}	La Habana	\N
 \.
 
 
@@ -1994,6 +2177,13 @@ COPY public.video_tutorial (id, titulo, descripcion, url_video, duracion_seg, ni
 36	IQFOIL Zero to Hero - Episodio 3 - Primer gybe en foil y día de práctica	Primer gybe en foil y día de práctica - episodio 3.	uploads/videos/IQFOIL Zero to Hero - Episode 3_ First Foil Gybe and Day of Practice(360P).mp4	0	principiante	\N	2026-06-26 10:42:48.341046	t
 37	IQFOIL Zero to Hero - Episodio 4 - Navegando en una tormenta tropical del monzón del sureste	Navegando en tormenta tropical - episodio 4.	uploads/videos/IQFOIL Zero to Hero - Episode 4_ Foiling in a South East Monsoon Tropical Storm(360P).mp4	0	intermedio	\N	2026-06-26 10:42:48.341046	t
 \.
+
+
+--
+-- Name: alertas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
+--
+
+SELECT pg_catalog.setval('public.alertas_id_seq', 4, true);
 
 
 --
@@ -2070,7 +2260,7 @@ SELECT pg_catalog.setval('public.insignia_id_seq', 4, true);
 -- Name: log_actividad_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.log_actividad_id_seq', 308, true);
+SELECT pg_catalog.setval('public.log_actividad_id_seq', 315, true);
 
 
 --
@@ -2091,7 +2281,7 @@ SELECT pg_catalog.setval('public.mensaje_privado_id_seq', 1, false);
 -- Name: mentoria_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.mentoria_id_seq', 1, false);
+SELECT pg_catalog.setval('public.mentoria_id_seq', 6, true);
 
 
 --
@@ -2099,6 +2289,13 @@ SELECT pg_catalog.setval('public.mentoria_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.pregunta_id_seq', 10, true);
+
+
+--
+-- Name: recomendaciones_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
+--
+
+SELECT pg_catalog.setval('public.recomendaciones_id_seq', 3, true);
 
 
 --
@@ -2123,10 +2320,17 @@ SELECT pg_catalog.setval('public.rubrica_id_seq', 3, true);
 
 
 --
+-- Name: solicitud_cambio_entrenador_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
+--
+
+SELECT pg_catalog.setval('public.solicitud_cambio_entrenador_id_seq', 1, false);
+
+
+--
 -- Name: usuario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: joel
 --
 
-SELECT pg_catalog.setval('public.usuario_id_seq', 5, true);
+SELECT pg_catalog.setval('public.usuario_id_seq', 11, true);
 
 
 --
@@ -2134,6 +2338,14 @@ SELECT pg_catalog.setval('public.usuario_id_seq', 5, true);
 --
 
 SELECT pg_catalog.setval('public.video_tutorial_id_seq', 49, true);
+
+
+--
+-- Name: alertas alertas_pkey; Type: CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.alertas
+    ADD CONSTRAINT alertas_pkey PRIMARY KEY (id);
 
 
 --
@@ -2297,6 +2509,14 @@ ALTER TABLE ONLY public.puntuacion_evaluacion
 
 
 --
+-- Name: recomendaciones recomendaciones_pkey; Type: CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.recomendaciones
+    ADD CONSTRAINT recomendaciones_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: respuesta_usuario respuesta_usuario_pkey; Type: CONSTRAINT; Schema: public; Owner: joel
 --
 
@@ -2326,6 +2546,14 @@ ALTER TABLE ONLY public.rol
 
 ALTER TABLE ONLY public.rubrica
     ADD CONSTRAINT rubrica_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: solicitud_cambio_entrenador solicitud_cambio_entrenador_pkey; Type: CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.solicitud_cambio_entrenador
+    ADD CONSTRAINT solicitud_cambio_entrenador_pkey PRIMARY KEY (id);
 
 
 --
@@ -2529,6 +2757,14 @@ CREATE INDEX idx_video_nivel ON public.video_tutorial USING btree (nivel);
 
 
 --
+-- Name: alertas alertas_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.alertas
+    ADD CONSTRAINT alertas_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuario(id) ON DELETE CASCADE;
+
+
+--
 -- Name: configuracion_usuario configuracion_usuario_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
 --
 
@@ -2606,6 +2842,14 @@ ALTER TABLE ONLY public.evento
 
 ALTER TABLE ONLY public.examen_teorico
     ADD CONSTRAINT examen_teorico_creado_por_fkey FOREIGN KEY (creado_por) REFERENCES public.usuario(id) ON DELETE SET NULL;
+
+
+--
+-- Name: usuario fk_usuario_entrenador; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.usuario
+    ADD CONSTRAINT fk_usuario_entrenador FOREIGN KEY (entrenador_id) REFERENCES public.usuario(id) ON DELETE SET NULL;
 
 
 --
@@ -2737,6 +2981,14 @@ ALTER TABLE ONLY public.puntuacion_evaluacion
 
 
 --
+-- Name: recomendaciones recomendaciones_usuario_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.recomendaciones
+    ADD CONSTRAINT recomendaciones_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuario(id) ON DELETE CASCADE;
+
+
+--
 -- Name: respuesta_usuario respuesta_usuario_examen_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
 --
 
@@ -2758,6 +3010,30 @@ ALTER TABLE ONLY public.respuesta_usuario
 
 ALTER TABLE ONLY public.rubrica
     ADD CONSTRAINT rubrica_creador_id_fkey FOREIGN KEY (creador_id) REFERENCES public.usuario(id) ON DELETE SET NULL;
+
+
+--
+-- Name: solicitud_cambio_entrenador solicitud_cambio_entrenador_atleta_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.solicitud_cambio_entrenador
+    ADD CONSTRAINT solicitud_cambio_entrenador_atleta_id_fkey FOREIGN KEY (atleta_id) REFERENCES public.usuario(id);
+
+
+--
+-- Name: solicitud_cambio_entrenador solicitud_cambio_entrenador_entrenador_actual_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.solicitud_cambio_entrenador
+    ADD CONSTRAINT solicitud_cambio_entrenador_entrenador_actual_id_fkey FOREIGN KEY (entrenador_actual_id) REFERENCES public.usuario(id);
+
+
+--
+-- Name: solicitud_cambio_entrenador solicitud_cambio_entrenador_entrenador_deseado_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: joel
+--
+
+ALTER TABLE ONLY public.solicitud_cambio_entrenador
+    ADD CONSTRAINT solicitud_cambio_entrenador_entrenador_deseado_id_fkey FOREIGN KEY (entrenador_deseado_id) REFERENCES public.usuario(id);
 
 
 --
@@ -2788,5 +3064,5 @@ ALTER TABLE ONLY public.usuario
 -- PostgreSQL database dump complete
 --
 
-\unrestrict Kc6YXOv3KZ6PafcYx4r56n0qDKlNodSEGtMbwNVfAAwZctj12mJeVsoB0jbyZ5r
+\unrestrict doWjukcdFQnE6dkAKbCJZwQCFkIuOP9KGmDOCfAzhuk5BKfaSdJBaDZaa8Gn40O
 

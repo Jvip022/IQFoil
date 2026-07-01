@@ -34,6 +34,24 @@
         <div class="card mb-3">
           <div class="card-header">📈 Progreso de {{ progresoIndividual.nombre }}</div>
           <div class="card-body">
+            <!-- Filtros -->
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label>Atleta:</label>
+                <select class="form-control" [(ngModel)]="usuarioSeleccionadoId" (change)="cargarProgresoIndividual()">
+                  <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nombre }}</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label>Fecha inicio:</label>
+                <input type="date" class="form-control" [(ngModel)]="filtroProgresoFechaInicio" (change)="aplicarFiltrosProgreso()">
+              </div>
+              <div class="col-md-3">
+                <label>Fecha fin:</label>
+                <input type="date" class="form-control" [(ngModel)]="filtroProgresoFechaFin" (change)="aplicarFiltrosProgreso()">
+              </div>
+            </div>
+            <!-- Datos -->
             <div class="row">
               <div class="col-md-6">
                 <p><strong>Progreso global:</strong> {{ progresoIndividual.progreso_global }}%</p>
@@ -60,6 +78,21 @@
         <div class="card">
           <div class="card-header">🏙️ Comparativo por provincia</div>
           <div class="card-body">
+            <!-- Filtros -->
+            <div class="row mb-3">
+              <div class="col-md-3">
+                <label>Provincia:</label>
+                <select class="form-control" [(ngModel)]="filtroProvincia" (change)="aplicarFiltrosComparativo()">
+                  <option value="">Todas</option>
+                  <option *ngFor="let p of getProvincias()" [value]="p">{{ p }}</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label>Progreso mínimo (%):</label>
+                <input type="number" class="form-control" [(ngModel)]="filtroProgresoMinimo" (change)="aplicarFiltrosComparativo()" min="0" max="100">
+              </div>
+            </div>
+            <!-- Tabla y gráfica -->
             <div class="row">
               <div class="col-md-7">
                 <table class="table table-striped table-sm">
@@ -72,7 +105,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let item of comparativo">
+                    <tr *ngFor="let item of comparativoFiltrado">
                       <td>{{ item.nombre }}</td>
                       <td>{{ item.provincia }}</td>
                       <td>{{ item.progreso_global }}%</td>
@@ -93,9 +126,17 @@
 
       <!-- ========== TALENTOS ========== -->
       <div id="seccion-talentos" *ngIf="tabActivo === 'talentos'">
-        <div class="card" *ngIf="talentos.length > 0; else sinTalentos">
+        <div class="card" *ngIf="talentosFiltrados.length > 0; else sinTalentos">
           <div class="card-header">🌟 Talentos detectados</div>
           <div class="card-body">
+            <!-- Filtro -->
+            <div class="row mb-3">
+              <div class="col-md-3">
+                <label>Score mínimo:</label>
+                <input type="number" class="form-control" [(ngModel)]="filtroScoreMinimo" (change)="aplicarFiltrosTalentos()" min="0">
+              </div>
+            </div>
+            <!-- Tabla y gráfica -->
             <div class="row">
               <div class="col-md-7">
                 <table class="table table-sm">
@@ -109,7 +150,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr *ngFor="let t of talentos">
+                    <tr *ngFor="let t of talentosFiltrados">
                       <td>{{ t.nombre }}</td>
                       <td>{{ t.progreso }}%</td>
                       <td>{{ t.insignias }}</td>
@@ -133,8 +174,7 @@
             <div class="card-body">
               <div class="alert alert-info">
                 <strong>ℹ️ No se detectaron talentos con el umbral actual.</strong>
-                <p class="mb-0">Esto puede deberse a que los atletas aún no han alcanzado el nivel necesario.
-                  Sigue motivándolos a completar videos, obtener insignias y mejorar sus evaluaciones.</p>
+                <p class="mb-0">Ajusta el filtro de score mínimo para ver más resultados.</p>
               </div>
             </div>
           </div>
@@ -146,6 +186,17 @@
         <div class="card">
           <div class="card-header">📊 Uso de la plataforma</div>
           <div class="card-body">
+            <!-- Filtro por mes -->
+            <div class="row mb-3">
+              <div class="col-md-3">
+                <label>Mes:</label>
+                <select class="form-control" [(ngModel)]="filtroMes" (change)="aplicarFiltrosUso()">
+                  <option value="">Todos</option>
+                  <option *ngFor="let m of getMeses()" [value]="m">{{ m }}</option>
+                </select>
+              </div>
+            </div>
+            <!-- Métricas generales -->
             <p>Usuarios totales: {{ usoPlataforma.usuarios_totales }}</p>
             <p>Usuarios activos último mes: {{ usoPlataforma.usuarios_activos_mes }}</p>
             <p>Total videos: {{ usoPlataforma.total_videos }}</p>
@@ -154,7 +205,7 @@
             <p>Evaluaciones realizadas: {{ usoPlataforma.evaluaciones_realizadas }}</p>
             <h5>Actividad mensual</h5>
             <table class="table">
-              <tr *ngFor="let m of usoPlataforma.uso_mensual">
+              <tr *ngFor="let m of usoPlataforma.uso_mensual" [hidden]="filtroMes && m.mes !== filtroMes">
                 <td>{{ m.mes }}</td>
                 <td>{{ m.actividades }} actividades</td>
               </tr>
@@ -168,7 +219,22 @@
         <div class="card">
           <div class="card-header">📄 Documentos desactualizados (>180 días)</div>
           <div class="card-body">
-            <div *ngIf="documentosDesactualizados.length > 0; else sinDocumentos">
+            <!-- Filtros -->
+            <div class="row mb-3">
+              <div class="col-md-3">
+                <label>Tipo:</label>
+                <select class="form-control" [(ngModel)]="filtroTipoDocumento" (change)="aplicarFiltrosDocumentos()">
+                  <option value="">Todos</option>
+                  <option *ngFor="let t of getTiposDocumento()" [value]="t">{{ t }}</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label>Días mínimos:</label>
+                <input type="number" class="form-control" [(ngModel)]="filtroDiasMinimos" (change)="aplicarFiltrosDocumentos()" min="0">
+              </div>
+            </div>
+            <!-- Tabla -->
+            <div *ngIf="documentosFiltrados.length > 0; else sinDocumentos">
               <table class="table">
                 <thead>
                   <tr>
@@ -179,7 +245,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let doc of documentosDesactualizados">
+                  <tr *ngFor="let doc of documentosFiltrados">
                     <td>{{ doc.titulo }}</td>
                     <td>{{ doc.tipo }}</td>
                     <td>{{ doc.autor }}</td>
@@ -190,7 +256,7 @@
             </div>
             <ng-template #sinDocumentos>
               <div class="alert alert-success">
-                <strong>✅ No hay documentos desactualizados.</strong> Todos los documentos están al día.
+                <strong>✅ No hay documentos que coincidan con los filtros.</strong>
               </div>
             </ng-template>
           </div>
@@ -205,11 +271,23 @@
           </div>
           <div class="card-body">
             <div class="row mb-3">
-              <div class="col-md-6">
-                <label>Seleccionar atleta:</label>
+              <div class="col-md-3">
+                <label>Atleta:</label>
                 <select class="form-control" [(ngModel)]="usuarioSeleccionadoId" (change)="cargarDatosGraficas()">
                   <option *ngFor="let u of usuarios" [value]="u.id">{{ u.nombre }}</option>
                 </select>
+              </div>
+              <div class="col-md-2">
+                <label>Top N atletas:</label>
+                <input type="number" class="form-control" [(ngModel)]="topAtletasMostrar" (change)="dibujarPeso()" min="1" max="50">
+              </div>
+              <div class="col-md-3">
+                <label>Fecha inicio:</label>
+                <input type="date" class="form-control" [(ngModel)]="filtroGraficasFechaInicio" (change)="aplicarFiltrosGraficas()">
+              </div>
+              <div class="col-md-3">
+                <label>Fecha fin:</label>
+                <input type="date" class="form-control" [(ngModel)]="filtroGraficasFechaFin" (change)="aplicarFiltrosGraficas()">
               </div>
             </div>
             <div class="row">

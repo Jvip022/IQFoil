@@ -1,14 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription, Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
-// Servicios
 import { TalentoService, Recomendacion } from '../../../core/services/talento.service';
 import { NotificacionService } from '../../../core/services/notificacion.service';
+import { AuthService } from '../../../core/services/auth.service';
 
-// Componentes compartidos
 import { EstadoConexionComponent } from '../../../shared/estado-conexion/estado-conexion.component';
 import { LoadingSpinnerComponent } from '../../../shared/loading-spinner/loading-spinner.component';
 import { ModalConfirmacionComponent } from '../../../shared/modal-confirmacion/modal-confirmacion.component';
@@ -40,7 +38,8 @@ export class RecomendacionesComponent implements OnInit, OnDestroy {
 
   constructor(
     private talentoService: TalentoService,
-    private notificacionService: NotificacionService
+    private notificacionService: NotificacionService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -58,26 +57,56 @@ export class RecomendacionesComponent implements OnInit, OnDestroy {
     return this.recomendaciones.filter(r => r.tipo === this.filtroTipo);
   }
 
+  // ============================================================
+  // CARGAR RECOMENDACIONES (con usuario real o mock)
+  // ============================================================
   cargarRecomendaciones(): void {
     this.cargando = true;
-    const usuarioId = '123'; // Simulado
-    this.talentoService.getRecomendaciones(usuarioId).subscribe({
-      next: (recomendaciones: Recomendacion[]) => {
-        this.recomendaciones = recomendaciones;
-        this.cargando = false;
+
+    // Obtener el usuario autenticado
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        const usuarioId = user?.uid || 'default-user';
+        this.talentoService.getRecomendaciones(usuarioId).subscribe({
+          next: (recomendaciones) => {
+            this.recomendaciones = recomendaciones;
+            this.cargando = false;
+          },
+          error: (err) => {
+            console.error('Error cargando recomendaciones', err);
+            this.notificacionService.mostrarError('No se pudieron cargar las recomendaciones');
+            this.cargando = false;
+          }
+        });
       },
-      error: (err: any) => {
-        console.error('Error cargando recomendaciones', err);
-        this.notificacionService.mostrarError('No se pudieron cargar las recomendaciones');
-        this.cargando = false;
+      error: () => {
+        // Fallback: usar usuario por defecto si no se puede obtener
+        this.talentoService.getRecomendaciones('default-user').subscribe({
+          next: (recomendaciones) => {
+            this.recomendaciones = recomendaciones;
+            this.cargando = false;
+          },
+          error: (err) => {
+            console.error('Error cargando recomendaciones (fallback)', err);
+            this.notificacionService.mostrarError('Error al cargar recomendaciones');
+            this.cargando = false;
+          }
+        });
       }
     });
   }
 
+  // ============================================================
+  // REFRESCAR
+  // ============================================================
   refrescarRecomendaciones(): void {
+    this.notificacionService.mostrarInfo('Actualizando recomendaciones...');
     this.cargarRecomendaciones();
   }
 
+  // ============================================================
+  // OBTENER TEXTO DEL TIPO
+  // ============================================================
   getTipoTexto(tipo: string): string {
     const textos: Record<string, string> = {
       curso: 'Curso',
@@ -87,6 +116,9 @@ export class RecomendacionesComponent implements OnInit, OnDestroy {
     return textos[tipo] || 'Recomendación';
   }
 
+  // ============================================================
+  // INTERÉS EN RECOMENDACIÓN
+  // ============================================================
   interesado(recomendacion: Recomendacion): void {
     this.recomendacionSeleccionada = recomendacion;
     this.modalMensaje = `¿Estás interesado en "${recomendacion.titulo}"? Te notificaremos cuando haya más información.`;
@@ -95,6 +127,7 @@ export class RecomendacionesComponent implements OnInit, OnDestroy {
 
   confirmarInteres(): void {
     if (this.recomendacionSeleccionada) {
+      // Aquí se podría llamar a un servicio para registrar el interés
       console.log('Interés registrado para:', this.recomendacionSeleccionada);
       this.notificacionService.mostrarExito('¡Interés registrado! Te mantendremos informado.');
     }
